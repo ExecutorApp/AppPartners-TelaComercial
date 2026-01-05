@@ -4,23 +4,13 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 
 // Lista de vídeos de exemplo usados em Treinamento e no Player
 export const videoSources = [
-  { id: 1, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video01.mp4' },
-  { id: 2, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video02.mp4' },
-  { id: 3, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video03.mp4' },
-  { id: 4, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video04.mp4' },
-  { id: 5, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video05.mp4' },
-  { id: 6, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: '/Video06.mp4' },
+  { id: 1, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4' },
+  { id: 2, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+  { id: 3, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
+  { id: 4, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' },
+  { id: 5, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4' },
+  { id: 6, title: 'Protege o patrimônio familiar e empresarial. Facilita sucessão e herança sem litígios.', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
 ];
-
-// Requires estáticos para cada vídeo — garantem path válido e Content-Type correto no Web
-export const videoModules: { [key: number]: any } = {
-  1: require('../../../assets/Video01.mp4'),
-  2: require('../../../assets/Video02.mp4'),
-  3: require('../../../assets/Video03.mp4'),
-  4: require('../../../assets/Video04.mp4'),
-  5: require('../../../assets/Video05.mp4'),
-  6: require('../../../assets/Video06.mp4'),
-};
 
 // Posters estáticos de fallback para os vídeos
 export const posterModules: { [key: number]: any } = {
@@ -30,23 +20,7 @@ export const posterModules: { [key: number]: any } = {
 
 // Resolve a URI do vídeo considerando diferenças Web/Mobile
 export const resolveVideoUri = (video: { id?: number; uri?: string }): string => {
-  const id = video.id;
-  if (id && videoModules[id]) {
-    try {
-      const asset = Asset.fromModule(videoModules[id]);
-      return asset.localUri ?? asset.uri;
-    } catch (e) {
-      // Fallback para URI bruta
-    }
-  }
   return video.uri || '';
-};
-
-// Pré-carrega os assets de vídeo para evitar atrasos iniciais
-export const preloadVideoAssets = async () => {
-  try {
-    await Asset.loadAsync(Object.values(videoModules));
-  } catch {}
 };
 
 // Carrega durações dos vídeos (suporte principal no Web)

@@ -21,7 +21,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Svg, { Path } from 'react-native-svg';
 import TrainingScreen from './4.TrainingScreen';
-import { videoSources, videoModules, posterModules, resolveVideoUri } from './videoLibrary';
+import { videoSources, posterModules, resolveVideoUri } from './videoLibrary';
 
 
 // **DEBUG EXTENSIVO**: Log inicial dos vídeos
@@ -203,16 +203,11 @@ const VideoPlayerScreen: React.FC<VideoPlayerScreenProps> = ({ route }) => {
     posterSource
   });
   
-  // Pré-carregar assets de vídeo (web/mobile) dentro do componente para evitar erro de hooks
   useEffect(() => {
     (async () => {
       try {
-        console.log('🎬 [ASSET] Pré-carregando vídeos…');
-        await Asset.loadAsync(Object.values(videoModules));
-        console.log('🎬 [ASSET] Pré-carregados com sucesso.');
-      } catch (e) {
-        console.warn('🎬 [ASSET] Falha ao pré-carregar vídeos:', e);
-      }
+        await Asset.loadAsync(Object.values(posterModules));
+      } catch {}
     })();
   }, []);
   
