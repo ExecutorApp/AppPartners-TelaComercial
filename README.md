@@ -1,0 +1,1 @@
+# Partner-10.Vendas
