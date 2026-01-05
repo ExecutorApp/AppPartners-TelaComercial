@@ -1,0 +1,34 @@
+[33m77cbc97[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msafety/estado-atual-2026-01-05[m[33m, [m[1;32mmain[m[33m)[m HEAD@{2026-01-05 15:10:57 -0300}: checkout: moving from main to safety/estado-atual-2026-01-05
+[33m77cbc97[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msafety/estado-atual-2026-01-05[m[33m, [m[1;32mmain[m[33m)[m HEAD@{2026-01-05 15:10:36 -0300}: reset: moving to HEAD
+[33m77cbc97[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msafety/estado-atual-2026-01-05[m[33m, [m[1;32mmain[m[33m)[m HEAD@{2026-01-05 13:44:22 -0300}: commit: Restauração: estado de hoje antes das operações (remove efeitos de Vendas 6062 e reset para 21%)
+[33mbd7ff22[m[33m ([m[1;32mbackup/pre-restore-2026-01-05[m[33m)[m HEAD@{2026-01-05 13:38:29 -0300}: reset: moving to HEAD
+[33mbd7ff22[m[33m ([m[1;32mbackup/pre-restore-2026-01-05[m[33m)[m HEAD@{2026-01-05 10:06:20 -0300}: commit: Vendas - 62%
+[33m99b2864[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2026-01-05 10:04:33 -0300}: commit: Vendas - 61%
+[33m2f5eb6f[m HEAD@{2026-01-05 09:52:07 -0300}: commit: Vendas - 60%
+[33m4283d19[m HEAD@{2026-01-05 09:50:49 -0300}: reset: moving to origin/main
+[33m8252b02[m HEAD@{2026-01-05 09:47:11 -0300}: commit: Vendas - 60%
+[33m0ce223d[m HEAD@{2026-01-05 09:35:43 -0300}: reset: moving to HEAD
+[33m0ce223d[m HEAD@{2025-12-10 16:27:44 -0300}: commit: Vendas - 22%
+[33m4283d19[m HEAD@{2025-12-10 16:22:39 -0300}: commit: Vendas - 21%
+[33m6dbc31b[m HEAD@{2025-12-10 16:20:14 -0300}: reset: moving to HEAD
+[33m6dbc31b[m HEAD@{2025-12-10 16:15:59 -0300}: commit: Vendas - 20%
+[33m013ec55[m HEAD@{2025-12-10 16:14:30 -0300}: reset: moving to HEAD~1
+[33m2c5331a[m HEAD@{2025-12-10 16:06:38 -0300}: commit: Vendas - 20%
+[33m013ec55[m HEAD@{2025-12-10 15:49:43 -0300}: reset: moving to origin/main
+[33m15af456[m HEAD@{2025-12-10 15:44:32 -0300}: commit: Vendas - 20%
+[33m7719976[m HEAD@{2025-12-02 17:55:37 -0300}: commit: Vendas 5%
+[33mb40913a[m HEAD@{2025-11-27 17:09:26 -0300}: commit: Agenda 93%
+[33m588d13b[m HEAD@{2025-11-22 15:38:42 -0300}: commit: Agenda 92%
+[33ma0e2116[m HEAD@{2025-11-22 15:17:34 -0300}: commit: Agenda 92%
+[33mdcd097d[m HEAD@{2025-11-21 14:13:00 -0300}: commit: Agenda 91%
+[33mae04a56[m HEAD@{2025-11-18 15:07:44 -0300}: commit: Agenda 90%
+[33m41975fd[m HEAD@{2025-11-13 18:11:23 -0300}: commit: Agenda - 65%
+[33m077e92c[m HEAD@{2025-11-13 15:34:25 -0300}: commit: Agenda - 60%
+[33m911bc4c[m HEAD@{2025-11-13 08:08:04 -0300}: commit: Agenda - 50%
+[33med22130[m HEAD@{2025-11-03 17:37:57 -0300}: commit: Vídeo - 93%
+[33mf154030[m HEAD@{2025-11-03 08:29:10 -0300}: commit: Player de Vídeo - 90%
+[33m16bfd8a[m HEAD@{2025-10-31 11:56:26 -0300}: commit: Player Vídeo 50%
+[33m013ec55[m HEAD@{2025-10-29 17:27:28 -0300}: commit: Produtos - Menu inferior Ok
+[33m746d4f9[m HEAD@{2025-10-29 10:49:04 -0300}: commit: Produto - Tela 02 Pronta
+[33m89d88a6[m HEAD@{2025-10-29 10:21:05 -0300}: commit: Tela - Produto 10%
+[33m9d8e25e[m HEAD@{2025-10-27 07:40:45 -0300}: commit (initial): chore: initial import

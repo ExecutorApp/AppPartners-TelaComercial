@@ -1,0 +1,185 @@
+<div style={{width: 223, paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, left: 0, top: 0, position: 'absolute', background: '#FCFCFC', borderRadius: 12, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', paddingRight: 5, justifyContent: 'flex-end', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+    <div style={{flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+      <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 18, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Desconto</div>
+    </div>
+    <div style={{position: 'relative', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+      <div data-svg-wrapper>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="6" fill="#1777CF"/>
+        <path d="M22 24L22.0127 24.1309C22.0383 24.2589 22.1016 24.3779 22.1953 24.4717L22.2969 24.5547C22.3694 24.603 22.4507 24.6363 22.5361 24.6533L22.667 24.667C22.8012 24.6669 22.9305 24.625 23.04 24.5508L23.1377 24.4717C23.2314 24.378 23.2947 24.2589 23.3203 24.1309L23.333 24V23.333M22 24H21.334M22 24H21.6572M22 24V23.334M23.333 23.333L24.2412 24.2412M23.333 23.333L24 22.667M23.333 23.333L24.2412 24.2412M23.333 23.333L24 22.667M23.333 23.333V22.667C23.333 22.4902 23.2627 22.3203 23.1377 22.1953C23.0438 22.1015 22.9251 22.0382 22.7969 22.0127L22.667 22C22.4902 22 22.3203 22.0703 22.1953 22.1953M24.2412 24.2412C23.9646 24.5178 23.6614 24.7698 23.333 24.9893C22.8286 25.3262 22.2785 25.5816 21.7031 25.752C21.5963 25.6932 21.4946 25.6248 21.3994 25.5469L21.2529 25.4141C21.1663 25.3275 21.089 25.2332 21.0205 25.1338M24.2412 24.2412C24.3912 24.0912 24.5339 23.9344 24.667 23.7695V22.667C24.667 22.4684 24.6367 22.2726 24.5801 22.0859M21.0205 25.1338L20.8848 24.4482M21.0205 25.1338C20.9034 24.9637 20.8117 24.7778 20.752 24.5811M21.0205 25.1338L20.8848 24.4482M20.8848 24.4482L21.334 24M20.8848 24.4482L20.752 24.5811M21.334 24H21.6572M21.334 24L21.5615 23.7715M20.752 24.5811L21.5615 23.7715M20.752 24.5811V24.5801M20.752 24.5801L21.5615 23.7705M20.752 24.5801L21.999 23.333M20.752 24.5801C20.6995 24.4069 20.6728 24.2258 20.6689 24.042L20.667 24V22.667C20.667 22.203 20.8277 21.7552 21.1191 21.3994L21.2529 21.2529M21.5615 23.7705V23.7715M21.5615 23.7705V23.7715M21.5615 23.7705L21.999 23.333M21.5615 23.7715L21.6572 24M21.5615 23.7715L22 23.334M21.5615 23.7715L21.6572 24M21.5615 23.7715L22 23.334M15.7539 24.2461L15.6553 24.1426M15.7539 24.2461L15.998 24.001M15.7539 24.2461C15.8918 24.384 16.0362 24.5139 16.1855 24.6367L16.2559 24.6162C16.3366 24.5827 16.4098 24.5335 16.4717 24.4717L19.9883 20.9541L19.9893 20.0098M15.7539 24.2461L15.998 24.001M15.6553 24.1426L15.998 24.001M15.6553 24.1426C15.5536 24.0359 15.4553 23.9266 15.3623 23.8135L15.3838 23.7441C15.4006 23.7037 15.4211 23.6651 15.4453 23.6289L15.5283 23.5283L18.3896 20.666M15.6553 24.1426L16 24M15.998 24.001L16 24M24 22.667V22.666L24.5801 22.0859M24 22.667L23.999 22.666L24.5801 22.0859M24.5801 22.0859C24.4854 21.7741 24.3147 21.4866 24.0801 21.252C23.752 20.9241 23.3218 20.7222 22.8643 20.6768L22.667 20.667C22.1366 20.667 21.628 20.8779 21.2529 21.2529M18.3896 20.666L19.9736 20.0098M18.3896 20.666L19.9736 20.0098M18.3896 20.666L19.0449 20.0107L19.9736 20.0098M19.9736 20.0098H19.9893M19.9893 20.0098L16 23.999M19.9893 20.0098L16 23.999M16 23.999V24M16 23.999V24M22 23.334V23.333M22 23.333H21.999M22 23.333H21.999M22 23.333V22.667C22 22.5344 22.0398 22.4056 22.1123 22.2969L22.1953 22.1953M22.1953 22.1953L21.2529 21.2529M22.1953 22.1953L21.2529 21.2529M20.4717 20.4717L20 20.9434V20.0098H20.0098M20.4717 20.4717L20.0098 20.0098M20.4717 20.4717L20.667 20.2754M20.4717 20.4717L20.0098 20.0098M20.0098 20.0098H20.0244M20.667 20.2754L20.0244 20.0098M20.667 20.2754L20.0244 20.0098M20.667 20.2754L20.9336 20.0088L20.0244 20.0098M19.9893 19.9893L19.9883 19.0674L19.5283 19.5283M19.9893 19.9893L19.5283 19.5283M19.9893 19.9893L19.0674 19.9883L19.5283 19.5283M19.9893 19.9893L19.5283 19.5283M17.8047 17.8047C17.6797 17.9297 17.5098 18 17.333 18L17.2031 17.9873C17.0749 17.9618 16.9562 17.8985 16.8623 17.8047L16.8613 17.8037M17.8047 17.8047L18.7471 18.7471M17.8047 17.8047L18.7471 18.7471M17.8047 17.8047C17.9297 17.6797 18 17.5098 18 17.333V16M18.7471 18.7471C18.372 19.1221 17.8634 19.333 17.333 19.333C16.8027 19.3329 16.2939 19.1221 15.9189 18.7471M18.7471 18.7471C19.1221 18.372 19.333 17.8634 19.333 17.333V16C19.333 15.801 19.3039 15.605 19.2471 15.418M15.9189 18.7471L16.666 18M15.9189 18.7471C15.5441 18.372 15.333 17.8633 15.333 17.333V16.2295C15.4663 16.0644 15.6084 15.9073 15.7578 15.7578M15.9189 18.7471L16.2285 18.4375M16.666 18V17.999M16.666 18L16.2285 18.4375M16.666 18V17.999M16.666 17.999L16.8018 17.8643V17.8633L16.8613 17.8037M16.666 17.999L16.2275 18.4375M16.8613 17.8037C16.768 17.71 16.7052 17.5917 16.6797 17.4639L16.667 17.333V16.667L15.7578 15.7578M16.8613 17.8037L16.2275 18.4375M15.7578 15.7578C16.2169 15.2988 16.7485 14.9161 17.333 14.626M15.7578 15.7578L16.666 16.666H16.667V16C16.667 15.8233 16.7364 15.6533 16.8613 15.5283C16.9863 15.4034 17.1563 15.3331 17.333 15.333M16.2275 18.4375H16.2285M16.2275 18.4375H16.2285M18 16H18.666M18 16H18.3428M18 16C18 15.8232 17.9297 15.6533 17.8047 15.5283C17.6797 15.4034 17.5097 15.333 17.333 15.333M18.666 16L19.2471 15.418M18.666 16L19.2471 15.418M18.666 16H18.3428M19.2471 15.418C19.1524 15.1066 18.9814 14.8203 18.7471 14.5859M24.2422 15.7578C24.1035 15.6191 23.9583 15.488 23.8076 15.3643C23.7866 15.3706 23.7645 15.3754 23.7441 15.3838L23.6289 15.4453C23.5928 15.4695 23.5592 15.4974 23.5283 15.5283L23.332 15.7236L20 19.0566V19.9893L20.9521 19.9902L24.4717 16.4717C24.5026 16.4408 24.5305 16.4072 24.5547 16.3711L24.6172 16.2559C24.6256 16.2355 24.6294 16.2134 24.6357 16.1924C24.5415 16.0776 24.4428 15.9663 24.3398 15.8584M24.2422 15.7578L24.001 15.998M24.2422 15.7578L24.001 15.998M24.2422 15.7578L24.3398 15.8584M24.001 15.998L24 15.999M24.001 15.998L24 15.999M24 15.999L24.3398 15.8584M24 15.999L24.3398 15.8584M17.333 14.626V15.333M17.333 14.626V15.333M17.333 14.626C17.4545 14.5657 17.5782 14.5092 17.7041 14.457L17.9111 14.376C18.0379 14.3289 18.1657 14.2854 18.2949 14.2471C18.4595 14.3373 18.6119 14.4508 18.7471 14.5859M18.7471 14.5859L18.0469 15.2852M18.7471 14.5859L18.0469 15.2852M18.0469 15.2852L18.3428 16M18.0469 15.2852L18.3428 16" fill="#FCFCFC" stroke="#FCFCFC" stroke-width="32"/>
+        </svg>
+      </div>
+      <div style={{width: 25, height: 25, left: 24, top: -11, position: 'absolute', background: '#FCFCFC', borderRadius: 99, outline: '0.30px #D8E0F0 solid', outlineOffset: '-0.15px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#1777CF', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>03</div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', padding: 5, background: 'rgba(23, 118.68, 207, 0.10)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', padding: 10, background: '#FCFCFC', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <div style={{width: 44, height: 44, background: '#F4F4F4', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div data-svg-wrapper style={{position: 'relative'}}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_1251_2182)">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#1777CF"/>
+            <rect x="5" y="5" width="10" height="10" rx="5" fill="#1777CF"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_1251_2182">
+            <rect width="20" height="20" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+        </div>
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Nenhum</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', padding: 10, background: '#FCFCFC', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Desconto sistema</div>
+        </div>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{width: 44, alignSelf: 'stretch', background: '#F4F4F4', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1251_2192)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#7D8592" stroke="#F4F4F4"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_1251_2192">
+              <rect width="20" height="20" fill="white"/>
+              </clipPath>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>0%</div>
+            </div>
+            <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+            </div>
+            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 00,00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', padding: 10, background: '#FCFCFC', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div style={{flex: '1 1 0', alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Desconto gestor</div>
+          </div>
+          <div data-svg-wrapper>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.8182 16H2.18182C1.60316 16 1.04821 15.7701 0.63904 15.361C0.229869 14.9518 0 14.3968 0 13.8182V2.18182C0 1.60316 0.229869 1.04821 0.63904 0.63904C1.04821 0.229869 1.60316 0 2.18182 0H6.54545C6.73834 0 6.92332 0.0766231 7.05971 0.213013C7.1961 0.349403 7.27273 0.534388 7.27273 0.727273C7.27273 0.920157 7.1961 1.10514 7.05971 1.24153C6.92332 1.37792 6.73834 1.45455 6.54545 1.45455H2.18182C1.98893 1.45455 1.80395 1.53117 1.66756 1.66756C1.53117 1.80395 1.45455 1.98893 1.45455 2.18182V13.8182C1.45455 14.0111 1.53117 14.1961 1.66756 14.3324C1.80395 14.4688 1.98893 14.5455 2.18182 14.5455H13.8182C14.0111 14.5455 14.1961 14.4688 14.3324 14.3324C14.4688 14.1961 14.5455 14.0111 14.5455 13.8182V9.45455C14.5455 9.26166 14.6221 9.07668 14.7585 8.94029C14.8949 8.8039 15.0798 8.72727 15.2727 8.72727C15.4656 8.72727 15.6506 8.8039 15.787 8.94029C15.9234 9.07668 16 9.26166 16 9.45455V13.8182C16 14.3968 15.7701 14.9518 15.361 15.361C14.9518 15.7701 14.3968 16 13.8182 16ZM6.54545 10.1818C6.44974 10.1824 6.35486 10.164 6.26625 10.1278C6.17764 10.0916 6.09705 10.0383 6.02909 9.97091C5.96092 9.9033 5.90682 9.82286 5.8699 9.73424C5.83297 9.64561 5.81397 9.55055 5.81397 9.45455C5.81397 9.35854 5.83297 9.26348 5.8699 9.17485C5.90682 9.08623 5.96092 9.00579 6.02909 8.93818L13.52 1.45455H10.9091C10.7162 1.45455 10.5312 1.37792 10.3948 1.24153C10.2584 1.10514 10.1818 0.920157 10.1818 0.727273C10.1818 0.534388 10.2584 0.349403 10.3948 0.213013C10.5312 0.0766231 10.7162 0 10.9091 0H15.2727C15.4656 0 15.6506 0.0766231 15.787 0.213013C15.9234 0.349403 16 0.534388 16 0.727273V5.09091C16 5.28379 15.9234 5.46878 15.787 5.60517C15.6506 5.74156 15.4656 5.81818 15.2727 5.81818C15.0798 5.81818 14.8949 5.74156 14.7585 5.60517C14.6221 5.46878 14.5455 5.28379 14.5455 5.09091V2.48L7.06182 9.97091C6.99386 10.0383 6.91327 10.0916 6.82466 10.1278C6.73605 10.164 6.64117 10.1824 6.54545 10.1818Z" fill="#1777CF"/>
+            </svg>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{width: 44, alignSelf: 'stretch', background: '#F4F4F4', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1251_2210)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#7D8592" stroke="#F4F4F4"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_1251_2210">
+              <rect width="20" height="20" fill="white"/>
+              </clipPath>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>0%</div>
+            </div>
+            <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+            </div>
+            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 00,00</div>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+        <div style={{width: 173, height: 38, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#FCFCFC', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01</div>
+          </div>
+          <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#FCFCFC', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>02</div>
+          </div>
+          <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#1777CF', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#FCFCFC', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>03</div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-end', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>ID:</div>
+          </div>
+          <div style={{justifyContent: 'flex-end', alignItems: 'center', display: 'flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>102030</div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+        <div style={{alignSelf: 'stretch', height: 39, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Redução de premiação</div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 15, display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>0%</div>
+            </div>
+            <div style={{width: 110, justifyContent: 'flex-end', alignItems: 'center', display: 'flex'}}>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 00,00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', padding: 10, background: '#FCFCFC', borderRadius: 12, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 10, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Valor do produto</div>
+        </div>
+        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>R$ 120.000,00</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', height: 2, paddingTop: 1, paddingBottom: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+      </div>
+      <div style={{alignSelf: 'stretch', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Desconto</div>
+          </div>
+        </div>
+        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>R$ 00,00</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', height: 2, paddingTop: 1, paddingBottom: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Total</div>
+        </div>
+        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>R$ 120.000,00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, background: '#1777CF', borderRadius: 6, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+    <div style={{color: '#FCFCFC', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Aplicar</div>
+  </div>
+</div>

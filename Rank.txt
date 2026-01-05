@@ -1,0 +1,769 @@
+import React from "react";
+import styled from "styled-components";
+
+const Styled02span = styled.span`
+  color: #FCFCFC;
+  font-size: 12px;
+  font-family: Nunito Sans;
+  font-weight: 700;
+  word-wrap: break-word;
+`;
+
+const StyledCourtneyhenryspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled5075span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0202span = styled.span`
+  color: #FCFCFC;
+  font-size: 12px;
+  font-family: Nunito Sans;
+  font-weight: 700;
+  word-wrap: break-word;
+`;
+
+const StyledSavannahnguyenspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled4000span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0203span = styled.span`
+  color: #FCFCFC;
+  font-size: 12px;
+  font-family: Nunito Sans;
+  font-weight: 700;
+  word-wrap: break-word;
+`;
+
+const StyledDarlenerobertsonspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled3000span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0204span = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledRonaldrichardsspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled2000span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0205span = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledDevonlanespan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled1000span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0206span = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledArlenemccoyspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled900span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0207span = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledRalphedwardsspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled800span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled0208span = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledBrooklynsimmonsspan = styled.span`
+  color: #3A3F51;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const Styled507501span = styled.span`
+  color: #3A3F51;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+`;
+
+const StyledNome = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledNome01 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos01 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledNome02 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos02 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledTrofeu03 = styled.div`
+  width: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledNome03 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos03 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledTrofeu04 = styled.div`
+  width: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledNome04 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos04 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledTrofeu05 = styled.div`
+  width: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledNome05 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos05 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledTrofeu06 = styled.div`
+  width: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledNome06 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos06 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledTrofeu07 = styled.div`
+  width: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledNome07 = styled.div`
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledPontos07 = styled.div`
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+`;
+
+const StyledFoto = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledTrofeu01 = styled.div`
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledFoto02 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled0201 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledTrofeu02 = styled.div`
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const StyledFoto04 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled03 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledFoto06 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled04 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledFoto08 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled05 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledFoto10 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled06 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledFoto12 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled07 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledFoto14 = styled.div`
+  padding-left: 20px;
+  padding-right: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled08 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledTrofeu = styled.div`
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+const Styled01 = styled.div`
+  align-self: stretch;
+  height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  outline: 0.50px #D8E0F0 solid;
+  outline-offset: -0.50px;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+`;
+
+const StyledListadeleads = styled.div`
+  width: 347px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: inline-flex;
+`;
+
+export const ListaDeLeads = () => {
+  return (
+    <StyledListadeleads>
+      <Styled01>
+        <StyledTrofeu>
+          <div data-svg-wrapper>
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.87327 0.78125C3.87327 0.57405 3.95558 0.375336 4.1021 0.228823C4.24861 0.08231 4.44732 0 4.65452 0L20.2795 0C20.4867 0 20.6854 0.08231 20.832 0.228823C20.9785 0.375336 21.0608 0.57405 21.0608 0.78125C21.0608 1.62187 21.042 2.42188 21.0076 3.18125C21.625 3.28349 22.2157 3.50831 22.7448 3.84247C23.274 4.17663 23.7308 4.61335 24.0885 5.12689C24.4461 5.64042 24.6973 6.22038 24.8272 6.83254C24.9572 7.44471 24.9632 8.07669 24.845 8.69123C24.7268 9.30577 24.4867 9.89041 24.1389 10.4107C23.7912 10.931 23.3427 11.3763 22.8201 11.7205C22.2975 12.0647 21.7112 12.3008 21.0959 12.4148C20.4805 12.5288 19.8486 12.5185 19.2373 12.3844C18.003 15.2984 16.303 16.7234 14.8108 17.0891V20.4844L17.0373 21.0406C17.3405 21.1156 17.6264 21.2516 17.8764 21.4391L20.7483 23.5938C20.8794 23.6921 20.9763 23.8293 21.0252 23.9858C21.0741 24.1423 21.0725 24.3102 21.0207 24.4658C20.9688 24.6214 20.8693 24.7567 20.7363 24.8525C20.6033 24.9484 20.4435 25 20.2795 25H4.65452C4.49055 25 4.33074 24.9484 4.19772 24.8525C4.0647 24.7567 3.96522 24.6214 3.91336 24.4658C3.86151 24.3102 3.85992 24.1423 3.90881 23.9858C3.9577 23.8293 4.0546 23.6921 4.18577 23.5938L7.05765 21.4391C7.30765 21.2516 7.59359 21.1156 7.89671 21.0406L10.1233 20.4844V17.0891C8.63109 16.7234 6.93109 15.2984 5.69671 12.3828C5.08513 12.5176 4.45273 12.5286 3.83685 12.4149C3.22098 12.3013 2.63413 12.0654 2.11095 11.7211C1.58777 11.3769 1.13888 10.9313 0.790783 10.4107C0.442687 9.89005 0.202444 9.30496 0.0842445 8.68994C-0.0339554 8.07493 -0.027716 7.44246 0.102594 6.8299C0.232904 6.21734 0.484643 5.63709 0.842943 5.12345C1.20124 4.6098 1.65884 4.17315 2.18871 3.8393C2.71857 3.50545 3.30997 3.28117 3.92796 3.17969C3.89118 2.38074 3.87294 1.58104 3.87327 0.78125ZM4.02796 4.75C3.21263 4.89918 2.48995 5.36615 2.01891 6.04817C1.54787 6.73018 1.36706 7.57138 1.51624 8.38672C1.66543 9.20205 2.13239 9.92473 2.81441 10.3958C3.49642 10.8668 4.33763 11.0476 5.15296 10.8984C4.63265 9.25781 4.23421 7.23281 4.02796 4.75ZM19.7826 10.8984C20.598 11.0476 21.4392 10.8668 22.1212 10.3958C22.8032 9.92473 23.2702 9.20205 23.4194 8.38672C23.5686 7.57138 23.3877 6.73018 22.9167 6.04817C22.4457 5.36615 21.723 4.89918 20.9076 4.75C20.6998 7.23438 20.3014 9.25781 19.7826 10.8984Z" fill="#1777CF"/>
+            </svg>
+          </div>
+          <Styled02>1</Styled02>
+        </StyledTrofeu>
+        <StyledFoto>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4277)"/>
+            <defs>
+            <pattern id="pattern0_1503_4277" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4277" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto>
+        <StyledNome>
+          <StyledCourtneyHenry>Courtney Henry</StyledCourtneyHenry>
+        </StyledNome>
+        <StyledPontos>
+          <Styled5075>5075</Styled5075>
+        </StyledPontos>
+      </Styled01>
+      <Styled0201>
+        <StyledTrofeu01>
+          <div data-svg-wrapper>
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.87327 0.78125C3.87327 0.57405 3.95558 0.375336 4.1021 0.228823C4.24861 0.08231 4.44732 0 4.65452 0L20.2795 0C20.4867 0 20.6854 0.08231 20.832 0.228823C20.9785 0.375336 21.0608 0.57405 21.0608 0.78125C21.0608 1.62187 21.042 2.42188 21.0076 3.18125C21.625 3.28349 22.2157 3.50831 22.7448 3.84247C23.274 4.17663 23.7308 4.61335 24.0885 5.12689C24.4461 5.64042 24.6973 6.22038 24.8272 6.83254C24.9572 7.44471 24.9632 8.07669 24.845 8.69123C24.7268 9.30577 24.4867 9.89041 24.1389 10.4107C23.7912 10.931 23.3427 11.3763 22.8201 11.7205C22.2975 12.0647 21.7112 12.3008 21.0959 12.4148C20.4805 12.5288 19.8486 12.5185 19.2373 12.3844C18.003 15.2984 16.303 16.7234 14.8108 17.0891V20.4844L17.0373 21.0406C17.3405 21.1156 17.6264 21.2516 17.8764 21.4391L20.7483 23.5938C20.8794 23.6921 20.9763 23.8293 21.0252 23.9858C21.0741 24.1423 21.0725 24.3102 21.0207 24.4658C20.9688 24.6214 20.8693 24.7567 20.7363 24.8525C20.6033 24.9484 20.4435 25 20.2795 25H4.65452C4.49055 25 4.33074 24.9484 4.19772 24.8525C4.0647 24.7567 3.96522 24.6214 3.91336 24.4658C3.86151 24.3102 3.85992 24.1423 3.90881 23.9858C3.9577 23.8293 4.0546 23.6921 4.18577 23.5938L7.05765 21.4391C7.30765 21.2516 7.59359 21.1156 7.89671 21.0406L10.1233 20.4844V17.0891C8.63109 16.7234 6.93109 15.2984 5.69671 12.3828C5.08513 12.5176 4.45273 12.5286 3.83685 12.4149C3.22098 12.3013 2.63413 12.0654 2.11095 11.7211C1.58777 11.3769 1.13888 10.9313 0.790783 10.4107C0.442687 9.89005 0.202444 9.30496 0.0842445 8.68994C-0.0339554 8.07493 -0.027716 7.44246 0.102594 6.8299C0.232904 6.21734 0.484643 5.63709 0.842943 5.12345C1.20124 4.6098 1.65884 4.17315 2.18871 3.8393C2.71857 3.50545 3.30997 3.28117 3.92796 3.17969C3.89118 2.38074 3.87294 1.58104 3.87327 0.78125ZM4.02796 4.75C3.21263 4.89918 2.48995 5.36615 2.01891 6.04817C1.54787 6.73018 1.36706 7.57138 1.51624 8.38672C1.66543 9.20205 2.13239 9.92473 2.81441 10.3958C3.49642 10.8668 4.33763 11.0476 5.15296 10.8984C4.63265 9.25781 4.23421 7.23281 4.02796 4.75ZM19.7826 10.8984C20.598 11.0476 21.4392 10.8668 22.1212 10.3958C22.8032 9.92473 23.2702 9.20205 23.4194 8.38672C23.5686 7.57138 23.3877 6.73018 22.9167 6.04817C22.4457 5.36615 21.723 4.89918 20.9076 4.75C20.6998 7.23438 20.3014 9.25781 19.7826 10.8984Z" fill="#1777CF"/>
+            </svg>
+          </div>
+          <Styled0202>2</Styled0202>
+        </StyledTrofeu01>
+        <StyledFoto02>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4288)"/>
+            <defs>
+            <pattern id="pattern0_1503_4288" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4288" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto02>
+        <StyledNome01>
+          <StyledSavannahNguyen>Savannah Nguyen</StyledSavannahNguyen>
+        </StyledNome01>
+        <StyledPontos01>
+          <Styled4000>4000</Styled4000>
+        </StyledPontos01>
+      </Styled0201>
+      <Styled03>
+        <StyledTrofeu02>
+          <div data-svg-wrapper>
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.87327 0.78125C3.87327 0.57405 3.95558 0.375336 4.1021 0.228823C4.24861 0.08231 4.44732 0 4.65452 0L20.2795 0C20.4867 0 20.6854 0.08231 20.832 0.228823C20.9785 0.375336 21.0608 0.57405 21.0608 0.78125C21.0608 1.62187 21.042 2.42188 21.0076 3.18125C21.625 3.28349 22.2157 3.50831 22.7448 3.84247C23.274 4.17663 23.7308 4.61335 24.0885 5.12689C24.4461 5.64042 24.6973 6.22038 24.8272 6.83254C24.9572 7.44471 24.9632 8.07669 24.845 8.69123C24.7268 9.30577 24.4867 9.89041 24.1389 10.4107C23.7912 10.931 23.3427 11.3763 22.8201 11.7205C22.2975 12.0647 21.7112 12.3008 21.0959 12.4148C20.4805 12.5288 19.8486 12.5185 19.2373 12.3844C18.003 15.2984 16.303 16.7234 14.8108 17.0891V20.4844L17.0373 21.0406C17.3405 21.1156 17.6264 21.2516 17.8764 21.4391L20.7483 23.5938C20.8794 23.6921 20.9763 23.8293 21.0252 23.9858C21.0741 24.1423 21.0725 24.3102 21.0207 24.4658C20.9688 24.6214 20.8693 24.7567 20.7363 24.8525C20.6033 24.9484 20.4435 25 20.2795 25H4.65452C4.49055 25 4.33074 24.9484 4.19772 24.8525C4.0647 24.7567 3.96522 24.6214 3.91336 24.4658C3.86151 24.3102 3.85992 24.1423 3.90881 23.9858C3.9577 23.8293 4.0546 23.6921 4.18577 23.5938L7.05765 21.4391C7.30765 21.2516 7.59359 21.1156 7.89671 21.0406L10.1233 20.4844V17.0891C8.63109 16.7234 6.93109 15.2984 5.69671 12.3828C5.08513 12.5176 4.45273 12.5286 3.83685 12.4149C3.22098 12.3013 2.63413 12.0654 2.11095 11.7211C1.58777 11.3769 1.13888 10.9313 0.790783 10.4107C0.442687 9.89005 0.202444 9.30496 0.0842445 8.68994C-0.0339554 8.07493 -0.027716 7.44246 0.102594 6.8299C0.232904 6.21734 0.484643 5.63709 0.842943 5.12345C1.20124 4.6098 1.65884 4.17315 2.18871 3.8393C2.71857 3.50545 3.30997 3.28117 3.92796 3.17969C3.89118 2.38074 3.87294 1.58104 3.87327 0.78125ZM4.02796 4.75C3.21263 4.89918 2.48995 5.36615 2.01891 6.04817C1.54787 6.73018 1.36706 7.57138 1.51624 8.38672C1.66543 9.20205 2.13239 9.92473 2.81441 10.3958C3.49642 10.8668 4.33763 11.0476 5.15296 10.8984C4.63265 9.25781 4.23421 7.23281 4.02796 4.75ZM19.7826 10.8984C20.598 11.0476 21.4392 10.8668 22.1212 10.3958C22.8032 9.92473 23.2702 9.20205 23.4194 8.38672C23.5686 7.57138 23.3877 6.73018 22.9167 6.04817C22.4457 5.36615 21.723 4.89918 20.9076 4.75C20.6998 7.23438 20.3014 9.25781 19.7826 10.8984Z" fill="#1777CF"/>
+            </svg>
+          </div>
+          <Styled0203>3</Styled0203>
+        </StyledTrofeu02>
+        <StyledFoto04>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4299)"/>
+            <defs>
+            <pattern id="pattern0_1503_4299" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4299" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto04>
+        <StyledNome02>
+          <StyledDarleneRobertson>Darlene Robertson</StyledDarleneRobertson>
+        </StyledNome02>
+        <StyledPontos02>
+          <Styled3000>3000</Styled3000>
+        </StyledPontos02>
+      </Styled03>
+      <Styled04>
+        <StyledTrofeu03>
+          <Styled0204>4</Styled0204>
+        </StyledTrofeu03>
+        <StyledFoto06>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4309)"/>
+            <defs>
+            <pattern id="pattern0_1503_4309" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4309" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto08>
+        <StyledNome04>
+          <StyledDevonLane>Devon Lane</StyledDevonLane>
+        </StyledNome04>
+        <StyledPontos04>
+          <Styled1000>1000</Styled1000>
+        </StyledPontos04>
+      </Styled05>
+      <Styled06>
+        <StyledTrofeu05>
+          <Styled0206>6</Styled0206>
+        </StyledTrofeu05>
+        <StyledFoto10>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4329)"/>
+            <defs>
+            <pattern id="pattern0_1503_4329" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4329" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto10>
+        <StyledNome05>
+          <StyledArleneMcCoy>Arlene McCoy</StyledArleneMcCoy>
+        </StyledNome05>
+        <StyledPontos05>
+          <Styled900>900</Styled900>
+        </StyledPontos05>
+      </Styled06>
+      <Styled07>
+        <StyledTrofeu06>
+          <Styled0207>7</Styled0207>
+        </StyledTrofeu06>
+        <StyledFoto12>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4339)"/>
+            <defs>
+            <pattern id="pattern0_1503_4339" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4339" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto12>
+        <StyledNome06>
+          <StyledRalphEdwards>Ralph Edwards</StyledRalphEdwards>
+        </StyledNome06>
+        <StyledPontos06>
+          <Styled800>800</Styled800>
+        </StyledPontos06>
+      </Styled07>
+      <Styled08>
+        <StyledTrofeu07>
+          <Styled0208>4</Styled0208>
+        </StyledTrofeu07>
+        <StyledFoto14>
+          <div data-svg-wrapper>
+            <svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <ellipse cx="17.8977" cy="17.5" rx="17.8977" ry="17.5" fill="url(#pattern0_1503_4349)"/>
+            <defs>
+            <pattern id="pattern0_1503_4349" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#image0_1503_4349" transform="matrix(0.005 0 0 0.00511364 0 -0.0113637)"/>
+            </pattern>
+            <"import uma imagem aqui"/>
+            </defs>
+            </svg>
+          </div>
+        </StyledFoto14>
+        <StyledNome07>
+          <StyledBrooklynSimmons>Brooklyn Simmons</StyledBrooklynSimmons>
+        </StyledNome07>
+        <StyledPontos07>
+          <Styled507501>5075</Styled507501>
+        </StyledPontos07>
+      </Styled08>
+    </StyledListadeleads>
+  );
+};

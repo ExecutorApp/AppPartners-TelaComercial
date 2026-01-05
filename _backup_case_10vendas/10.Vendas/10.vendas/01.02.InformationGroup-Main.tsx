@@ -1,0 +1,1163 @@
+// ==========================================================================
+// BLOCO: IMPORTS
+// ==========================================================================
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, Platform, TouchableOpacity } from 'react-native';
+import Svg, { Path, Rect } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
+import InformationGroupPersonalData from './01.02.InformationGroup-PersonalData';
+import ContractTabContent from './01.02.InformationGroup-Contract';
+
+// ==========================================================================
+// BLOCO: CONSTANTES - PALETA DE CORES
+// ==========================================================================
+const COLORS = {
+  primary: '#1777CF',
+  textPrimary: '#3A3F51',
+  textSecondary: '#7D8592',
+  border: '#D8E0F0',
+  white: '#FCFCFC',
+  bg: '#FFFFFF',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  danger: '#EF4444',
+  greenSoft: 'rgba(23,119,207,0.03)',
+};
+
+// ==========================================================================
+// BLOCO: ÍCONES
+// ==========================================================================
+// Ícone de três pontos (menu)
+const ThreeDotsIcon = () => (
+  <Svg width={4} height={18} viewBox="0 0 4 18" fill="none">
+    <Path d="M4 2C4 3.10457 3.10457 4 2 4C0.895431 4 0 3.10457 0 2C0 0.895431 0.895431 0 2 0C3.10457 0 4 0.895431 4 2Z" fill={COLORS.textSecondary}/>
+    <Path d="M4 9C4 10.1046 3.10457 11 2 11C0.895431 11 0 10.1046 0 9C0 7.89543 0.895431 7 2 7C3.10457 7 4 7.89543 4 9Z" fill={COLORS.textSecondary}/>
+    <Path d="M2 18C3.10457 18 4 17.1046 4 16C4 14.8954 3.10457 14 2 14C0.895431 14 0 14.8954 0 16C0 17.1046 0.895431 18 2 18Z" fill={COLORS.textSecondary}/>
+  </Svg>
+);
+
+// Ícone do produto (caixa)
+const ProductIconBox = () => (
+  <Svg width={46} height={46} viewBox="0 0 46 46" fill="none">
+    <Rect x={0.25} y={0.25} width={45.5} height={45.5} rx={5.75} fill={COLORS.greenSoft} stroke={COLORS.border} strokeWidth={0.5} />
+    <Path d="M33.3779 16.0836H31.2376H29.198H27.8398V14.6336C27.8398 13.7347 27.1152 13 26.2178 13H19.7774C18.8848 13 18.1554 13.7298 18.1554 14.6336V16.0836H16.7972H14.7576H12.6221C11.7247 16.0836 11 16.8134 11 17.7124V31.3664C11 32.2653 11.7247 33 12.6221 33H14.7624H16.802H29.198H31.2376H33.3779C34.2705 33 35 32.2702 35 31.3664V17.7124C34.9952 16.8134 34.2705 16.0836 33.3779 16.0836ZM18.6401 17.0503H27.3599H28.7181V32.0333H17.2771V17.0503H18.6401ZM19.12 14.6336C19.12 14.2663 19.4175 13.9667 19.7822 13.9667H26.2226C26.5873 13.9667 26.8848 14.2663 26.8848 14.6336V16.0836H19.12V14.6336ZM11.9598 31.3664V17.7124C11.9598 17.3451 12.2573 17.0454 12.6221 17.0454L16.7972 17.0503V24.798V32.0333L12.6221 32.0285C12.2573 32.0334 11.9598 31.7337 11.9598 31.3664ZM16.7972 32.0333V24.798V17.0503H16.3173V32.0333H16.7972ZM29.6779 32.0333V17.0503H29.198V32.0333H29.6779ZM34.0354 31.3664C34.0354 31.7337 33.7379 32.0333 33.3731 32.0333H29.198V17.0503H33.3731C33.7379 17.0503 34.0354 17.3499 34.0354 17.7173V31.3664Z" fill={COLORS.textPrimary} />
+  </Svg>
+);
+
+// Ícone de somatório (Prolabore)
+const ProlaboreIcon = () => (
+  <Svg width={37} height={37} viewBox="0 0 37 37" fill="none">
+    <Rect x={0.5} y={0.5} width={36} height={36} rx={6} fill={COLORS.bg} stroke={COLORS.border}/>
+    <Path d="M18.5 8C12.7 8 8 12.7 8 18.5C8 24.3 12.7 29 18.5 29C24.3 29 29 24.3 29 18.5C29 12.7 24.3 8 18.5 8Z" stroke={COLORS.textSecondary} strokeWidth={0.8}/>
+    <Path d="M18.5 13.5V23.5M13.5 18.5H23.5" stroke={COLORS.textSecondary} strokeWidth={1.8} strokeLinecap="round"/>
+  </Svg>
+);
+
+// Ícone Prolabore grande (46x46) conforme referência
+const ProlaboreIconLarge = () => (
+  <Svg width={46} height={46} viewBox="0 0 46 46" fill="none">
+    <Rect width={46} height={46} rx={6} fill={COLORS.primary}/>
+    <Path d="M23 18.7143C23.5198 18.6724 24.0353 18.8359 24.4359 19.1697C24.8365 19.5036 25.0903 19.9812 25.1429 20.5C25.1429 20.6894 25.2181 20.8711 25.3521 21.0051C25.486 21.139 25.6677 21.2143 25.8571 21.2143C26.0466 21.2143 26.2283 21.139 26.3622 21.0051C26.4962 20.8711 26.5714 20.6894 26.5714 20.5C26.5375 19.7241 26.2333 18.9845 25.7115 18.4092C25.1897 17.834 24.4832 17.4593 23.7143 17.35V16.5714C23.7143 16.382 23.639 16.2003 23.5051 16.0664C23.3711 15.9324 23.1894 15.8571 23 15.8571C22.8106 15.8571 22.6289 15.9324 22.4949 16.0664C22.361 16.2003 22.2857 16.382 22.2857 16.5714V17.35C21.5168 17.4593 20.8103 17.834 20.2885 18.4092C19.7667 18.9845 19.4625 19.7241 19.4286 20.5C19.4286 22.7 21.9643 23.4429 22.8 23.6857C25.0429 24.3429 25.1429 24.7357 25.1429 25.5C25.0903 26.0188 24.8365 26.4964 24.4359 26.8303C24.0353 27.1641 23.5198 27.3276 23 27.2857C22.4802 27.3276 21.9647 27.1641 21.5641 26.8303C21.1635 26.4964 20.9097 26.0188 20.8571 25.5C20.8571 25.3106 20.7819 25.1289 20.6479 24.9949C20.514 24.861 20.3323 24.7857 20.1429 24.7857C19.9534 24.7857 19.7717 24.861 19.6378 24.9949C19.5038 25.1289 19.4286 25.3106 19.4286 25.5C19.4625 26.2759 19.7667 27.0155 20.2885 27.5908C20.8103 28.166 21.5168 28.5407 22.2857 28.65V29.4286C22.2857 29.618 22.361 29.7997 22.4949 29.9336C22.6289 30.0676 22.8106 30.1429 23 30.1429C23.1894 30.1429 23.3711 30.0676 23.5051 29.9336C23.639 29.7997 23.7143 29.618 23.7143 29.4286V28.65C24.4832 28.5407 25.1897 28.166 25.7115 27.5908C26.2333 27.0155 26.5375 26.2759 26.5714 25.5C26.5714 23.4571 25.1429 22.8714 23.2 22.2857C21.1 21.7 20.8571 20.9857 20.8571 20.5C20.9097 19.9812 21.1635 19.5036 21.5641 19.1697C21.9647 18.8359 22.4802 18.6724 23 18.7143Z" fill={COLORS.white}/>
+    <Path d="M23 13C21.0222 13 19.0888 13.5865 17.4443 14.6853C15.7998 15.7841 14.5181 17.3459 13.7612 19.1732C13.0043 21.0004 12.8063 23.0111 13.1922 24.9509C13.578 26.8907 14.5304 28.6725 15.9289 30.0711C17.3275 31.4696 19.1093 32.422 21.0491 32.8078C22.9889 33.1937 24.9996 32.9957 26.8268 32.2388C28.6541 31.4819 30.2159 30.2002 31.3147 28.5557C32.4135 26.9112 33 24.9778 33 23C33 20.3478 31.9464 17.8043 30.0711 15.9289C28.1957 14.0536 25.6522 13 23 13ZM23 31.5714C21.3047 31.5714 19.6475 31.0687 18.238 30.1269C16.8284 29.185 15.7298 27.8464 15.081 26.2801C14.4323 24.7139 14.2625 22.9905 14.5933 21.3278C14.924 19.6651 15.7404 18.1378 16.9391 16.9391C18.1378 15.7403 19.6651 14.924 21.3278 14.5933C22.9905 14.2625 24.7139 14.4323 26.2801 15.081C27.8464 15.7298 29.185 16.8284 30.1269 18.238C31.0687 19.6475 31.5714 21.3047 31.5714 23C31.5714 25.2733 30.6684 27.4535 29.0609 29.0609C27.4535 30.6684 25.2733 31.5714 23 31.5714Z" fill={COLORS.white}/>
+  </Svg>
+);
+
+// Ícone menu em quadrado 35x35 conforme referência
+const ThreeDotsSquareIcon = () => (
+  <Svg width={35} height={35} viewBox="0 0 35 35" fill="none">
+    <Rect x={0.25} y={0.25} width={34.5} height={34.5} rx={5.75} fill="#F4F4F4"/>
+    <Rect x={0.25} y={0.25} width={34.5} height={34.5} rx={5.75} stroke={COLORS.border} strokeWidth={0.5}/>
+    <Path d="M19.5 10.5C19.5 11.6046 18.6046 12.5 17.5 12.5C16.3954 12.5 15.5 11.6046 15.5 10.5C15.5 9.39543 16.3954 8.5 17.5 8.5C18.6046 8.5 19.5 9.39543 19.5 10.5Z" fill={COLORS.textSecondary}/>
+    <Path d="M19.5 17.5C19.5 18.6046 18.6046 19.5 17.5 19.5C16.3954 19.5 15.5 18.6046 15.5 17.5C15.5 16.3954 16.3954 15.5 17.5 15.5C18.6046 15.5 19.5 16.3954 19.5 17.5Z" fill={COLORS.textSecondary}/>
+    <Path d="M17.5 26.5C18.6046 26.5 19.5 25.6046 19.5 24.5C19.5 23.3954 18.6046 22.5 17.5 22.5C16.3954 22.5 15.5 23.3954 15.5 24.5C15.5 25.6046 16.3954 26.5 17.5 26.5Z" fill={COLORS.textSecondary}/>
+  </Svg>
+);
+
+// Ícone Pix
+const PixIcon = () => (
+  <Svg width={37} height={37} viewBox="0 0 37 37" fill="none">
+    <Rect x={0.5} y={0.5} width={36} height={36} rx={6} fill={COLORS.bg} stroke={COLORS.border}/>
+    <Path d="M18.5 12L24 17.5L18.5 23L13 17.5L18.5 12Z" fill={COLORS.primary}/>
+  </Svg>
+);
+
+// Ícone Cartão de Crédito
+const CreditIcon = () => (
+  <Svg width={37} height={37} viewBox="0 0 37 37" fill="none">
+    <Rect x={0.5} y={0.5} width={36} height={36} rx={6} fill={COLORS.bg} stroke={COLORS.border}/>
+    <Rect x={9} y={11} width={19} height={14} rx={2} stroke={COLORS.textSecondary} strokeWidth={1}/>
+    <Rect x={10} y={14} width={17} height={3} fill={COLORS.textSecondary}/>
+  </Svg>
+);
+
+// Ícone Êxito (check)
+const ExitoIcon = () => (
+  <Svg width={37} height={37} viewBox="0 0 37 37" fill="none">
+    <Rect x={0.5} y={0.5} width={36} height={36} rx={6} fill={COLORS.bg} stroke={COLORS.border}/>
+    <Path d="M15 19L17 21L22 16" stroke={COLORS.primary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+// ==========================================================================
+// BLOCO: COMPONENTE - INFORMATION GROUP CONTRACT
+// ==========================================================================
+const InformationGroupContract: React.FC = () => {
+  const navigation = useNavigation();
+  const [activeTab, setActiveTab] = useState<'main' | 'personal' | 'content'>('main');
+  const [headerHeight, setHeaderHeight] = useState(0);
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.header} onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
+          <View style={styles.headerTopRow}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+              activeOpacity={0.85}
+            >
+              <Svg width={20} height={20} viewBox="0 0 20 20" fill="none">
+                <Path
+                  d="M10 19L1 10M1 10L10 1M1 10L19 10"
+                  stroke={COLORS.primary}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </Svg>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headerDivider} />
+          <View style={styles.tabsWrapper}>
+            <View style={styles.tabsBox}>
+              <TouchableOpacity
+                style={[styles.tabBtn, activeTab === 'main' && styles.tabBtnActive]}
+                activeOpacity={0.85}
+                onPress={() => setActiveTab('main')}
+              >
+                <Text style={[styles.tabText, activeTab === 'main' && styles.tabTextActive]}>Principal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tabBtn, activeTab === 'personal' && styles.tabBtnActive]}
+                activeOpacity={0.85}
+                onPress={() => setActiveTab('personal')}
+              >
+                <Text style={[styles.tabText, activeTab === 'personal' && styles.tabTextActive]}>Dados pessoais</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tabBtn, activeTab === 'content' && styles.tabBtnActive]}
+                activeOpacity={0.85}
+                onPress={() => setActiveTab('content')}
+              >
+                <Text style={[styles.tabText, activeTab === 'content' && styles.tabTextActive]}>Contrato</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      <ScrollView
+        style={[styles.scroll, Platform.OS === 'web' ? ({ top: headerHeight } as any) : undefined]}
+        contentContainerStyle={[styles.content, styles.contentGrow, { paddingTop: Platform.OS === 'web' ? 0 : headerHeight }]}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
+        horizontal={false}
+        scrollEnabled
+      >
+        {activeTab === 'main' && (
+          <>
+        {/* Card: Detalhes da venda */}
+        <View style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.cardHeaderTitle}>Detalhes da venda</Text>
+          </View>
+          <View style={styles.saleHeaderInfoRow}>
+            <View style={styles.saleHeaderLabelBox}>
+              <Text style={styles.saleHeaderLabel}>Data e horário</Text>
+            </View>
+            <View style={styles.saleHeaderValueBox}>
+              <Text style={styles.saleHeaderValue}>16/11/25 - 08:00</Text>
+            </View>
+          </View>
+          <View style={styles.thinDivider} />
+          <View style={styles.saleDetailsRow}>
+            <View style={styles.imageWrap}>
+              <Image source={require('../../../assets/00001.png')} style={styles.image} />
+            </View>
+            <View style={styles.saleFields}>
+              <View style={styles.fieldGroup}>
+                <View style={styles.labelRow}><Text style={styles.saleFieldLabel}>Produto</Text></View>
+                <View style={styles.valueRow}><Text style={styles.saleFieldValue}>Holding Patrimonial</Text></View>
+              </View>
+              <View style={styles.thinDivider} />
+              <View style={styles.fieldGroup}>
+                <View style={styles.labelRow}><Text style={styles.saleFieldLabel}>Serviço</Text></View>
+                <View style={styles.valueRow}><Text style={styles.saleFieldValue}>Reunião estratégica</Text></View>
+              </View>
+              <View style={styles.thinDivider} />
+              <View style={styles.fieldGroup}>
+                <View style={styles.labelRow}><Text style={styles.saleFieldLabel}>Tipo de Honorários</Text></View>
+                <View style={styles.valueRow}><Text style={styles.saleFieldValue}>Prolabore</Text></View>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Card: Valor do produto */}
+        <View style={styles.productValueCard}>
+          <View style={styles.iconBox}>
+            <ProductIconBox />
+          </View>
+          <View style={styles.productValueDetails}>
+            <View style={styles.labelRow}><Text style={styles.label}>Valor do produto</Text></View>
+            <View style={styles.thinDivider} />
+            <View style={styles.valueRow}><Text style={styles.price}>R$ 120.000,00</Text></View>
+          </View>
+        </View>
+
+        {/* Card: Forma de pagamento */}
+        <View style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={[styles.cardHeaderTitle, styles.paymentHeaderTitle]}>Forma de pagamento</Text>
+          </View>
+          <View style={styles.payBlock}>
+            <View style={styles.payHeaderBlue}>
+              <View style={styles.summaryIconWrap}>
+                <ProlaboreIconLarge />
+              </View>
+              <View style={styles.payInfo}>
+                <View style={styles.payTitleRow}>
+                  <Text style={styles.payTitleBlue}>Prolabore</Text>
+                </View>
+                <View style={styles.innerDivider} />
+                <View style={styles.payAmountRow}>
+                  <Text style={styles.payAmountNormal}>R$ 50.000,00</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.methodWrapperSuccess}>
+              <View style={styles.methodCard}>
+                <View style={styles.methodHeaderRow}>
+                  <View style={styles.methodHeaderLeft}>
+                    <Text style={styles.methodTitle}>Pix</Text>
+                  </View>
+                  <View style={styles.methodHeaderRight}>
+                    <ThreeDotsSquareIcon />
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Valor</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>R$ 25.000,00</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Status</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodStatusSuccess}>Pago</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Data e hora</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>10/12/25 - 11:45</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodBlock}>
+                  <View style={styles.methodBlockHeader}>
+                    <Text style={styles.methodLabel}>Desconto</Text>
+                  </View>
+                  <View style={styles.methodLine}>
+                    <View style={styles.methodLineLeft}>
+                      <Text style={styles.methodValue}>0%</Text>
+                    </View>
+                    <View style={styles.methodLineRightFixed}>
+                      <Text style={styles.methodValue}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodBlock}>
+                  <View style={styles.methodBlockHeader}>
+                    <Text style={styles.methodLabel}>Redução de premiação</Text>
+                  </View>
+                  <View style={styles.methodLine}>
+                    <View style={styles.methodLineLeft}>
+                      <Text style={styles.methodValue}>0%</Text>
+                    </View>
+                    <View style={styles.methodLineRightFixed}>
+                      <Text style={styles.methodValue}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.methodWrapperDanger}>
+              <View style={styles.methodCard}>
+                <View style={styles.methodHeaderRow}>
+                  <View style={styles.methodHeaderLeft}>
+                    <Text style={styles.methodTitle}>Crédito</Text>
+                  </View>
+                  <View style={styles.methodHeaderRight}>
+                    <ThreeDotsSquareIcon />
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Valor</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>R$ 25.000,00</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Parcelas</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>10 x 1.500,00</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Juros</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValueDanger}>00,00</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Status</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodStatusDanger}>Atrasado</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Data e hora</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>----------</Text>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodBlock}>
+                  <View style={styles.methodBlockHeader}>
+                    <Text style={styles.methodLabel}>Desconto</Text>
+                  </View>
+                  <View style={styles.methodLine}>
+                    <View style={styles.methodLineLeft}>
+                      <Text style={styles.methodValue}>0%</Text>
+                    </View>
+                    <View style={styles.methodLineRightFixed}>
+                      <Text style={styles.methodValue}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.methodDivider} />
+                <View style={styles.methodBlock}>
+                  <View style={styles.methodBlockHeader}>
+                    <Text style={styles.methodLabel}>Redução de premiação</Text>
+                  </View>
+                  <View style={styles.methodLine}>
+                    <View style={styles.methodLineLeft}>
+                      <Text style={styles.methodValue}>0%</Text>
+                    </View>
+                    <View style={styles.methodLineRightFixed}>
+                      <Text style={styles.methodValue}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+            </View>
+          </View>
+            {/* Card: Total (dentro do bloco Forma de pagamento) */}
+            <View style={styles.totalOuter}>
+              <View style={styles.totalCard}>
+                <View style={styles.totalHeaderRow}>
+                  <View style={styles.totalHeaderTextWrap}>
+                    <Text style={styles.totalHeaderText}>Total</Text>
+                  </View>
+                </View>
+                <View style={styles.totalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.totalSection}>
+                  <View style={styles.totalLabelRow}>
+                    <Text style={styles.totalLabelText}>Desconto</Text>
+                  </View>
+                  <View style={styles.totalValueRow}>
+                    <View style={styles.totalPercentWrap}>
+                      <Text style={styles.totalValueText}>0%</Text>
+                    </View>
+                    <View style={styles.totalRightWrap}>
+                      <Text style={styles.totalValueText}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.totalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.totalReductionBlock}>
+                  <View style={styles.totalReductionLabelRow}>
+                    <Text style={styles.totalLabelText}>Redução de premiação</Text>
+                  </View>
+                  <View style={styles.totalValueRow}>
+                    <View style={styles.totalPercentWrap}>
+                      <Text style={styles.totalValueText}>0%</Text>
+                    </View>
+                    <View style={styles.totalRightWrapFixed}>
+                      <Text style={styles.totalValueText}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View style={styles.exitoHeaderBlue}>
+              <View style={styles.summaryIconWrap}>
+                <ProlaboreIconLarge />
+              </View>
+              <View style={styles.payInfo}>
+                <View style={styles.payTitleRow}>
+                  <Text style={styles.exitoTitleBlue}>Êxito</Text>
+                </View>
+                <View style={styles.exitoInnerDivider} />
+                <View style={styles.exitoAmountRow}>
+                  <Text style={styles.payAmountNormal}>R$ 70.000,00</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.totalOuter}>
+              <View style={styles.totalCard}>
+                <View style={styles.totalHeaderRow}>
+                  <View style={styles.totalHeaderTextWrap}>
+                    <Text style={styles.totalHeaderText}>Pix</Text>
+                  </View>
+                  <View style={styles.dots}>
+                    <ThreeDotsSquareIcon />
+                  </View>
+                </View>
+                <View style={styles.pixFinalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Valor</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>R$ 70.000,00</Text>
+                  </View>
+                </View>
+                <View style={styles.pixFinalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Status</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>Aguardando</Text>
+                  </View>
+                </View>
+                <View style={styles.pixFinalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.methodLine}>
+                  <View style={styles.methodLineLeft}>
+                    <Text style={styles.methodLabel}>Data e hora</Text>
+                  </View>
+                  <View style={styles.methodLineRight}>
+                    <Text style={styles.methodValue}>----------</Text>
+                  </View>
+                </View>
+                <View style={styles.pixFinalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.totalReductionBlock}>
+                  <View style={styles.totalReductionLabelRow}>
+                    <Text style={styles.totalLabelText}>Desconto</Text>
+                  </View>
+                  <View style={styles.totalValueRow}>
+                    <View style={styles.totalPercentWrap}>
+                      <Text style={styles.totalValueText}>0%</Text>
+                    </View>
+                    <View style={styles.totalRightWrapFixed}>
+                      <Text style={styles.totalValueText}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.pixFinalDividerContainer}>
+                  <View style={styles.totalDividerLine} />
+                </View>
+                <View style={styles.totalReductionBlock}>
+                  <View style={styles.totalReductionLabelRow}>
+                    <Text style={styles.totalLabelText}>Redução de premiação</Text>
+                  </View>
+                  <View style={styles.totalValueRow}>
+                    <View style={styles.totalPercentWrap}>
+                      <Text style={styles.totalValueText}>0%</Text>
+                    </View>
+                    <View style={styles.totalRightWrapFixed}>
+                      <Text style={styles.totalValueText}>R$ 00,00</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View style={styles.bottomSpacer} />
+          </>
+        )}
+        {activeTab === 'personal' && (
+          <InformationGroupPersonalData />
+        )}
+        {activeTab === 'content' && (
+          <ContractTabContent />
+        )}
+      </ScrollView>
+    </View>
+  );
+};
+
+export default InformationGroupContract;
+
+// ==========================================================================
+// BLOCO: ESTILOS
+// ==========================================================================
+const styles = StyleSheet.create({
+  // Containers
+  wrapper: {
+    ...Platform.select({
+      web: {
+        flex: 1,
+        backgroundColor: COLORS.bg,
+        position: 'relative',
+        overflow: 'hidden',
+        minHeight: 0,
+      } as any,
+      default: {
+        flex: 1,
+        backgroundColor: COLORS.bg,
+        position: 'relative',
+      },
+    }),
+  },
+  scroll: {
+    ...Platform.select({
+      web: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      } as any,
+      default: {
+        flex: 1,
+      },
+    }),
+  },
+  content: {
+    padding: 15,
+    paddingBottom: 20,
+  },
+  contentGrow: {
+    flexGrow: 1,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    padding: 12,
+    marginBottom: 10,
+  },
+  thinDivider: {
+    height: 0.5,
+    backgroundColor: COLORS.border,
+    alignSelf: 'stretch',
+    marginVertical: 6,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardHeaderTitle: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  paymentHeaderTitle: {
+    paddingLeft: 5,
+  },
+
+  // Detalhes da venda
+  saleDetailsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 15,
+    marginTop: 10,
+  },
+  imageWrap: {
+    width: 80,
+    height: 170,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
+  },
+  image: {
+    width: 80,
+    height: 170,
+    resizeMode: 'cover',
+  },
+  saleFields: {
+    flex: 1,
+    gap: 5,
+    marginTop: 3,
+  },
+  fieldGroup: {
+    gap: 5,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontFamily: 'Inter_500Medium',
+    paddingLeft: 0,
+  },
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  value: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    fontFamily: 'Inter_400Regular',
+  },
+  saleHeaderInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    paddingHorizontal: 0,
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  saleHeaderLabelBox: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  saleHeaderValueBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saleHeaderLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+  },
+  saleHeaderValue: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  saleFieldLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+  },
+  saleFieldValue: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+
+  // Valor do produto
+  productValueCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: "#1777CF08",
+    padding: 12,
+    marginBottom: 10,
+    gap: 12,
+  },
+  iconBox: {
+    width: 46,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  productValueDetails: {
+    flex: 1,
+  },
+  price: {
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    fontFamily: 'Inter_500Medium',
+  },
+
+  // Pagamentos
+  payBlock: {
+    marginTop: 8,
+    gap: 10,
+  },
+  payHeaderBlue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(30, 64, 175, 0.2)',
+    borderRadius: 8,
+    backgroundColor: 'rgba(23, 119, 207, 0.1)',
+    padding: 10,
+  },
+  payHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    padding: 10,
+  },
+  exitoHeaderBlue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(33, 85, 163, 0.16)',
+    borderRadius: 8,
+    backgroundColor: 'rgba(23, 119, 207, 0.10)',
+    padding: 10,
+  },
+  payIcon: {
+    width: 37,
+    height: 37,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  summaryIconWrap: {
+    width: 46,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  payInfo: {
+    flex: 1,
+  },
+  payTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  exitoTitleBlue: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: COLORS.primary,
+  },
+  payTitleBlue: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.primary,
+  },
+  payTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.textPrimary,
+  },
+  innerDivider: {
+    height: 0.5,
+    backgroundColor: 'rgba(30, 64, 175, 0.2)',
+    alignSelf: 'stretch',
+    marginVertical: 6,
+  },
+  exitoInnerDivider: {
+    height: 0.5,
+    backgroundColor: 'rgba(33, 85, 163, 0.16)',
+    alignSelf: 'stretch',
+    marginTop: 6,
+    marginBottom: 0,
+  },
+  exitoAmountRow: {
+    marginTop: 5,
+  },
+  pixFinalDividerContainer: {
+    alignSelf: 'stretch',
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  payAmountRow: {
+    marginTop: 6,
+  },
+  payAmountNormal: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textPrimary,
+  },
+  payAmount: {
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.textPrimary,
+  },
+  payCard: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    padding: 12,
+    marginTop: 10,
+  },
+  payCardSuccess: {
+    borderColor: '#91E6B3',
+    backgroundColor: 'rgba(145, 230, 179, 0.06)',
+  },
+  payCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  payCardHeaderContent: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  payCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  payCardTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.textPrimary,
+  },
+  dots: {
+    paddingHorizontal: 4,
+  },
+  payCardDivider: {
+    height: 0.5,
+    backgroundColor: COLORS.border,
+    alignSelf: 'stretch',
+    marginVertical: 10,
+  },
+  methodWrapperSuccess: {
+    padding: 5,
+    backgroundColor: '#DCFCE7',
+    borderRadius: 10,
+  },
+  methodWrapperDanger: {
+    padding: 5,
+    backgroundColor: 'rgba(220, 38, 38, 0.05)',
+    borderRadius: 10,
+  },
+  methodCard: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: '#FAFAFA',
+    padding: 10,
+  },
+  methodHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  methodHeaderLeft: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  methodHeaderRight: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  methodTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.primary,
+  },
+  methodDivider: {
+    height: 0.5,
+    backgroundColor: COLORS.border,
+    alignSelf: 'stretch',
+    marginVertical: 15,
+  },
+  methodLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 14,
+  },
+  methodLineLeft: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  methodLineRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  methodLineRightFixed: {
+    width: 112,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  methodLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: COLORS.textSecondary,
+  },
+  methodValue: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textPrimary,
+  },
+  methodValueDanger: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: '#C1253A',
+  },
+  methodStatusSuccess: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#1B883C',
+  },
+  methodStatusDanger: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#C1253A',
+  },
+  methodBlock: {
+    height: 40,
+    justifyContent: 'space-between',
+  },
+  methodBlockHeader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  totalOuter: {
+    alignSelf: 'stretch',
+    padding: 5,
+    backgroundColor: '#F4F4F4',
+    borderRadius: 12,
+  },
+  totalCard: {
+    alignSelf: 'stretch',
+    padding: 10,
+    backgroundColor: '#FCFCFC',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D8E0F0',
+    gap: 5,
+  },
+  totalHeaderRow: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  totalHeaderTextWrap: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  totalHeaderText: {
+    color: '#1777CF',
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  totalDividerContainer: {
+    alignSelf: 'stretch',
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+  totalDividerLine: {
+    alignSelf: 'stretch',
+    height: 0.5,
+    backgroundColor: '#D8E0F0',
+  },
+  totalSection: {
+    alignSelf: 'stretch',
+    gap: 5,
+  },
+  totalLabelRow: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  totalLabelText: {
+    color: '#7D8592',
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+  },
+  totalValueRow: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  totalPercentWrap: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  totalRightWrap: {
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  totalRightWrapFixed: {
+    width: 110,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  totalValueText: {
+    color: '#3A3F51',
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  totalReductionBlock: {
+    height: 39,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 5,
+  },
+  totalReductionLabelRow: {
+    width: 292,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  payLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 8,
+  },
+  payLineLabel: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+    color: COLORS.textSecondary,
+  },
+  payLineRight: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textPrimary,
+  },
+  payLineRightCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  percent: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textSecondary,
+  },
+  currency: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textSecondary,
+  },
+  statusSuccess: {
+    color: COLORS.success,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  statusWarning: {
+    color: COLORS.warning,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  statusDanger: {
+    color: COLORS.danger,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  danger: {
+    color: COLORS.danger,
+  },
+
+  // Rodapé
+  totalLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.textPrimary,
+  },
+  bottomSpacer: {
+    height: 0,
+  },
+  header: {
+    backgroundColor: COLORS.bg,
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingHorizontal: 12,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  headerDivider: {
+    height: 0.5,
+    backgroundColor: '#F4F4F4',
+    alignSelf: 'stretch',
+    marginTop: 10,
+    marginBottom: 15,
+    marginLeft: -12,
+    marginRight: -12,
+  },
+  tabsWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  tabsBox: {
+    flexDirection: 'row',
+    backgroundColor: '#F4F4F4',
+    borderRadius: 8,
+    padding: 4,
+    gap: 8,
+    alignSelf: 'center',
+  },
+  tabBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  tabBtnActive: {
+    backgroundColor: COLORS.primary,
+  },
+  tabText: {
+    color: COLORS.textPrimary,
+    fontFamily: 'Inter_500Medium',
+  },
+  tabTextActive: {
+    color: COLORS.white,
+  },
+});

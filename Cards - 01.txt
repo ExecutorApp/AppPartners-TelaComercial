@@ -1,0 +1,246 @@
+<div style={{alignSelf: 'stretch', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, background: 'rgba(23, 118.68, 207, 0.03)', borderRadius: 8, outline: '0.60px #1777CF solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+    <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+      <div style={{width: 79, flex: '1 1 0', padding: 3, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', flex: '1 1 0', position: 'relative', overflow: 'hidden', borderRadius: 6, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <img style={{alignSelf: 'stretch', flex: '1 1 0'}} src="https://placehold.co/73x118" />
+          <div data-svg-wrapper style={{left: 38, top: 83, position: 'absolute'}}>
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="30" height="30" rx="15" fill="#FCFCFC"/>
+            <rect width="30" height="30" rx="15" stroke="#E5E7EB"/>
+            <path d="M18.5357 12.4643C18.7915 12.4643 19.0479 12.3667 19.2427 12.1714L22.0713 9.34273C22.462 8.95258 22.462 8.3193 22.0713 7.92867C21.6807 7.53805 21.0469 7.53805 20.6573 7.92867L17.8286 10.7573C17.438 11.1475 17.438 11.7812 17.8286 12.1714C18.0234 12.3667 18.2798 12.4643 18.5357 12.4643ZM24 14H20C19.4477 14 19 14.4478 19 15C19 15.5523 19.4477 16 20 16H24C24.5523 16 25 15.5523 25 15C25 14.4478 24.5523 14 24 14ZM17.8286 19.2427L20.6573 22.0713C20.8521 22.2666 21.1084 22.3643 21.3643 22.3643C21.6202 22.3643 21.876 22.2666 22.0713 22.0713C22.462 21.6807 22.462 21.0474 22.0713 20.6573L19.2427 17.8286C18.8525 17.438 18.2188 17.438 17.8286 17.8286C17.438 18.2188 17.438 18.8525 17.8286 19.2427ZM14 24C14 24.5523 14.4478 25 15 25C15.5523 25 16 24.5523 16 24V20C16 19.4477 15.5523 19 15 19C14.4478 19 14 19.4477 14 20V24ZM9.34277 22.0713L12.1714 19.2427C12.562 18.8525 12.562 18.2187 12.1714 17.8286C11.7812 17.438 11.1475 17.438 10.7573 17.8286L7.92871 20.6572C7.53809 21.0474 7.53809 21.6807 7.92871 22.0713C8.12402 22.2666 8.37988 22.3643 8.63574 22.3643C8.8916 22.3643 9.14793 22.2666 9.34277 22.0713ZM5 15C5 15.5523 5.44773 16 6 16H10C10.5522 16 11 15.5523 11 15C11 14.4478 10.5522 14 10 14H6C5.44773 14 5 14.4478 5 15ZM9.34277 7.92871C8.95312 7.53809 8.31934 7.53809 7.92871 7.92871C7.53809 8.31934 7.53809 8.95262 7.92871 9.34277L10.7573 12.1714C10.9521 12.3667 11.2085 12.4644 11.4644 12.4644C11.7202 12.4644 11.9766 12.3667 12.1714 12.1714C12.562 11.7812 12.562 11.1475 12.1714 10.7573L9.34277 7.92871ZM15 11C15.5523 11 16 10.5522 16 10V6C16 5.44773 15.5523 5 15 5C14.4478 5 14 5.44773 14 6V10C14 10.5522 14.4478 11 15 11Z" fill="#1777CF"/>
+            </svg>
+          </div>
+          <div style={{padding: 5, left: 36, top: 150, position: 'absolute', background: '#FCFCFC', overflow: 'hidden', borderRadius: 99, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{width: 18, height: 18, background: '#1B883C'}} />
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', background: '#FCFCFC', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{width: 64, textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>10/11/25</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'inline-flex'}}>
+              <div data-svg-wrapper>
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.84596 3.18003C6.8113 2.88162 6.5577 2.65 6.25 2.65C5.91863 2.65 5.65 2.91863 5.65 3.25V6.4L5.65514 6.47849C5.68231 6.68484 5.81538 6.86476 6.00951 6.94969L8.40951 7.99969L8.47523 8.02404C8.76251 8.1119 9.07636 7.97239 9.19969 7.69049L9.22404 7.62477C9.3119 7.33749 9.17239 7.02364 8.89049 6.90031L6.85 6.0076V3.25L6.84596 3.18003Z" fill="#91929E"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 0.25C2.93629 0.25 0.25 2.93629 0.25 6.25C0.25 9.56371 2.93629 12.25 6.25 12.25C9.56371 12.25 12.25 9.56371 12.25 6.25C12.25 2.93629 9.56371 0.25 6.25 0.25ZM6.25 1.45C8.90097 1.45 11.05 3.59903 11.05 6.25C11.05 8.90097 8.90097 11.05 6.25 11.05C3.59903 11.05 1.45 8.90097 1.45 6.25C1.45 3.59903 3.59903 1.45 6.25 1.45Z" fill="#91929E"/>
+                <path d="M6.84596 3.18003C6.8113 2.88162 6.5577 2.65 6.25 2.65C5.91863 2.65 5.65 2.91863 5.65 3.25V6.4L5.65514 6.47849C5.68231 6.68484 5.81538 6.86476 6.00951 6.94969L8.40951 7.99969L8.47523 8.02404C8.76251 8.1119 9.07636 7.97239 9.19969 7.69049L9.22404 7.62477C9.3119 7.33749 9.17239 7.02364 8.89049 6.90031L6.85 6.0076V3.25L6.84596 3.18003Z" stroke="#FCFCFC" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 0.25C2.93629 0.25 0.25 2.93629 0.25 6.25C0.25 9.56371 2.93629 12.25 6.25 12.25C9.56371 12.25 12.25 9.56371 12.25 6.25C12.25 2.93629 9.56371 0.25 6.25 0.25ZM6.25 1.45C8.90097 1.45 11.05 3.59903 11.05 6.25C11.05 8.90097 8.90097 11.05 6.25 11.05C3.59903 11.05 1.45 8.90097 1.45 6.25C1.45 3.59903 3.59903 1.45 6.25 1.45Z" stroke="#FCFCFC" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#91929E', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>09:51</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+      <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Joaquim Aparecido Bernardo</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Produto completo</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 800,00</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#1777CF', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Aguardando pagamento</div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+    <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+      <div style={{width: 79, flex: '1 1 0', padding: 3, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', flex: '1 1 0', position: 'relative', overflow: 'hidden', borderRadius: 6, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <img style={{alignSelf: 'stretch', flex: '1 1 0'}} src="https://placehold.co/73x118" />
+          <div data-svg-wrapper style={{left: 41, top: 84, position: 'absolute'}}>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="28" height="28" rx="14" fill="#FCFCFC"/>
+            <rect width="28" height="28" rx="14" stroke="#E5E7EB"/>
+            <path d="M14 6.6875C15.9394 6.6875 17.7994 7.45792 19.1707 8.82928C20.5421 10.2006 21.3125 12.0606 21.3125 14C21.3125 15.9394 20.5421 17.7994 19.1707 19.1707C17.7994 20.5421 15.9394 21.3125 14 21.3125C12.0606 21.3125 10.2006 20.5421 8.82928 19.1707C7.45792 17.7994 6.6875 15.9394 6.6875 14C6.6875 12.0606 7.45792 10.2006 8.82928 8.82928C10.2006 7.45792 12.0606 6.6875 14 6.6875ZM14 23C16.3869 23 18.6761 22.0518 20.364 20.364C22.0518 18.6761 23 16.3869 23 14C23 11.6131 22.0518 9.32387 20.364 7.63604C18.6761 5.94821 16.3869 5 14 5C11.6131 5 9.32387 5.94821 7.63604 7.63604C5.94821 9.32387 5 11.6131 5 14C5 16.3869 5.94821 18.6761 7.63604 20.364C9.32387 22.0518 11.6131 23 14 23ZM17.9727 12.3477C18.3031 12.0172 18.3031 11.4828 17.9727 11.1559C17.6422 10.8289 17.1078 10.8254 16.7809 11.1559L12.8785 15.0582L11.2262 13.4059C10.8957 13.0754 10.3613 13.0754 10.0344 13.4059C9.70742 13.7363 9.70391 14.2707 10.0344 14.5977L12.2844 16.8477C12.6148 17.1781 13.1492 17.1781 13.4762 16.8477L17.9727 12.3477Z" fill="#1B883C"/>
+            </svg>
+          </div>
+          <div style={{padding: 5, left: 36, top: 150, position: 'absolute', background: '#FCFCFC', overflow: 'hidden', borderRadius: 99, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{width: 18, height: 18, background: '#1B883C'}} />
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', background: '#FCFCFC', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{width: 64, textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>10/11/25</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'inline-flex'}}>
+              <div data-svg-wrapper>
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.84596 3.18003C6.8113 2.88162 6.5577 2.65 6.25 2.65C5.91863 2.65 5.65 2.91863 5.65 3.25V6.4L5.65514 6.47849C5.68231 6.68484 5.81538 6.86476 6.00951 6.94969L8.40951 7.99969L8.47523 8.02404C8.76251 8.1119 9.07636 7.97239 9.19969 7.69049L9.22404 7.62477C9.3119 7.33749 9.17239 7.02364 8.89049 6.90031L6.85 6.0076V3.25L6.84596 3.18003Z" fill="#91929E"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 0.25C2.93629 0.25 0.25 2.93629 0.25 6.25C0.25 9.56371 2.93629 12.25 6.25 12.25C9.56371 12.25 12.25 9.56371 12.25 6.25C12.25 2.93629 9.56371 0.25 6.25 0.25ZM6.25 1.45C8.90097 1.45 11.05 3.59903 11.05 6.25C11.05 8.90097 8.90097 11.05 6.25 11.05C3.59903 11.05 1.45 8.90097 1.45 6.25C1.45 3.59903 3.59903 1.45 6.25 1.45Z" fill="#91929E"/>
+                <path d="M6.84596 3.18003C6.8113 2.88162 6.5577 2.65 6.25 2.65C5.91863 2.65 5.65 2.91863 5.65 3.25V6.4L5.65514 6.47849C5.68231 6.68484 5.81538 6.86476 6.00951 6.94969L8.40951 7.99969L8.47523 8.02404C8.76251 8.1119 9.07636 7.97239 9.19969 7.69049L9.22404 7.62477C9.3119 7.33749 9.17239 7.02364 8.89049 6.90031L6.85 6.0076V3.25L6.84596 3.18003Z" stroke="#FCFCFC" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 0.25C2.93629 0.25 0.25 2.93629 0.25 6.25C0.25 9.56371 2.93629 12.25 6.25 12.25C9.56371 12.25 12.25 9.56371 12.25 6.25C12.25 2.93629 9.56371 0.25 6.25 0.25ZM6.25 1.45C8.90097 1.45 11.05 3.59903 11.05 6.25C11.05 8.90097 8.90097 11.05 6.25 11.05C3.59903 11.05 1.45 8.90097 1.45 6.25C1.45 3.59903 3.59903 1.45 6.25 1.45Z" stroke="#FCFCFC" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#91929E', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>09:51</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+      <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Emanoel muito locuo</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Produto completo</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 35.200,00</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#1B883C', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Pagamento confirmado pró-labore</div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+    <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+      <div style={{width: 79, flex: '1 1 0', padding: 3, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', flex: '1 1 0', position: 'relative', overflow: 'hidden', borderRadius: 6, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <img style={{alignSelf: 'stretch', flex: '1 1 0'}} src="https://placehold.co/73x118" />
+          <div data-svg-wrapper style={{left: 41, top: 82, position: 'absolute'}}>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="28" height="28" rx="14" fill="#FCFCFC"/>
+            <rect width="28" height="28" rx="14" stroke="#E5E7EB"/>
+            <path d="M14 6.6875C15.9394 6.6875 17.7994 7.45792 19.1707 8.82928C20.5421 10.2006 21.3125 12.0606 21.3125 14C21.3125 15.9394 20.5421 17.7994 19.1707 19.1707C17.7994 20.5421 15.9394 21.3125 14 21.3125C12.0606 21.3125 10.2006 20.5421 8.82928 19.1707C7.45792 17.7994 6.6875 15.9394 6.6875 14C6.6875 12.0606 7.45792 10.2006 8.82928 8.82928C10.2006 7.45792 12.0606 6.6875 14 6.6875ZM14 23C16.3869 23 18.6761 22.0518 20.364 20.364C22.0518 18.6761 23 16.3869 23 14C23 11.6131 22.0518 9.32387 20.364 7.63604C18.6761 5.94821 16.3869 5 14 5C11.6131 5 9.32387 5.94821 7.63604 7.63604C5.94821 9.32387 5 11.6131 5 14C5 16.3869 5.94821 18.6761 7.63604 20.364C9.32387 22.0518 11.6131 23 14 23ZM17.9727 12.3477C18.3031 12.0172 18.3031 11.4828 17.9727 11.1559C17.6422 10.8289 17.1078 10.8254 16.7809 11.1559L12.8785 15.0582L11.2262 13.4059C10.8957 13.0754 10.3613 13.0754 10.0344 13.4059C9.70742 13.7363 9.70391 14.2707 10.0344 14.5977L12.2844 16.8477C12.6148 17.1781 13.1492 17.1781 13.4762 16.8477L17.9727 12.3477Z" fill="#1B883C"/>
+            </svg>
+          </div>
+          <div style={{padding: 5, left: 36, top: 150, position: 'absolute', background: '#FCFCFC', overflow: 'hidden', borderRadius: 99, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{width: 18, height: 18, background: '#1B883C'}} />
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', background: '#FCFCFC', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{width: 64, textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>10/11/25</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+          <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'inline-flex'}}>
+              <div style={{width: 12, height: 12, background: '#91929E', outline: '0.50px #FCFCFC solid', outlineOffset: '-0.25px'}} />
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#91929E', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>09:51</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+      <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Marina Betânia</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Produto completo</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="237" height="1" viewBox="0 0 237 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0.25H237" stroke="#D8E0F0" stroke-width="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 35.200,00</div>
+      </div>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', height: 1, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}} />
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#1B883C', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Pagamento confirmado pró-labore</div>
+      </div>
+    </div>
+  </div>
+</div>
