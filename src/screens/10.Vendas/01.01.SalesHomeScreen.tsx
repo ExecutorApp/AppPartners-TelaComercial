@@ -30,7 +30,7 @@ const APPOINTMENTS_STORAGE_KEY = 'partners.sales.items';
 const SELECTED_APT_STORAGE_KEY = 'partners.sales.selected.appointment';
 const TOTAL_STEPS = 7;
 
-// SVG da ilustraÃ§Ã£o de estado vazio (arquivo de referÃªncia completo)
+// SVG da ilustração de estado vazio (arquivo de referência completo)
 const EMPTY_CALENDAR_SVG = `
 <svg xmlns="http://www.w3.org/2000/svg" width="202" height="150" viewBox="0 0 202 150" fill="none">
   <g clip-path="url(#clip0_706_1863)">
@@ -73,7 +73,7 @@ const SalesHomeScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [sideMenuVisible, setSideMenuVisible] = useState<boolean>(false);
   const [showWeekCalendar, setShowWeekCalendar] = useState<boolean>(false);
-  // SeleÃ§Ã£o de dia no calendÃ¡rio mensal (30 dias)
+  // Seleção de dia no calendário mensal (30 dias)
   const [selectedMonthDateKey, setSelectedMonthDateKey] = useState<string | null>(null);
   // Modal de menu por agenda (3 pontinhos)
   const [agendaMenuVisible, setAgendaMenuVisible] = useState<boolean>(false);
@@ -90,12 +90,12 @@ const SalesHomeScreen: React.FC = () => {
     }
     setAgendaMenuVisible(true);
   };
-  // Fecha o menu mas MANTÃ‰M o card ativo
+  // Fecha o menu mas MANTÉM o card ativo
   const handleCloseAgendaMenu = () => {
     setAgendaMenuVisible(false);
   };
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
-  // Inicializa com o dia atual da semana (0 = Domingo, 6 = SÃ¡bado)
+  // Inicializa com o dia atual da semana (0 = Domingo, 6 = Sábado)
   const [selectedWeekDayIndex, setSelectedWeekDayIndex] = useState<number>(new Date().getDay());
   const [showMonthCalendar, setShowMonthCalendar] = useState<boolean>(false);
   const [currentMonthDate, setCurrentMonthDate] = useState<Date>(new Date());
@@ -104,10 +104,10 @@ const SalesHomeScreen: React.FC = () => {
   // Modal de Filtros
   const [filtersModalVisible, setFiltersModalVisible] = useState<boolean>(false);
   const [filtersModalTab, setFiltersModalTab] = useState<'periods' | 'status'>('periods');
-  // Labels dinÃ¢micos dos filtros exibidos nos cards
+  // Labels dinâmicos dos filtros exibidos nos cards
   const [periodsLabel, setPeriodsLabel] = useState<string>('Hoje');
   const [statusLabel, setStatusLabel] = useState<string>('Todos');
-  // Estado detalhado do filtro de PerÃ­odos para compor o label conforme regras
+  // Estado detalhado do filtro de Períodos para compor o label conforme regras
   const [periodQuickLabel, setPeriodQuickLabel] = useState<'none' | 'Hoje' | '15 dias' | 'Este mês'>('none');
   const [periodStartDate, setPeriodStartDate] = useState<Date | null>(null);
   const [periodEndDate, setPeriodEndDate] = useState<Date | null>(null);
@@ -117,7 +117,7 @@ const SalesHomeScreen: React.FC = () => {
   };
 
   const handleNewSchedule = () => {
-    // Fluxo de criaÃ§Ã£o: desativa modo ediÃ§Ã£o
+    // Fluxo de criação: desativa modo edição
     setIsEditingSchedule(false);
     setNewAppointmentStep(1);
     setNewAppointmentVisible(true);
@@ -152,7 +152,7 @@ const SalesHomeScreen: React.FC = () => {
     }
   };
 
-  // Alternar telas (placeholder para futura lÃ³gica de alternÃ¢ncia de layout)
+  // Alternar telas (placeholder para futura lógica de alternância de layout)
   const [alternateView, setAlternateView] = useState<boolean>(false);
   const handleToggleScreens = () => {
     setAlternateView((v) => !v);
@@ -165,12 +165,12 @@ const SalesHomeScreen: React.FC = () => {
   const [leaveModalVisible, setLeaveModalVisible] = React.useState<boolean>(false);
   // Flag para bloquear o modal de confirmação durante navegação para DiscountSales
   const [navigatingToDiscount, setNavigatingToDiscount] = React.useState<boolean>(false);
-  // Modo de ediÃ§Ã£o do agendamento (altera tÃ­tulo e rÃ³tulo final)
+  // Modo de edição do agendamento (altera título e rótulo final)
   const [isEditingSchedule, setIsEditingSchedule] = React.useState<boolean>(false);
-  // SeleÃ§Ãµes para navegaÃ§Ã£o condicional
+  // Seleções para navegação condicional
   const [selectedFlowType, setSelectedFlowType] = React.useState<'guided' | 'free' | null>(null);
   const [selectedAgendaType, setSelectedAgendaType] = React.useState<'personal' | 'shared' | null>(null);
-  // DireÃ§Ã£o das transiÃ§Ãµes entre etapas do novo agendamento
+  // Direção das transições entre etapas do novo agendamento
   const [transitionDirection, setTransitionDirection] = React.useState<'forward' | 'backward'>('forward');
 
   type SlotPair = { start: string; end: string };
@@ -208,7 +208,7 @@ const SalesHomeScreen: React.FC = () => {
 
   const handleEditAppointment = async () => {
     if (selectedAppointment) {
-      // Monta resumo da etapa 7 (data e horÃ¡rios) para hidrataÃ§Ã£o do fluxo guiado
+      // Monta resumo da etapa 7 (data e horários) para hidratação do fluxo guiado
       const parseDate = (key: string) => {
         const [yyyy, mm, dd] = key.split('-').map((v) => parseInt(v, 10));
         return new Date(yyyy, (mm || 1) - 1, dd || 1);
@@ -217,7 +217,7 @@ const SalesHomeScreen: React.FC = () => {
       const dd = String(d.getDate()).padStart(2, '0');
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const yy = String(d.getFullYear()).slice(-2);
-      const weekdayNames = ['Domingo', 'Segunda Feira', 'TerÃ§a Feira', 'Quarta Feira', 'Quinta Feira', 'Sexta Feira', 'SÃ¡bado'];
+      const weekdayNames = ['Domingo', 'Segunda Feira', 'Terça Feira', 'Quarta Feira', 'Quinta Feira', 'Sexta Feira', 'Sábado'];
       const dateLabel = `${weekdayNames[d.getDay()]} - ${dd}/${mm}/${yy}`;
       const timesLabel = (selectedAppointment.slots || []).map((s) => `${s.start}-${s.end}`).join(', ');
       const step7Summary = timesLabel ? `${dateLabel}: ${timesLabel}` : `${dateLabel}`;
@@ -257,12 +257,12 @@ const SalesHomeScreen: React.FC = () => {
       }
       console.log('[EditAppointment] Selected flowType:', inferredFlowType, 'agendaType:', agendaType);
 
-      // Precarrega storage da etapa 7 para que a tela de Data/HorÃ¡rio venha hidratada
+      // Precarrega storage da etapa 7 para que a tela de Data/Horário venha hidratada
       try {
         const storage = getLocalStorage();
         const SLOTS_STORAGE_KEY = 'partners.sales.slots.map';
         const SELECTED_DATE_STORAGE_KEY = 'partners.sales.selected.date';
-        // Merge do mapa de horÃ¡rios existente com os do agendamento selecionado
+        // Merge do mapa de horários existente com os do agendamento selecionado
         const rawLocal = storage ? storage.getItem(SLOTS_STORAGE_KEY) : null;
         const rawIdb = await idbGet(SLOTS_STORAGE_KEY);
         const raw = rawLocal ?? rawIdb;
@@ -271,15 +271,15 @@ const SalesHomeScreen: React.FC = () => {
         const payload = JSON.stringify(newMap);
         if (storage) storage.setItem(SLOTS_STORAGE_KEY, payload);
         await idbSet(SLOTS_STORAGE_KEY, payload);
-        // Persiste tambÃ©m a data selecionada para posicionar o calendÃ¡rio
+        // Persiste também a data selecionada para posicionar o calendário
         if (storage) storage.setItem(SELECTED_DATE_STORAGE_KEY, selectedAppointment.date);
         await idbSet(SELECTED_DATE_STORAGE_KEY, selectedAppointment.date);
         console.log('[EditAppointment] Preloaded date/time:', { date: selectedAppointment.date, slots: selectedAppointment.slots });
       } catch {
-        // silencia erros de persistÃªncia
+        // silencia erros de persistência
       }
     }
-    // Fluxo vindo do menu: ativa modo ediÃ§Ã£o
+    // Fluxo vindo do menu: ativa modo edição
     setIsEditingSchedule(true);
     setNewAppointmentStep(1);
     setNewAppointmentVisible(true);
@@ -293,14 +293,14 @@ const SalesHomeScreen: React.FC = () => {
         await (navigator as any).clipboard.writeText(fakeLink);
         console.log('[CardMenu] Link copiado (web):', fakeLink);
       } else {
-        // Nativo: exibe alerta com link para cÃ³pia manual
+        // Nativo: exibe alerta com link para cópia manual
         Alert.alert('Link copiado', fakeLink);
-        console.log('[CardMenu] Link disponÃ­vel (native):', fakeLink);
+        console.log('[CardMenu] Link disponível (native):', fakeLink);
       }
     } catch {
       // fallback discreto
       console.log('[CardMenu] Falha ao copiar, exibir link:', fakeLink);
-      Alert.alert('Link da reuniÃ£o', fakeLink);
+      Alert.alert('Link da reunião', fakeLink);
     }
   };
 
@@ -318,7 +318,7 @@ const SalesHomeScreen: React.FC = () => {
     await saveAppointments(next);
     setDeleteModalVisible(false);
     setSelectedAppointment(null);
-    // Limpa tambÃ©m do storage apÃ³s excluir
+    // Limpa também do storage após excluir
     try {
       const storage = getLocalStorage();
       if (storage) storage.removeItem(SELECTED_APT_STORAGE_KEY);
@@ -400,7 +400,7 @@ const SalesHomeScreen: React.FC = () => {
   };
   
   const confirmLeaveSchedule = async () => {
-    // Fechar imediatamente os modais para evitar travamentos/latÃªncia
+    // Fechar imediatamente os modais para evitar travamentos/latência
     setLeaveModalVisible(false);
     setNewAppointmentVisible(false);
     setFlowSummaries({});
@@ -408,14 +408,14 @@ const SalesHomeScreen: React.FC = () => {
     setNewAppointmentStep(1);
     setIsEditingSchedule(false);
     setSelectedAppointment(null);
-    // Limpa tambÃ©m do storage
+    // Limpa também do storage
     try {
       const storage = getLocalStorage();
       if (storage) storage.removeItem(SELECTED_APT_STORAGE_KEY);
       await idbRemove(SELECTED_APT_STORAGE_KEY);
     } catch {}
 
-    // Limpeza assÃ­ncrona nÃ£o bloqueante
+    // Limpeza assíncrona não bloqueante
     try {
       const storage = getLocalStorage();
       if (storage) {
@@ -442,7 +442,7 @@ const SalesHomeScreen: React.FC = () => {
       .map(([k]) => Number(k));
     const maxCompleted = completedSteps.length ? Math.max(...completedSteps) : 0;
     const next = Math.min(TOTAL_STEPS, Math.max(1, (maxCompleted || 0) + 1));
-    // Nunca reduzir o passo mÃ¡ximo acessÃ­vel; manter monotÃ´nico
+    // Nunca reduzir o passo máximo acessível; manter monotônico
     setMaxAccessibleStep((prev) => Math.max(prev, next));
   };
   const handleUpdateSummary = (step: number, value: string) => {
@@ -453,7 +453,7 @@ const SalesHomeScreen: React.FC = () => {
     });
   };
   const handleSelectFullFlowStep = (step: number) => {
-    // Permite navegaÃ§Ã£o direta ao passo via FullFlow
+    // Permite navegação direta ao passo via FullFlow
     if (step >= 1 && step <= 7) {
       setNewAppointmentStep(step as 1 | 2 | 3 | 4 | 5 | 6 | 7);
       setMaxAccessibleStep((prev) => Math.max(prev, step));
@@ -466,7 +466,7 @@ const SalesHomeScreen: React.FC = () => {
     setFiltersModalVisible(true);
   };
 
-  // Recebe as seleÃ§Ãµes do modal e atualiza os labels visÃ­veis
+  // Recebe as seleções do modal e atualiza os labels visíveis
   const handleApplyFilters = (selection: {
     periodsLabel: string;
     statusLabel: string;
@@ -476,7 +476,7 @@ const SalesHomeScreen: React.FC = () => {
   }) => {
     setPeriodsLabel(selection.periodsLabel);
     setStatusLabel(selection.statusLabel);
-    // Atualiza estado detalhado para cÃ¡lculo do label de PerÃ­odos
+    // Atualiza estado detalhado para cálculo do label de Períodos
     setPeriodQuickLabel(selection.quickLabel ?? 'none');
     setPeriodStartDate(selection.startDate ?? null);
     setPeriodEndDate(selection.endDate ?? null);
@@ -545,7 +545,7 @@ const SalesHomeScreen: React.FC = () => {
 
   React.useEffect(() => { loadAppointments(); }, [loadAppointments]);
 
-  // Restaura o selectedAppointment do storage ao ganhar foco (montagem OU volta da navegaÃ§Ã£o)
+  // Restaura o selectedAppointment do storage ao ganhar foco (montagem OU volta da navegação)
   useFocusEffect(
     useCallback(() => {
       const restoreSelectedAppointment = async () => {
@@ -575,10 +575,10 @@ const SalesHomeScreen: React.FC = () => {
     return `${h}:${m}`;
   };
 
-  // Ajusta rÃ³tulos em caixa alta (HOJE/AMANHÃƒ/DIAS) para frase (Hoje/AmanhÃ£/Segunda...)
+  // Ajusta rótulos em caixa alta (HOJE/AMANHÃ/DIAS) para frase (Hoje/Amanhã/Segunda...)
   const sentenceCaseLabel = (s: string) => {
     if (!s) return s;
-    // MantÃ©m datas no formato DD/MM/AA como estÃ£o
+    // Mantém datas no formato DD/MM/AA como estão
     if (s.includes('/')) return s;
     const lower = s.toLowerCase();
     return lower.charAt(0).toUpperCase() + lower.slice(1);
@@ -621,7 +621,7 @@ const SalesHomeScreen: React.FC = () => {
       id,
       date: dateKey(date),
       slots: Array.isArray(slots) && slots.length ? slots : [{ start: hourTextNow, end: hourTextNow }],
-      // Usa resumos do fluxo (jÃ¡ hidratados ao entrar em ediÃ§Ã£o) com fallback ao agendamento atual
+      // Usa resumos do fluxo (já hidratados ao entrar em edição) com fallback ao agendamento atual
       client: (flowSummaries?.[1] ?? selectedAppointment?.client ?? null),
       product: (flowSummaries?.[2] ?? selectedAppointment?.product ?? null),
       activity: (flowSummaries?.[4] ?? selectedAppointment?.activity ?? null),
@@ -654,7 +654,7 @@ const SalesHomeScreen: React.FC = () => {
     setNewAppointmentVisible(false);
     setIsEditingSchedule(false);
     setSelectedAppointment(null);
-    // Limpa tambÃ©m do storage apÃ³s criar/editar
+    // Limpa também do storage após criar/editar
     try {
       const storage = getLocalStorage();
       if (storage) storage.removeItem(SELECTED_APT_STORAGE_KEY);
@@ -673,19 +673,22 @@ const SalesHomeScreen: React.FC = () => {
   };
   const weekStartSunday = (d: Date) => { const r = new Date(d); r.setDate(d.getDate() - d.getDay()); return startOfDay(r); };
 
-  // A funÃ§Ã£o Ã© importada de ../../utils/dateLabel para manter modularidade e testabilidade.
+  // A função é importada de ../../utils/dateLabel para manter modularidade e testabilidade.
   const isSameWeek = (a: Date, b: Date) => {
     const ws = weekStartSunday(b);
     const we = addDays(ws, 6);
     const ad = startOfDay(a);
     return ad >= ws && ad <= we;
   };
-  const weekdayNames = ['Domingo', 'Segunda', 'TerÃ§a', 'Quarta', 'Quinta', 'Sexta', 'SÃ¡bado'];
+  const weekdayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
   // Resolve a imagem do cliente a partir da chave ou URI
   const resolveClientPhotoSource = (apt: AppointmentItem) => {
-    if (apt.clientPhotoUri) return { uri: apt.clientPhotoUri } as any;
-    switch (apt.clientPhotoKey) {
+    const uri = String(apt.clientPhotoUri ?? '').trim();
+    if (uri) return { uri } as any;
+    const rawKey = String(apt.clientPhotoKey ?? '').trim();
+    const key = rawKey.includes('/') ? (rawKey.split('/').pop() ?? rawKey) : rawKey;
+    switch (key) {
       case '01-Foto.png': return require('../../../assets/01-Foto.png');
       case '02-Foto.png': return require('../../../assets/02-Foto.png');
       case '03-Foto.png': return require('../../../assets/03-Foto.png');
@@ -695,11 +698,11 @@ const SalesHomeScreen: React.FC = () => {
     }
   };
 
-  // Computa o label visÃ­vel do card "PerÃ­odos" conforme regras fornecidas
+  // Computa o label visível do card "Períodos" conforme regras fornecidas
   const periodsDisplayLabel = React.useMemo(() => {
     const today = new Date();
 
-    // Deriva datas a partir dos atalhos rÃ¡pidos quando necessÃ¡rio
+    // Deriva datas a partir dos atalhos rápidos quando necessário
     let s: Date | null = periodStartDate;
     let e: Date | null = periodEndDate;
     if (periodQuickLabel === 'Hoje') {
@@ -713,24 +716,24 @@ const SalesHomeScreen: React.FC = () => {
       e = startOfDay(lastOfMonth(today));
     }
 
-    // Caso nenhum perÃ­odo selecionado
+    // Caso nenhum período selecionado
     if (!s && !e) return 'Todos';
 
-    // Se apenas uma das datas existe, tratar como data Ãºnica
+    // Se apenas uma das datas existe, tratar como data única
     const single = (s && !e) ? s : (!s && e) ? e : (s && e && isSameDay(s, e)) ? s : null;
     if (single) {
       const d = single;
       const inSameWeek = isSameWeek(d, today);
       const dayName = weekdayNames[d.getDay()];
       if (isSameDay(d, today)) return `Hoje - ${formatDDMMYY(d)}`;
-      if (inSameWeek && isTomorrow(d, today)) return `AmanhÃ£ - ${formatDDMMYY(d)}`;
+      if (inSameWeek && isTomorrow(d, today)) return `Amanhã - ${formatDDMMYY(d)}`;
       if (inSameWeek) return `${dayName} - ${formatDDMMYY(d)}`;
       return `${formatDDMMYY(d)} (${dayName})`;
     }
 
-    // Intervalo com inÃ­cio e fim
+    // Intervalo com início e fim
     if (s && e) {
-      // Garantir consistÃªncia de ordem
+      // Garantir consistência de ordem
       const start = s.getTime() <= e.getTime() ? s : e;
       const end = e.getTime() >= s.getTime() ? e : s;
       return `${formatDDMMYY(start)} - ${formatDDMMYY(end)}`;
@@ -744,10 +747,10 @@ const SalesHomeScreen: React.FC = () => {
     let result = [...appointments];
     const today = startOfDay(new Date());
 
-    // 0. Filtro por dia selecionado no calendÃ¡rio (tem prioridade sobre filtro de perÃ­odo)
-    // CalendÃ¡rio de 7 dias ativo
+    // 0. Filtro por dia selecionado no calendário (tem prioridade sobre filtro de período)
+    // Calendário de 7 dias ativo
     if (showWeekCalendar && !showMonthCalendar) {
-      // Calcular a data selecionada no calendÃ¡rio de 7 dias
+      // Calcular a data selecionada no calendário de 7 dias
       const startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - today.getDay());
       const selectedDate = new Date(startOfWeek);
@@ -759,13 +762,13 @@ const SalesHomeScreen: React.FC = () => {
 
       result = result.filter((apt) => apt.date === selectedDateKey);
     }
-    // CalendÃ¡rio de 30 dias ativo e dia selecionado
+    // Calendário de 30 dias ativo e dia selecionado
     else if (showMonthCalendar && selectedMonthDateKey) {
       result = result.filter((apt) => apt.date === selectedMonthDateKey);
     }
-    // Modo padrÃ£o - aplicar filtros normais
+    // Modo padrão - aplicar filtros normais
     else {
-      // 1. Filtro de PerÃ­odo
+      // 1. Filtro de Período
       let filterStartDate: Date | null = null;
       let filterEndDate: Date | null = null;
 
@@ -783,7 +786,7 @@ const SalesHomeScreen: React.FC = () => {
         filterEndDate = periodEndDate ? startOfDay(periodEndDate) : null;
       }
 
-      // Aplicar filtro de perÃ­odo se houver datas definidas
+      // Aplicar filtro de período se houver datas definidas
       if (filterStartDate || filterEndDate) {
         result = result.filter((apt) => {
           const aptDate = startOfDay(new Date(`${apt.date}T00:00:00`));
@@ -818,7 +821,7 @@ const SalesHomeScreen: React.FC = () => {
     return result;
   }, [appointments, periodQuickLabel, periodStartDate, periodEndDate, statusLabel, showWeekCalendar, showMonthCalendar, selectedWeekDayIndex, selectedMonthDateKey]);
 
-  // NavegaÃ§Ã£o do calendÃ¡rio mensal
+  // Navegação do calendário mensal
   const goToPrevMonth = () => {
     const d = new Date(currentMonthDate);
     d.setMonth(d.getMonth() - 1);
@@ -842,17 +845,17 @@ const SalesHomeScreen: React.FC = () => {
     return countMap;
   }, [appointments]);
 
-  // Calcular dias com agendamentos para o mÃªs atual (calendÃ¡rio de 30 dias)
+  // Calcular dias com agendamentos para o mês atual (calendário de 30 dias)
   React.useEffect(() => {
     const year = currentMonthDate.getFullYear();
     const month = currentMonthDate.getMonth();
     const daysWithAppointments: number[] = [];
 
-    // Verificar cada dia do mÃªs se tem agendamento
+    // Verificar cada dia do mês se tem agendamento
     appointments.forEach((apt) => {
       if (apt.date) {
         const [aptYear, aptMonth, aptDay] = apt.date.split('-').map(Number);
-        // aptMonth vem como 1-12, month Ã© 0-11
+        // aptMonth vem como 1-12, month é 0-11
         if (aptYear === year && aptMonth === month + 1) {
           if (!daysWithAppointments.includes(aptDay)) {
             daysWithAppointments.push(aptDay);
@@ -864,14 +867,14 @@ const SalesHomeScreen: React.FC = () => {
     setAppointmentDays(daysWithAppointments.sort((a, b) => a - b));
   }, [currentMonthDate, appointments]);
 
-  // Render do calendÃ¡rio semanal (Figma 03), abaixo dos filtros
+  // Render do calendário semanal (Figma 03), abaixo dos filtros
   const renderWeekCalendar = () => {
     if (!showWeekCalendar || showMonthCalendar) return null;
     const today = new Date();
     const startOfWeek = new Date(today);
     // semana iniciando no domingo
     startOfWeek.setDate(today.getDate() - today.getDay());
-    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'SÃ¡b'];
+    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
     const days = new Array(7).fill(0).map((_, i) => {
       const d = new Date(startOfWeek);
@@ -920,17 +923,17 @@ const SalesHomeScreen: React.FC = () => {
     );
   };
 
-  // Render do calendÃ¡rio mensal (Figma 02), abaixo do Header e acima do conteÃºdo
+  // Render do calendário mensal (Figma 02), abaixo do Header e acima do conteúdo
   const renderMonthCalendar = () => {
     if (!showMonthCalendar) return null;
 
-    const monthNames = ['Janeiro', 'Fevereiro', 'MarÃ§o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'SÃ¡b'];
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
     const year = currentMonthDate.getFullYear();
     const month = currentMonthDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const startWeekday = firstDay.getDay(); // 0..6 (Dom..SÃ¡b)
+    const startWeekday = firstDay.getDay(); // 0..6 (Dom..Sáb)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
 
@@ -940,11 +943,11 @@ const SalesHomeScreen: React.FC = () => {
     const innerWidth = monthContainerWidth - horizontalPadding * 2;
     const columnWidth = Math.floor((innerWidth - gap * 6) / 7);
 
-    // Gerar cÃ©lulas e semanas (linhas)
+    // Gerar células e semanas (linhas)
     const cells: { label: number; inMonth: boolean; date: Date; isToday: boolean }[] = [];
     const today = new Date();
 
-    // Dias do mÃªs anterior para preencher o inÃ­cio
+    // Dias do mês anterior para preencher o início
     for (let i = 0; i < startWeekday; i++) {
       const num = daysInPrevMonth - startWeekday + 1 + i;
       const d = new Date(year, month - 1, num);
@@ -952,16 +955,16 @@ const SalesHomeScreen: React.FC = () => {
       cells.push({ label: num, inMonth: false, date: d, isToday });
     }
 
-    // Dias do mÃªs atual
+    // Dias do mês atual
     for (let i = 1; i <= daysInMonth; i++) {
       const d = new Date(year, month, i);
       const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
       cells.push({ label: i, inMonth: true, date: d, isToday });
     }
 
-    // Preenche o resto com dias do prÃ³ximo mÃªs
+    // Preenche o resto com dias do próximo mês
     let nextDay = 1;
-    // Completar atÃ© mÃºltiplo de 7
+    // Completar até múltiplo de 7
     while (cells.length % 7 !== 0) {
       const d = new Date(year, month + 1, nextDay);
       const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
@@ -975,7 +978,7 @@ const SalesHomeScreen: React.FC = () => {
       weeks.push(cells.slice(i, i + 7));
     }
 
-    // Remover semanas que nÃ£o possuem nenhum dia do mÃªs atual
+    // Remover semanas que não possuem nenhum dia do mês atual
     const visibleWeeks = weeks.filter((w) => w.some((c) => c.inMonth));
 
     const dateKey = (d: Date) => {
@@ -987,7 +990,7 @@ const SalesHomeScreen: React.FC = () => {
 
     return (
       <View style={styles.monthCalendarContainer} onLayout={(e) => setMonthContainerWidth(e?.nativeEvent?.layout?.width ?? monthContainerWidth)}>
-        {/* CabeÃ§alho: setas e mÃªs/ano */}
+        {/* Cabeçalho: setas e mês/ano */}
         <View style={styles.monthCalendarHeader}>
           <TouchableOpacity onPress={goToPrevMonth} style={styles.monthArrowButton}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
@@ -1071,7 +1074,7 @@ const SalesHomeScreen: React.FC = () => {
     </Svg>
   );
 
-  // Ãcone do botÃ£o "Alternar telas" (adaptado do SVG fornecido)
+  // Ícone do botão "Alternar telas" (adaptado do SVG fornecido)
   const renderToggleIcon = (active?: boolean) => (
     <Svg width="37" height="32" viewBox="0 0 37 32" fill="none">
       <Rect x="0.25" y="0.25" width="36.5" height="31.5" rx="5.75" fill={active ? '#1777CF' : '#F4F4F4'} />
@@ -1124,7 +1127,7 @@ const SalesHomeScreen: React.FC = () => {
     </Svg>
   );
 
-  // RenderizaÃ§Ã£o do card de agendamento (reutilizado em web/mobile)
+  // Renderização do card de agendamento (reutilizado em web/mobile)
   const renderAppointmentCard = (apt: AppointmentItem) => {
     const d = new Date(`${apt.date}T00:00:00`);
     const firstSlot = apt.slots?.[0]?.start;
@@ -1140,9 +1143,9 @@ const SalesHomeScreen: React.FC = () => {
     const statusIsConfirmed = /confirmado/i.test(statusLabel);
     const isAwaitingPayment = /^aguardando pagamento$/i.test(statusLabel);
 
-    // Monta estilos do card principal de forma explÃ­cita
+    // Monta estilos do card principal de forma explícita
     const cardStyles: ViewStyle[] = [styles.scheduleCardRow];
-    // Todos os cards usam a mesma altura (conteÃºdo interno Ã© idÃªntico)
+    // Todos os cards usam a mesma altura (conteúdo interno é idêntico)
     cardStyles.push(styles.scheduleCardRowSmall);
     // Card ativo (COM ou SEM foto): mesma borda azul e fundo azul 3%
     if (isSelected) {
@@ -1219,11 +1222,11 @@ const SalesHomeScreen: React.FC = () => {
     );
   };
 
-  // CabeÃ§alho da lista (reutilizado em FlatList e ScrollView)
+  // Cabeçalho da lista (reutilizado em FlatList e ScrollView)
   const renderListHeader = () => (
     <View>
       {renderMonthCalendar()}
-      {/* BotÃ£o Nova agenda */}
+      {/* Botão Nova agenda */}
       {!showMonthCalendar && (
         <View style={styles.actionsRow}>
           <TouchableOpacity
@@ -1245,16 +1248,16 @@ const SalesHomeScreen: React.FC = () => {
         </View>
       )}
 
-      {/* Filtros (apenas PerÃ­odos e Status) */}
+      {/* Filtros (apenas Períodos e Status) */}
       {!showMonthCalendar && (
         showWeekCalendar ? (
-          // Modo 7 dias: 2 filtros com flex distribuÃ­do, sem scroll
+          // Modo 7 dias: 2 filtros com flex distribuído, sem scroll
           <View style={styles.filtersRowWeekMode}>
             <TouchableOpacity
               style={styles.filterCardFlex}
               onPress={() => openFiltersModal('periods')}
             >
-              <Text style={styles.filterLabel} numberOfLines={1}>PerÃ­odos</Text>
+              <Text style={styles.filterLabel} numberOfLines={1}>Períodos</Text>
               <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{periodsDisplayLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -1266,13 +1269,13 @@ const SalesHomeScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         ) : (
-          // Modo normal: 2 filtros com flex distribuÃ­do, sem scroll
+          // Modo normal: 2 filtros com flex distribuído, sem scroll
           <View style={styles.filtersRowWeekMode}>
             <TouchableOpacity
               style={styles.filterCardFlex}
               onPress={() => openFiltersModal('periods')}
             >
-              <Text style={styles.filterLabel} numberOfLines={1}>PerÃ­odos</Text>
+              <Text style={styles.filterLabel} numberOfLines={1}>Períodos</Text>
               <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{periodsDisplayLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -1318,17 +1321,17 @@ const SalesHomeScreen: React.FC = () => {
         onCalendarMonthPress={() => setShowMonthCalendar((v) => { const next = !v; if (next) setShowWeekCalendar(false); return next; })}
         calendarMonthActive={showMonthCalendar}
       />
-      {/* DivisÃ³ria abaixo do header */}
+      {/* Divisória abaixo do header */}
       <View style={styles.headerDividerWrapper}>
         <View style={styles.headerDivider} />
       </View>
       
-      {/* ÃREA FIXA: BotÃµes e Filtros (fora do scroll) */}
+      {/* ÁREA FIXA: Botões e Filtros (fora do scroll) */}
       <View style={styles.fixedHeader}>
         {renderListHeader()}
       </View>
       
-      {/* ÃREA SCROLLÃVEL: Apenas os cards */}
+      {/* ÁREA SCROLLÁVEL: Apenas os cards */}
       <View style={styles.scrollWrapper}>
         <ScrollView
           style={styles.scrollView}
@@ -1336,7 +1339,7 @@ const SalesHomeScreen: React.FC = () => {
           showsVerticalScrollIndicator={true}
           keyboardShouldPersistTaps="handled"
         >
-          {/* ConteÃºdo principal - apenas cards */}
+          {/* Conteúdo principal - apenas cards */}
           {filteredAppointments.length === 0 ? (
             renderEmptyState()
           ) : alternateView ? (
@@ -1368,7 +1371,7 @@ const SalesHomeScreen: React.FC = () => {
             </>
           )}
           
-          {/* EspaÃ§ador final para o BottomMenu */}
+          {/* Espaçador final para o BottomMenu */}
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </View>
@@ -1381,7 +1384,7 @@ const SalesHomeScreen: React.FC = () => {
         onApply={(selection: { periodsLabel: string; statusLabel: string; startDate?: Date | null; endDate?: Date | null; quickLabel?: 'none' | 'Hoje' | '15 dias' | 'Este mês' }) => handleApplyFilters(selection)}
       />
 
-      {/* Novo Agendamento â€“ Modal unificado com Header/Footer fixos e conteÃºdo embed */}
+      {/* Novo Agendamento – Modal unificado com Header/Footer fixos e conteúdo embed */}
       <ModalShell
         visible={newAppointmentVisible}
         onClose={requestLeaveSchedule}
@@ -1414,14 +1417,14 @@ const SalesHomeScreen: React.FC = () => {
         onSchedule={(payload: any) => handleSchedule(payload?.date, payload?.slots, payload?.client ?? null, payload)}
       />
 
-      {/* Modal de confirmaÃ§Ã£o de saÃ­da do novo agendamento */}
+      {/* Modal de confirmação de saída do novo agendamento */}
       <ModalAlertLeaveTheSchedule
         visible={leaveModalVisible}
         onCancel={cancelLeaveSchedule}
         onConfirm={confirmLeaveSchedule}
       />
 
-      {/* Menu de aÃ§Ãµes do card (Figma 17) */}
+      {/* Menu de ações do card (Figma 17) */}
       <CardMenu
         visible={agendaMenuVisible}
         onClose={handleCloseAgendaMenu}
@@ -1431,7 +1434,7 @@ const SalesHomeScreen: React.FC = () => {
         onSendEmail={handleSendEmail}
       />
 
-      {/* ConfirmaÃ§Ã£o de exclusÃ£o de agendamento */}
+      {/* Confirmação de exclusão de agendamento */}
       <ModalAlertDeleteCommitment
         visible={deleteModalVisible}
         start={selectedAppointment?.slots?.[0]?.start ?? ''}
@@ -1457,7 +1460,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FCFCFC',
   },
-  // ÃREA FIXA: BotÃµes e Filtros (nÃ£o fazem scroll)
+  // ÁREA FIXA: Botões e Filtros (não fazem scroll)
   fixedHeader: {
     paddingHorizontal: 16,
     backgroundColor: '#FCFCFC',
@@ -1496,14 +1499,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 0,
-    // Faz o conteÃºdo ocupar toda a altura disponÃ­vel do ScrollView
+    // Faz o conteúdo ocupar toda a altura disponível do ScrollView
     flexGrow: 1,
   },
-  // EspaÃ§ador no final para nÃ£o ficar atrÃ¡s do BottomMenu
+  // Espaçador no final para não ficar atrás do BottomMenu
   bottomSpacer: {
     height: 0,
   },
-  // DivisÃ³ria entre o Header (tÃ­tulo + Ã­cones) e a Ã¡rea do botÃ£o
+  // Divisória entre o Header (título + ícones) e a área do botão
   headerDividerWrapper: {
     paddingHorizontal: 16,
   },
@@ -1512,7 +1515,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D8E0F0',
     alignSelf: 'stretch',
   },
-  // Linha de aÃ§Ãµes (Alternar telas + Novo agendamento)
+  // Linha de ações (Alternar telas + Novo agendamento)
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1586,7 +1589,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_500Medium',
     color: '#FCFCFC',
   },
-  // Linha de filtros no modo 7 dias (flex distribuÃ­do, sem scroll)
+  // Linha de filtros no modo 7 dias (flex distribuído, sem scroll)
   filtersRowWeekMode: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -1638,7 +1641,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     alignSelf: 'stretch',
-    // Ocupa 100% da Ã¡rea com respiro de 10px sem provocar scroll
+    // Ocupa 100% da área com respiro de 10px sem provocar scroll
     ...Platform.select({
       web: { height: 'calc(100% - 15px)' } as any,
       default: { flexGrow: 1 },
@@ -1682,7 +1685,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  // VariaÃ§Ãµes de altura conforme layout do Figma
+  // Variações de altura conforme layout do Figma
   scheduleCardRowSmall: {
     minHeight: 130,
   },
@@ -1900,7 +1903,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
   },
-  // VariaÃ§Ã£o azul do tile
+  // Variação azul do tile
   leftTileBlue: {
     backgroundColor: '#1777CF',
     borderColor: '#D8E0F0',
@@ -1952,7 +1955,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D8E0F0',
     marginVertical: 0,
   },
-  // DivisÃ³ria entre cards da lista
+  // Divisória entre cards da lista
   cardsDivider: {
     height: 1,
     backgroundColor: '#D8E0F0',
@@ -1998,9 +2001,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     color: '#7D8592',
   },
-  // CalendÃ¡rio mensal (Figma 02)
+  // Calendário mensal (Figma 02)
   monthCalendarContainer: {
-    // EspaÃ§amento antes dos cards de agendamentos no modo 30 dias
+    // Espaçamento antes dos cards de agendamentos no modo 30 dias
     marginTop: 8,
     marginBottom: 16,
     marginHorizontal: 0,
@@ -2114,11 +2117,11 @@ const styles = StyleSheet.create({
     top: -3,
     right: -3,
   },
-  // CalendÃ¡rio semanal (Figma 03)
+  // Calendário semanal (Figma 03)
   weekCalendarContainer: {
     marginTop: 4,
     marginBottom: 10,
-    // Usar toda a largura disponÃ­vel do conteÃºdo
+    // Usar toda a largura disponível do conteúdo
     marginHorizontal: 0,
   },
   weekCalendarDaysRow: {
@@ -2192,7 +2195,7 @@ const styles = StyleSheet.create({
   scheduleCards: {
     marginHorizontal: 0,
     paddingTop: 10,
-    // EspaÃ§o vertical entre cards
+    // Espaço vertical entre cards
     gap: 10,
   },
 });

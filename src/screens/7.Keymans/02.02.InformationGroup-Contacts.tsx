@@ -148,7 +148,7 @@ const contactsData = [
   },
   {
     id: 2,
-    name: 'Ruan de Londres',
+    name: 'Ruan de Londres 10',
     whatsapp: '17 99246-0563',
     state: 'São Paulo',
     photo: 'https://randomuser.me/api/portraits/men/1.jpg',

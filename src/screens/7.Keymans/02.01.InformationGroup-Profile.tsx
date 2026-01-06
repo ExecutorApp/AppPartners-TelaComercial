@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Svg, Path, Rect, G, Defs, ClipPath, Circle } from 'react-native-svg';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import InformationGroupRank from './02.03.InformationGroup-Rank';
 
 // Cores do tema
 const COLORS = {
@@ -583,100 +584,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
     );
   };
 
-  const RankTabContent: React.FC = () => {
-    const [searchText, setSearchText] = useState('');
-    const FAKE_RANKING = [
-      { id: '1', position: 1, name: 'Courtney Henry', points: 5075 },
-      { id: '2', position: 2, name: 'Savannah Nguyen', points: 4000 },
-      { id: '3', position: 3, name: 'Darlene Robertson', points: 3000 },
-      { id: '4', position: 4, name: 'Ronald Richards', points: 2000 },
-      { id: '5', position: 5, name: 'Devon Lane', points: 1000 },
-      { id: '6', position: 6, name: 'Arlene McCoy', points: 900 },
-      { id: '7', position: 7, name: 'Ralph Edwards', points: 800 },
-      { id: '8', position: 8, name: 'Brooklyn Simmons', points: 700 },
-      { id: '9', position: 9, name: 'Jacob Jones', points: 650 },
-      { id: '10', position: 10, name: 'Jenny Wilson', points: 600 },
-    ];
-    const filteredRanking = FAKE_RANKING.filter(item => {
-      const term = searchText.trim().toLowerCase();
-      return term.length === 0 || item.name.toLowerCase().includes(term);
-    });
-    const renderPositionIcon = (position: number) => {
-      if (position <= 3) {
-        return (
-          <View style={styles.trophyWrapper}>
-            <TrophyIcon />
-            <Text style={styles.positionNumberSmall}>{position}</Text>
-          </View>
-        );
-      }
-      return <Text style={styles.positionNumber}>{position}</Text>;
-    };
-    const renderRankingItem = (item: typeof FAKE_RANKING[0]) => (
-      <View key={item.id} style={styles.rankingItem}>
-        <View style={styles.positionContainer}>{renderPositionIcon(item.position)}</View>
-        <View style={styles.rankPhotoContainer}>
-          <View style={styles.rankPhotoPlaceholder}>
-            <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-                stroke={COLORS.textTertiary}
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-                stroke={COLORS.textTertiary}
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </Svg>
-          </View>
-        </View>
-        <View style={styles.nameContainer}>
-          <Text style={styles.nameText} numberOfLines={1}>{item.name}</Text>
-        </View>
-        <View style={styles.pointsContainer}>
-          <Text style={styles.pointsText}>{item.points}</Text>
-        </View>
-      </View>
-    );
-    return (
-      <View style={styles.rankContent}>
-        <View style={styles.searchContainerRank}>
-          <SearchIcon />
-          <TextInput
-            style={styles.searchInputRank}
-            placeholder="Pesquise aqui"
-            placeholderTextColor={COLORS.textTertiary}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View>
-        <View style={styles.tableHeader}>
-          <View style={styles.headerPosition}>
-            <Text style={styles.headerText}>Lugar</Text>
-          </View>
-          <View style={styles.headerName}>
-            <Text style={styles.headerText}>Nome</Text>
-          </View>
-          <View style={styles.headerPoints}>
-            <Text style={styles.headerText}>Pontos</Text>
-          </View>
-        </View>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {filteredRanking.map(renderRankingItem)}
-          <View style={styles.bottomSpacer} />
-        </ScrollView>
-      </View>
-    );
-  };
+  // Conteúdo da aba Rank removido deste arquivo. Renderização delegada ao componente externo.
 
   return (
     <SafeAreaView style={styles.container}>
@@ -697,7 +605,6 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
       <View style={styles.content}>
         {activeTab === 'perfil' && renderProfileForm()}
         {activeTab === 'contatos' && <ContactsTabContent />}
-        {activeTab === 'rank' && <RankTabContent />}
       </View>
 
       <View style={styles.footerContainer}>
@@ -712,6 +619,14 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
       </View>
 
       {renderCancelModal()}
+      <InformationGroupRank
+        visible={activeTab === 'rank'}
+        onClose={() => setActiveTab('perfil')}
+        keymanName={formData.nome}
+        keymanId={keymanId ? String(keymanId) : undefined}
+        onNavigateToProfile={() => setActiveTab('perfil')}
+        onNavigateToContacts={() => setActiveTab('contatos')}
+      />
     </SafeAreaView>
   );
 };
@@ -961,137 +876,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 50,
-  },
-  rankContent: {
-    flex: 1,
-    paddingHorizontal: 16,
-    gap: 15,
-  },
-  searchContainerRank: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-    gap: 10,
-    backgroundColor: COLORS.white,
-  },
-  searchInputRank: {
-    flex: 1,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    height: '100%',
-    ...Platform.select({
-      web: {
-        outlineStyle: 'none',
-        outlineWidth: 0,
-        outlineColor: 'transparent',
-      } as any,
-      default: {},
-    }),
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  headerPosition: {
-    width: 50,
-  },
-  headerName: {
-    flex: 1,
-    paddingLeft: 50,
-  },
-  headerPoints: {
-    width: 60,
-    alignItems: 'flex-end',
-  },
-  headerText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-    flexGrow: 1,
-    gap: 10,
-  },
-  bottomSpacer: {
-    height: 20,
-  },
-  rankingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 50,
-    paddingHorizontal: 10,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    backgroundColor: COLORS.white,
-    gap: 10,
-  },
-  positionContainer: {
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  trophyWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  positionNumber: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  positionNumberSmall: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    color: COLORS.textPrimary,
-  },
-  rankPhotoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  rankPhotoPlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: COLORS.background,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  nameContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  nameText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  pointsContainer: {
-    width: 60,
-    alignItems: 'flex-end',
-  },
-  pointsText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
   },
   titleSection: {
     gap: 10,

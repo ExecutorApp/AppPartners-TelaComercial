@@ -214,7 +214,7 @@ const ModalShell: React.FC<ModalShellProps> = ({
             onBack={() => { setTransitionDirection?.('backward'); goToStep(6); }}
             navigation={navigation}
             onSaveSale={(saleData) => {
-              onSchedule?.({ date: new Date(), slots: [], client: selectedClient, ...saleData });
+              onSchedule?.({ date: new Date(), slots: [], ...saleData, client: selectedClient });
               // Fecha o modal após salvar a venda
               if (onCloseImmediate) {
                 onCloseImmediate();
@@ -237,7 +237,7 @@ const ModalShell: React.FC<ModalShellProps> = ({
             onBack={() => { setTransitionDirection?.('backward'); goToStep(7); }}
             navigation={navigation}
             onSaveSale={(saleData) => {
-              onSchedule?.({ date: new Date(), slots: [], client: selectedClient, ...saleData });
+              onSchedule?.({ date: new Date(), slots: [], ...saleData, client: selectedClient });
               // Fecha o modal após salvar a venda
               if (onCloseImmediate) {
                 onCloseImmediate();
