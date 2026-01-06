@@ -9,16 +9,13 @@ import {
   StyleSheet,
   PanResponder,
 } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
+import Svg, { Path, SvgXml } from 'react-native-svg';
 
-type FiltersTab = 'periods' | 'products' | 'flows' | 'types';
+type FiltersTab = 'periods' | 'status';
 
-// Payload de seleção retornado ao clicar em "Aplicar"
 type FiltersSelection = {
   periodsLabel: string;
-  productLabel: string;
-  flowLabel: string;
-  typeLabel: string;
+  statusLabel: string;
   startDate?: Date | null;
   endDate?: Date | null;
   quickLabel?: 'none' | 'Hoje' | '15 dias' | 'Este mês';
@@ -28,7 +25,6 @@ interface ModalFiltersProps {
   visible: boolean;
   initialTab: FiltersTab;
   onClose: () => void;
-  // Quando fornecido, será chamado com o resumo das seleções feitas no modal
   onApply?: (selection: FiltersSelection) => void;
 }
 
@@ -50,21 +46,35 @@ const monthNames = [
 const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClose, onApply }) => {
   const [activeTab, setActiveTab] = React.useState<FiltersTab>(initialTab);
   const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
-  // Estado de seleção de períodos
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
   const [selectMode, setSelectMode] = React.useState<'none' | 'start' | 'end' | 'drag'>('none');
   const [quickLabel, setQuickLabel] = React.useState<'none' | 'Hoje' | '15 dias' | 'Este mês'>('none');
-  // "Final" só pode ficar ativo após o usuário escolher uma data inicial via botão "Inicial"
   const [canUseFinal, setCanUseFinal] = React.useState<boolean>(false);
-  // Aba Produtos: controlar opção selecionada para exibição no cabeçalho e estilo ativo
-  const [selectedProduct, setSelectedProduct] = React.useState<string>('Todos');
-  // Aba Tipos: controlar opção selecionada para exibição no cabeçalho e estilo ativo
-  const [selectedType, setSelectedType] = React.useState<string>('Todos');
-  // Aba Tipos de fluxo: controlar opção selecionada para exibição no cabeçalho e estilo ativo
-  const [selectedFlow, setSelectedFlow] = React.useState<string>('Todos');
+  const [selectedStatus, setSelectedStatus] = React.useState<string>('Todos');
+  const [footerHeight, setFooterHeight] = React.useState<number>(0);
   const gridLayoutRef = React.useRef<{ x: number; y: number; width: number; height: number }>({ x: 0, y: 0, width: 0, height: 0 });
   const cellsRef = React.useRef<Date[]>([]);
+  const normalizeSvgXml = React.useCallback((raw: string, key: string) => {
+    const xml = (raw ?? '').trim();
+    if (!xml) return '';
+    const safeKey = key.replace(/[^a-zA-Z0-9_]+/g, '_');
+    const prefix = `status_${safeKey}_`;
+    const withIds = xml.replace(/id="([^"]+)"/g, (_m, id: string) => `id="${prefix}${id}"`);
+    const withUrls = withIds.replace(/url\(#([^)]+)\)/g, (_m, id: string) => `url(#${prefix}${id})`);
+    const withHref = withUrls
+      .replace(/href="#([^"]+)"/g, (_m, id: string) => `href="#${prefix}${id}"`)
+      .replace(/xlink:href="#([^"]+)"/g, (_m, id: string) => `xlink:href="#${prefix}${id}"`);
+    return withHref;
+  }, []);
+
+  const statusOptions = React.useMemo(() => {
+    try {
+      return require('../../../status_parsed.json') as Array<{ title: string; desc: string; svg: string }>;
+    } catch {
+      return [] as Array<{ title: string; desc: string; svg: string }>;
+    }
+  }, []);
 
   // Helpers de datas
   const formatDate = React.useCallback((d?: Date | null) => {
@@ -88,19 +98,7 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
   const today = React.useMemo(() => new Date(), []);
 
   const headerText = React.useMemo(() => {
-    // Aba Produtos: mostrar a opção selecionada pelo usuário
-    if (activeTab === 'products') {
-      return selectedProduct;
-    }
-    // Aba Tipos de fluxo: mostrar a opção selecionada pelo usuário
-    if (activeTab === 'flows') {
-      return selectedFlow;
-    }
-    // Aba Tipos de agenda: mostrar a opção selecionada pelo usuário
-    if (activeTab === 'types') {
-      return selectedType;
-    }
-    // Demais abas: manter comportamento existente (especialmente Períodos)
+    if (activeTab === 'status') return selectedStatus;
     if (quickLabel === 'Hoje') {
       return `Hoje - ${formatDate(today)}`;
     }
@@ -114,13 +112,10 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
       const end = lastOfMonth(today);
       return `Este mês - De ${formatDate(start)} à ${formatDate(end)}`;
     }
-    // Quando o usuário está no modo de seleção (Inicial/Final), sempre mostramos o intervalo
-    // com placeholders se necessário, em vez de "Todos".
     if (selectMode === 'start' || selectMode === 'end') {
       return `De ${formatDate(startDate)} à ${formatDate(endDate)}`;
     }
     if (startDate && endDate) {
-      // Se for uma única data (start === end) e fora de modos de seleção, exibe apenas a data.
       if (startDate.getTime() === endDate.getTime()) {
         return `${formatDate(startDate)}`;
       }
@@ -128,18 +123,16 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
     }
     if (startDate && !endDate) return `De ${formatDate(startDate)} à 00/00/00`;
     return 'Todos';
-  }, [activeTab, selectedProduct, selectedFlow, selectedType, quickLabel, startDate, endDate, selectMode, formatDate, today]);
+  }, [activeTab, selectedStatus, quickLabel, startDate, endDate, selectMode, formatDate, today]);
 
   // Constrói o payload de seleção para uso externo
   const buildSelection = React.useCallback((): FiltersSelection => {
-    // Label de períodos resumida para os cards da home
     let periodsLabel = 'Todos';
     if (quickLabel === 'Hoje') {
       periodsLabel = 'Hoje';
     } else if (quickLabel === '15 dias') {
       periodsLabel = '15 dias';
     } else if (quickLabel === 'Este mês') {
-      // Mantemos o texto curto do card conforme referência visual
       periodsLabel = 'Esse mês';
     } else if (startDate || endDate) {
       const s = formatDate(startDate);
@@ -149,27 +142,34 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
 
     return {
       periodsLabel,
-      productLabel: selectedProduct || 'Todos',
-      flowLabel: selectedFlow || 'Todos',
-      typeLabel: selectedType || 'Todos',
+      statusLabel: selectedStatus || 'Todos',
       startDate,
       endDate,
       quickLabel,
     };
-  }, [quickLabel, startDate, endDate, selectedProduct, selectedFlow, selectedType, formatDate]);
+  }, [quickLabel, startDate, endDate, selectedStatus, formatDate]);
 
   React.useEffect(() => {
     if (visible) setActiveTab(initialTab);
   }, [visible, initialTab]);
 
+  React.useEffect(() => {
+    if (!visible) return;
+    if (activeTab !== 'status') return;
+    console.log('[SalesModalFilters][Status] open', {
+      optionsCount: statusOptions.length,
+      selectedStatus,
+    });
+  }, [visible, activeTab, statusOptions.length, selectedStatus]);
+
   const goPrevTab = () => {
-    const order: FiltersTab[] = ['periods', 'products', 'flows', 'types'];
+    const order: FiltersTab[] = ['periods', 'status'];
     const idx = order.indexOf(activeTab);
     setActiveTab(order[Math.max(0, idx - 1)]);
   };
 
   const goNextTab = () => {
-    const order: FiltersTab[] = ['periods', 'products', 'flows', 'types'];
+    const order: FiltersTab[] = ['periods', 'status'];
     const idx = order.indexOf(activeTab);
     setActiveTab(order[Math.min(order.length - 1, idx + 1)]);
   };
@@ -186,7 +186,6 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
     setCurrentDate(d);
   };
 
-  // Ícones (SVG) conforme especificação
   const HeaderArrowLeftIcon: React.FC<{ width?: number; height?: number; color?: string }> = ({ width = 8, height = 12, color = '#FFFFFF' }) => (
     <Svg width={width} height={height} viewBox="0 0 8 12" fill="none">
       <Path
@@ -228,17 +227,13 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
   );
 
   const renderHeader = () => {
-    const order: FiltersTab[] = ['periods', 'products', 'flows', 'types'];
+    const order: FiltersTab[] = ['periods', 'status'];
     const idx = order.indexOf(activeTab);
     const step = `${String(idx + 1).padStart(2, '0')}/${String(order.length).padStart(2, '0')}`;
     const title =
       activeTab === 'periods'
         ? 'Períodos'
-        : activeTab === 'products'
-        ? 'Produtos'
-        : activeTab === 'flows'
-        ? 'Tipos de fluxo'
-        : 'Tipos de agenda';
+        : 'Status';
     const isPrevDisabled = idx === 0;
     const isNextDisabled = idx === order.length - 1;
     return (
@@ -464,8 +459,6 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
                 setQuickLabel('Hoje');
                 // Garantir exclusividade: desativa modos de seleção manual
                 setSelectMode('none');
-                // Normaliza para início do dia para coincidir com as células do calendário
-                const sod = startOfDay(now);
                 // Para "Hoje": destacar visualmente o dia atual via quickLabel,
                 // mas resetar os campos Inicial/Final para 00/00/00
                 setStartDate(null);
@@ -622,107 +615,52 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
     );
   };
 
-  const renderProductsTab = () => (
-    <View style={styles.tabContainer}>
-      <ScrollView>
-        <TouchableOpacity onPress={() => setSelectedProduct('Todos')} activeOpacity={0.85}>
-          <Text style={[
-            styles.linkAll,
-            selectedProduct === 'Todos' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Todos</Text>
-        </TouchableOpacity>
-        <View style={styles.divider} />
-        <TouchableOpacity style={styles.listItem} onPress={() => setSelectedProduct('Holding Patrimonial')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedProduct === 'Holding Patrimonial' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Holding Patrimonial</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.listItem} onPress={() => setSelectedProduct('Ativos Fundiários')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedProduct === 'Ativos Fundiários' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Ativos Fundiários</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.listItem, styles.listItemLast]} onPress={() => setSelectedProduct('Planejamento Tributário')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedProduct === 'Planejamento Tributário' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Planejamento Tributário</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
-  );
-
-  const renderFlowsTab = () => (
-    <View style={styles.tabContainer}>
-      <ScrollView>
-        <TouchableOpacity onPress={() => setSelectedFlow('Todos')} activeOpacity={0.85}>
-          <Text style={[
-            styles.linkAll,
-            selectedFlow === 'Todos' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Todos</Text>
-        </TouchableOpacity>
-        <View style={styles.divider} />
-        <TouchableOpacity style={styles.listItem} onPress={() => setSelectedFlow('Guiado')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedFlow === 'Guiado' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Guiado</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.listItem, styles.listItemLast]} onPress={() => setSelectedFlow('Livre')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedFlow === 'Livre' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Livre</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
-  );
-
-  const renderTypesTab = () => (
-    <View style={styles.tabContainer}>
-      <ScrollView>
-        <TouchableOpacity onPress={() => setSelectedType('Todos')} activeOpacity={0.85}>
-          <Text style={[
-            styles.linkAll,
-            selectedType === 'Todos' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Todos</Text>
-        </TouchableOpacity>
-        <View style={styles.divider} />
-        <TouchableOpacity style={styles.listItem} onPress={() => setSelectedType('Individual')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedType === 'Individual' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Individual</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.listItem, styles.listItemLast]} onPress={() => setSelectedType('Compartilhada')} activeOpacity={0.85}>
-          <Text style={[
-            styles.listItemText,
-            styles.productTitle,
-            selectedType === 'Compartilhada' ? styles.productActiveText : styles.productInactiveText,
-          ]}>Compartilhada</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
-  );
+  const renderStatusTab = () => {
+    return (
+      <View style={styles.statusTabContainer}>
+        <ScrollView style={styles.statusScroll} contentContainerStyle={[styles.statusList, { paddingBottom: footerHeight + 12 }]}>
+          {statusOptions.map((opt) => {
+            const isSelected = selectedStatus === opt.title;
+            return (
+              <TouchableOpacity
+                key={opt.title}
+                style={[styles.statusCard, isSelected ? styles.statusCardSelected : null]}
+                onPress={() => setSelectedStatus(opt.title)}
+                activeOpacity={0.85}
+              >
+                <View style={styles.statusCardTextBlock}>
+                  <Text style={styles.statusCardTitle}>{opt.title}</Text>
+                  <Text style={styles.statusCardDesc}>{opt.desc}</Text>
+                </View>
+                <View style={styles.statusCardIcon}>
+                  {(() => {
+                    try {
+                      const xml = normalizeSvgXml(opt.svg, opt.title);
+                      if (!xml) return null;
+                      return <SvgXml xml={xml} width={40} height={40} />;
+                    } catch (error) {
+                      console.error('[SalesModalFilters][Status] svg render failed', {
+                        title: opt.title,
+                        error,
+                      });
+                      return null;
+                    }
+                  })()}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+    );
+  };
 
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'periods':
         return renderPeriodsTab();
-      case 'products':
-        return renderProductsTab();
-      case 'flows':
-        return renderFlowsTab();
-      case 'types':
-        return renderTypesTab();
+      case 'status':
+        return renderStatusTab();
       default:
         return null;
     }
@@ -737,7 +675,13 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
           <View style={styles.modalContent}>
             {renderActiveTab()}
           </View>
-          <View style={styles.footerActions}>
+          <View
+            style={styles.footerActions}
+            onLayout={(e) => {
+              const h = e?.nativeEvent?.layout?.height ?? 0;
+              setFooterHeight((prev) => (prev === h ? prev : h));
+            }}
+          >
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
@@ -761,14 +705,12 @@ const ModalFilters: React.FC<ModalFiltersProps> = ({ visible, initialTab, onClos
   );
 };
 
-const viewport = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
   modalContainer: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' },
   modalCard: {
     width: 340,
-    height: 650, // Altura fixa conforme Figma (05)
+    height: 650,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
@@ -776,7 +718,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     flexDirection: 'column',
   },
-  modalContent: { flex: 1 },
+  modalContent: { flex: 1, overflow: 'hidden' },
   modalHeader: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
   stepContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 5 },
   navButton: { width: 30, height: 30, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginHorizontal: 0 },
@@ -803,7 +745,6 @@ const styles = StyleSheet.create({
   inputFakeText: { color: '#6B7280', fontSize: 14, fontFamily: 'Inter_400Regular' },
 
   tabContainer: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8 },
-  // Filtros (Todos, Inicial, Final) – layout do Figma
   filterContainer: { alignSelf: 'stretch', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: 10, marginBottom: 10 },
   filterTopRow: { alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5 },
     allButton: { minWidth: 60, height: 60, paddingHorizontal: 20, backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', justifyContent: 'center', alignItems: 'center' },
@@ -813,6 +754,7 @@ const styles = StyleSheet.create({
   rangeContainer: { flex: 1, height: 60, padding: 5, backgroundColor: '#F4F4F4', borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 5 },
   rangeBox: { flex: 1, height: '100%', paddingHorizontal: 10, backgroundColor: '#FFFFFF', borderRadius: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', justifyContent: 'center', alignItems: 'center' },
   rangeBoxActive: { backgroundColor: '#1777CF', borderColor: '#1777CF' },
+  rangeBoxDisabled: { opacity: 0.5 },
   rangeLabel: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_400Regular', textAlign: 'center' },
   rangeLabelActive: { color: '#FCFCFC' },
   rangeValue: { color: '#91929E', fontSize: 14, fontFamily: 'Inter_400Regular', textAlign: 'center' },
@@ -820,13 +762,11 @@ const styles = StyleSheet.create({
   shortcutRow: { alignSelf: 'stretch', height: 40, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10 },
   shortcutItem: { flex: 1, height: '100%', paddingHorizontal: 20, backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', justifyContent: 'center', alignItems: 'center' },
   shortcutItemActive: { backgroundColor: '#1777CF', borderColor: '#1777CF' },
-  // Ajustes finos para evitar quebra do botão "Esse mês"
   shortcutItemNarrow: { flex: 0.92, paddingHorizontal: 16 },
   shortcutItemWide: { flex: 1.16 },
   shortcutText: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_400Regular', textAlign: 'center' },
   shortcutTextActive: { color: '#FCFCFC' },
 
-  // Cabeçalho do calendário e navegação do mês (layout do Figma)
   calendarHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10, gap: 10, },
   monthArrowButton: {
     width: 30,
@@ -851,7 +791,6 @@ const styles = StyleSheet.create({
   },
   monthHeaderText: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_500Medium', },
 
-  // Semana e grade de dias
   weekRow: { flexDirection: 'row', justifyContent: 'center', marginBottom: 6 },
   weekNameCell: { alignItems: 'center', justifyContent: 'center', borderRadius: 4, height: 34 },
   weekLabel: { textAlign: 'center', color: '#3A3F51', opacity: 0.4, fontSize: 14, fontFamily: 'Inter_500Medium' },
@@ -869,7 +808,6 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
     dayCellSelected: { backgroundColor: '#1777CF', borderColor: '#1777CF' },
-    // Dias intermediários do intervalo: mesmo azul com 10% de opacidade
     dayCellInRange: { backgroundColor: 'rgba(23, 119, 207, 0.1)' },
   dayCellOut: { opacity: 0.4 },
   dayText: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_400Regular', },
@@ -877,18 +815,28 @@ const styles = StyleSheet.create({
   dayTextOut: { color: '#7D8592' },
   todayDot: { position: 'absolute', width: 10, height: 10, borderRadius: 99, backgroundColor: '#1777CF', top: -4, right: -4, zIndex: 3 },
   rangeEdgeOverlay: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderWidth: StyleSheet.hairlineWidth, borderColor: '#FFFFFF', borderRadius: 4, zIndex: 2 },
+  statusTabContainer: { flex: 1, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8 },
+  statusScroll: { flex: 1 },
+  statusList: { paddingBottom: 8, gap: 10 },
+  statusCard: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: '#D8E0F0',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  statusCardSelected: { backgroundColor: 'rgba(23, 119, 207, 0.03)', borderWidth: 1, borderColor: '#1777CF' },
+  statusCardTextBlock: { flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10 },
+  statusCardTitle: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_400Regular' },
+  statusCardDesc: { color: '#7D8592', fontSize: 14, fontFamily: 'Inter_400Regular' },
+  statusCardIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 
-  linkAll: { color: '#1777CF', fontSize: 14, marginBottom: 5, fontFamily: 'Inter_400Regular' },
-  listItem: { paddingVertical: 15, borderBottomWidth: 0.08, borderBottomColor: '#D8E0F0' },
-  listItemLast: { borderBottomWidth: 0 },
-  listItemText: { fontSize: 14, color: '#3A3F51' },
-  productTitle: { fontFamily: 'Inter_400Regular' },
-  // Estados de cor para itens da aba Produtos
-  productActiveText: { color: '#1777CF' },
-  productInactiveText: { color: '#3A3F51' },
-  divider: { height: 0.08, backgroundColor: '#D8E0F0', alignSelf: 'stretch', marginVertical: 8 },
-
-  footerActions: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
+  footerActions: { position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 10, backgroundColor: '#FFFFFF', flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
   cancelButton: { flex: 1, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginRight: 8 },
   cancelButtonText: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_600SemiBold' },
   applyButton: { flex: 1, borderRadius: 8, paddingVertical: 10, alignItems: 'center', backgroundColor: '#1777CF', marginLeft: 8 },

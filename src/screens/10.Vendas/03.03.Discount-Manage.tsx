@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
-  Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import NewSaleDiscount from './02.05.NewSale-PaymentMethod-Discount';
@@ -784,11 +783,7 @@ const DiscountManageScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) =
   const EmptyState: React.FC<{ type: 'solicitacoes' | 'condicoes' }> = ({ type }) => (
     <View style={styles.emptyStateContainer}>
       <View style={styles.emptyIllustrationWrapper}>
-        <Image
-          source={require('../../../Ilustração - Gerenciar.svg')}
-          style={styles.emptyIllustration}
-          resizeMode="contain"
-        />
+        <View style={[styles.emptyIllustration, styles.emptyIllustrationPlaceholder]} />
       </View>
       <View style={styles.emptyTextWrapper}>
         <Text style={styles.emptyTitle}>
@@ -1708,6 +1703,12 @@ const styles = StyleSheet.create({
   emptyIllustration: {
     width: 160,
     height: 240,
+  },
+  emptyIllustrationPlaceholder: {
+    backgroundColor: '#F4F4F4',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D8E0F0',
   },
 
   // Wrapper do título do empty state

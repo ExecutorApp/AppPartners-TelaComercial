@@ -9,7 +9,7 @@ import CardMenu from './01.01.SalesHomeScreen-Modal-Options';
 import Header from '../5.Side Menu/2.Header';
 import BottomMenu from '../5.Side Menu/3.BottomMenu';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
-import AlternativeScreen from './18.AlternativeScreen';
+import AlternativeScreen from './01.01.SalesHomeScreen-Alternative';
 import { RootStackParamList, ScreenNames } from '../../types/navigation';
 import ModalFilters from './01.01.SalesHomeScreen-Modal-Filter';
 import NewAppointment01 from './02.01.NewSale-Custome';
@@ -23,10 +23,6 @@ import ModalShell from './16.NewAppointment-ModalShell';
 import formatAppointmentDateLabel from '../../utils/dateLabel';
 
 const { width, height: winHeight } = Dimensions.get('window');
-if (Platform.OS === 'web') {
-  // Log temporÃ¡rio para validar cÃ¡lculo de altura do ScrollView na web
-  console.log('[web] ScrollView target height:', winHeight - Layout.bottomMenuHeight);
-}
 const FLOW_SUMMARIES_STORAGE_KEY = 'partners.sales.flow.summaries';
 const FLOW_PROGRESS_STORAGE_KEY = 'partners.sales.flow.progress';
 const SLOT_MAP_STORAGE_KEY = 'partners.sales.slots.map';
@@ -107,46 +103,14 @@ const SalesHomeScreen: React.FC = () => {
   const [appointmentDays, setAppointmentDays] = useState<number[]>([]);
   // Modal de Filtros
   const [filtersModalVisible, setFiltersModalVisible] = useState<boolean>(false);
-  const [filtersModalTab, setFiltersModalTab] = useState<'periods' | 'products' | 'flows' | 'types'>('periods');
+  const [filtersModalTab, setFiltersModalTab] = useState<'periods' | 'status'>('periods');
   // Labels dinÃ¢micos dos filtros exibidos nos cards
   const [periodsLabel, setPeriodsLabel] = useState<string>('Hoje');
-  const [productsLabel, setProductsLabel] = useState<string>('Todos');
-  const [flowsLabel, setFlowsLabel] = useState<string>('Todos');
-  const [typesLabel, setTypesLabel] = useState<string>('Todos');
+  const [statusLabel, setStatusLabel] = useState<string>('Todos');
   // Estado detalhado do filtro de PerÃ­odos para compor o label conforme regras
   const [periodQuickLabel, setPeriodQuickLabel] = useState<'none' | 'Hoje' | '15 dias' | 'Este mês'>('none');
   const [periodStartDate, setPeriodStartDate] = useState<Date | null>(null);
   const [periodEndDate, setPeriodEndDate] = useState<Date | null>(null);
-  // MediÃ§Ã£o para decidir entre "esticar" (preencher largura) ou manter tamanho natural com scroll
-  const [containerWidth, setContainerWidth] = useState<number>(width);
-  const [filterWidths, setFilterWidths] = useState<number[]>([0, 0, 0, 0]);
-  const [measurementDone, setMeasurementDone] = useState<boolean>(false);
-  const gapSize = 10; // mesmo valor usado em styles.filtersRow.gap
-  // total de largura dos filtros + gaps entre eles
-  const numFilterCards = showWeekCalendar ? 3 : 4;
-  const gapCount = numFilterCards - 1;
-  const totalFiltersWidth = filterWidths.reduce((a, b) => a + b, 0) + gapSize * gapCount;
-  const shouldStretch = measurementDone && totalFiltersWidth > 0 && totalFiltersWidth <= containerWidth;
-  // No modo 7 dias, usamos flex layout (sem scroll), entÃ£o shouldStretch nÃ£o Ã© usado
-  // No modo normal (4 filtros), mantÃ©m o comportamento padrÃ£o baseado em shouldStretch
-  const effectiveShouldStretch = showWeekCalendar ? false : shouldStretch;
-  const cardStretchWidth = Math.max(120, Math.floor((containerWidth - gapSize * gapCount) / numFilterCards));
-
-  const onFilterLayout = (index: number) => (e: any) => {
-    if (measurementDone) return; // evita re-mediÃ§Ã£o que causa loop visual
-    const w = e?.nativeEvent?.layout?.width ?? 0;
-    setFilterWidths((prev) => {
-      const next = [...prev];
-      next[index] = w;
-      return next;
-    });
-  };
-
-  React.useEffect(() => {
-    if (!measurementDone && filterWidths.every((w) => w > 0)) {
-      setMeasurementDone(true);
-    }
-  }, [filterWidths, measurementDone]);
 
   const handleMenuPress = () => {
     setSideMenuVisible(true);
@@ -497,7 +461,7 @@ const SalesHomeScreen: React.FC = () => {
   };
 
   // Abrir modal de filtros na aba correspondente
-  const openFiltersModal = (tab: 'periods' | 'products' | 'flows' | 'types') => {
+  const openFiltersModal = (tab: 'periods' | 'status') => {
     setFiltersModalTab(tab);
     setFiltersModalVisible(true);
   };
@@ -505,17 +469,13 @@ const SalesHomeScreen: React.FC = () => {
   // Recebe as seleÃ§Ãµes do modal e atualiza os labels visÃ­veis
   const handleApplyFilters = (selection: {
     periodsLabel: string;
-    productLabel: string;
-    flowLabel: string;
-    typeLabel: string;
+    statusLabel: string;
     startDate?: Date | null;
     endDate?: Date | null;
     quickLabel?: 'none' | 'Hoje' | '15 dias' | 'Este mês';
   }) => {
     setPeriodsLabel(selection.periodsLabel);
-    setProductsLabel(selection.productLabel);
-    setFlowsLabel(selection.flowLabel);
-    setTypesLabel(selection.typeLabel);
+    setStatusLabel(selection.statusLabel);
     // Atualiza estado detalhado para cÃ¡lculo do label de PerÃ­odos
     setPeriodQuickLabel(selection.quickLabel ?? 'none');
     setPeriodStartDate(selection.startDate ?? null);
@@ -842,44 +802,21 @@ const SalesHomeScreen: React.FC = () => {
       }
     }
 
-    // 2. Filtro de Produto (aplicado sempre)
-    if (productsLabel && productsLabel !== 'Todos') {
+    // 2. Filtro de Status (aplicado sempre)
+    if (statusLabel && statusLabel !== 'Todos') {
       result = result.filter((apt) => {
-        if (!apt.product) return false;
-        return apt.product.toLowerCase().includes(productsLabel.toLowerCase());
-      });
-    }
-
-    // 3. Filtro de Tipo de Fluxo (aplicado sempre)
-    if (flowsLabel && flowsLabel !== 'Todos') {
-      result = result.filter((apt) => {
-        if (!apt.flowType) return false;
-        // Mapear label para valor interno
-        const flowMap: Record<string, string> = {
-          'Guiado': 'guided',
-          'Livre': 'free',
-        };
-        const expectedFlow = flowMap[flowsLabel] || flowsLabel.toLowerCase();
-        return apt.flowType === expectedFlow;
-      });
-    }
-
-    // 4. Filtro de Tipo de Agenda (aplicado sempre)
-    if (typesLabel && typesLabel !== 'Todos') {
-      result = result.filter((apt) => {
-        if (!apt.agendaType) return false;
-        // Mapear label para valor interno
-        const typeMap: Record<string, string> = {
-          'Pessoal': 'personal',
-          'Compartilhada': 'shared',
-        };
-        const expectedType = typeMap[typesLabel] || typesLabel.toLowerCase();
-        return apt.agendaType === expectedType;
+        const rawStatus = String(((apt as any)?.status ?? '')).trim();
+        const computedStatusLabel = rawStatus.length ? rawStatus : 'Aguardando pagamento';
+        const normalized = computedStatusLabel.trim();
+        if (/^aguardando pagamento$/i.test(statusLabel)) return /^aguardando pagamento$/i.test(normalized);
+        if (/^confirmado$/i.test(statusLabel)) return /confirmado/i.test(normalized);
+        if (/^cancelado$/i.test(statusLabel)) return /cancelado/i.test(normalized);
+        return normalized.toLowerCase().includes(statusLabel.toLowerCase());
       });
     }
 
     return result;
-  }, [appointments, periodQuickLabel, periodStartDate, periodEndDate, productsLabel, flowsLabel, typesLabel, showWeekCalendar, showMonthCalendar, selectedWeekDayIndex, selectedMonthDateKey]);
+  }, [appointments, periodQuickLabel, periodStartDate, periodEndDate, statusLabel, showWeekCalendar, showMonthCalendar, selectedWeekDayIndex, selectedMonthDateKey]);
 
   // NavegaÃ§Ã£o do calendÃ¡rio mensal
   const goToPrevMonth = () => {
@@ -1322,10 +1259,10 @@ const SalesHomeScreen: React.FC = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.filterCardFlex}
-              onPress={() => openFiltersModal('products')}
+              onPress={() => openFiltersModal('status')}
             >
               <Text style={styles.filterLabel} numberOfLines={1}>Status</Text>
-              <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{productsLabel}</Text>
+              <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{statusLabel}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -1340,10 +1277,10 @@ const SalesHomeScreen: React.FC = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.filterCardFlex}
-              onPress={() => openFiltersModal('products')}
+              onPress={() => openFiltersModal('status')}
             >
               <Text style={styles.filterLabel} numberOfLines={1}>Status</Text>
-              <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{productsLabel}</Text>
+              <Text style={styles.filterValue} numberOfLines={1} ellipsizeMode="tail">{statusLabel}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -1407,10 +1344,9 @@ const SalesHomeScreen: React.FC = () => {
               items={filteredAppointments.map((a) => ({
                 id: a.id,
                 date: a.date,
-                slots: a.slots,
                 client: a.client || undefined,
-                product: a.product || undefined,
-                hasExpert: !!(a.professional && a.professional !== 'Nenhum'),
+                amount: ((a as any)?.price ?? (a as any)?.amount ?? null) ? String((a as any)?.price ?? (a as any)?.amount) : null,
+                status: ((a as any)?.status ?? null) ? String((a as any)?.status) : null,
               }))}
               selectedId={selectedAppointment?.id}
               onSelect={(id: string) => {
@@ -1442,7 +1378,7 @@ const SalesHomeScreen: React.FC = () => {
         visible={filtersModalVisible}
         initialTab={filtersModalTab}
         onClose={() => setFiltersModalVisible(false)}
-        onApply={(selection: { periodsLabel: string; productLabel: string; flowLabel: string; typeLabel: string; startDate?: Date | null; endDate?: Date | null; quickLabel?: 'none' | 'Hoje' | '15 dias' | 'Este mês' }) => handleApplyFilters(selection)}
+        onApply={(selection: { periodsLabel: string; statusLabel: string; startDate?: Date | null; endDate?: Date | null; quickLabel?: 'none' | 'Hoje' | '15 dias' | 'Este mês' }) => handleApplyFilters(selection)}
       />
 
       {/* Novo Agendamento â€“ Modal unificado com Header/Footer fixos e conteÃºdo embed */}
@@ -1649,24 +1585,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_500Medium',
     color: '#FCFCFC',
-  },
-  // Linha de filtros
-  filtersRow: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    gap: 10,
-  },
-  filtersRowFull: {
-    // Quando o conteÃºdo total for menor que a largura do container,
-    // o contentContainerStyle cresce para a largura do ScrollView
-    flexGrow: 1,
-  },
-  filtersScroll: {
-    marginBottom: 16,
-  },
-  // EspaÃ§amento reduzido quando calendÃ¡rio de 7 dias estÃ¡ ativo
-  filtersScrollCompact: {
-    marginBottom: 6,
   },
   // Linha de filtros no modo 7 dias (flex distribuÃ­do, sem scroll)
   filtersRowWeekMode: {
