@@ -8,6 +8,7 @@ import InformationGroupProfileContent, {
   ScreenMode,
 } from './02.01.InformationGroup-Profile';
 import InformationGroupContactsContent from './02.02.InformationGroup-Contacts';
+import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact';
 import InformationGroupRankContent from './02.03.InformationGroup-Rank';
 
 const COLORS = {
@@ -93,12 +94,14 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   const [personType, setPersonType] = useState<PersonType>('fisica');
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showNewContactModal, setShowNewContactModal] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
     setActiveTab(initialTab);
     setPersonType('fisica');
     setFormData(initialFormData);
+    setShowNewContactModal(false);
   }, [visible, initialTab, initialFormData, keymanId, mode]);
 
   const handleCancel = () => {
@@ -113,6 +116,15 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   const handleSave = () => {
     onSave?.(formData);
     onClose();
+  };
+
+  const handleOpenNewContact = () => {
+    setShowNewContactModal(true);
+    onOpenNewContact?.();
+  };
+
+  const handleCloseNewContact = () => {
+    setShowNewContactModal(false);
   };
 
   const updateFormField = (field: keyof ProfileFormData, value: string) => {
@@ -178,7 +190,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
         )}
         {activeTab === 'contatos' && (
           <InformationGroupContactsContent
-            onOpenNewContact={onOpenNewContact}
+            onOpenNewContact={handleOpenNewContact}
             onOpenSortModal={onOpenSortModal}
             onEditContact={onEditContact}
             onViewContact={onViewContact}
@@ -225,6 +237,12 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
           </View>
         </View>
       </Modal>
+
+      <InformationGroupContactsNewContact
+        visible={showNewContactModal}
+        onClose={handleCloseNewContact}
+        mode="criar"
+      />
     </SafeAreaView>
   );
 };

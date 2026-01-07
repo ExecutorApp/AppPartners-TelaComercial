@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Svg, Path, Rect } from 'react-native-svg';
-import ContentList, { ContentFilterType as ListFilterType, NoteItem, DEFAULT_ITEMS } from '../../components/content/ContentList';
+import ContentList, { ContentFilterType as ListFilterType, NoteItem } from '../../components/content/ContentList';
 import { WavePanelIcon, PauseCircleIcon, GearIcon, PlayCircleIcon, PrevIcon, NextIcon } from '../../components/content/ContentIcons';
 import { formatDurationHM, formatPositionByDuration } from '../../utils/time';
 import { FilterIcon } from '../../components/content/ContentIcons';
@@ -468,7 +468,6 @@ const SchedulingDetailsContent: React.FC = () => {
           <ContentList
             items={items}
             filterType={filterType}
-            audioDurations={sanitizedAudioDurations}
             onOpenItemMenu={(info) => { setMenuItem(info); setMenuVisible(true); }}
             onOpenText={(info) => {
               const originalIdx = items.findIndex((it) => it === info.item);

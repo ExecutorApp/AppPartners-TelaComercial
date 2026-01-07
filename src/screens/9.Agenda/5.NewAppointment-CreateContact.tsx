@@ -95,7 +95,7 @@ const CameraIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
 
 // Ícone de seta (direita) usado no dropdown de Estado
 const ArrowRightIcon: React.FC<{ width?: number; height?: number; color?: string }> = ({ width = 8, height = 12, color = '#7D8592' }) => (
-  <Svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 8 12" fill="none">
+  <Svg width={width} height={height} viewBox="0 0 8 12" fill="none">
     <Path d="M-5.72205e-06 1.4L1.39999 0L7.39999 6L1.39999 12L-5.72205e-06 10.6L4.59999 6L-5.72205e-06 1.4Z" fill={color} />
   </Svg>
 );

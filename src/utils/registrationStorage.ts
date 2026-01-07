@@ -267,7 +267,7 @@ export const RegistrationStorage = {
     }
   },
   async clearRegistrationCompleteFlag(): Promise<void> {
-    const storage = getWebStorage();
+    const storage = getLocalStorage();
     try {
       if (storage) {
         storage.removeItem(REGISTRATION_COMPLETED_KEY);

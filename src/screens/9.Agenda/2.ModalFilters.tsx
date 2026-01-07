@@ -813,6 +813,7 @@ const styles = StyleSheet.create({
   rangeContainer: { flex: 1, height: 60, padding: 5, backgroundColor: '#F4F4F4', borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 5 },
   rangeBox: { flex: 1, height: '100%', paddingHorizontal: 10, backgroundColor: '#FFFFFF', borderRadius: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#D8E0F0', justifyContent: 'center', alignItems: 'center' },
   rangeBoxActive: { backgroundColor: '#1777CF', borderColor: '#1777CF' },
+  rangeBoxDisabled: { backgroundColor: '#F4F4F4', borderColor: '#D8E0F0', opacity: 0.6 },
   rangeLabel: { color: '#3A3F51', fontSize: 14, fontFamily: 'Inter_400Regular', textAlign: 'center' },
   rangeLabelActive: { color: '#FCFCFC' },
   rangeValue: { color: '#91929E', fontSize: 14, fontFamily: 'Inter_400Regular', textAlign: 'center' },

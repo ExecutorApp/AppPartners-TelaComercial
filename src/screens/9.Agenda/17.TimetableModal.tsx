@@ -410,7 +410,7 @@ const TimetableModal: React.FC<TimetableModalProps> = ({ visible, title, initial
           <View style={styles.pickersRow}>
             <View style={styles.pickerWrapper}>
               <ScrollView
-                ref={(r) => (hourRef.current = r)}
+                ref={(r) => { hourRef.current = r; }}
                 showsVerticalScrollIndicator={false}
                 decelerationRate={Platform.OS === 'ios' ? 'fast' : 0.9}
                 onMomentumScrollEnd={onHourScrollEnd}
@@ -432,7 +432,7 @@ const TimetableModal: React.FC<TimetableModalProps> = ({ visible, title, initial
 
             <View style={styles.pickerWrapper}>
               <ScrollView
-                ref={(r) => (minuteRef.current = r)}
+                ref={(r) => { minuteRef.current = r; }}
                 showsVerticalScrollIndicator={false}
                 decelerationRate={Platform.OS === 'ios' ? 'fast' : 0.9}
                 onMomentumScrollEnd={onMinuteScrollEnd}

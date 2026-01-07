@@ -60,27 +60,27 @@ const ModalCongratulations: React.FC<ModalCongratulationsProps> = ({
                     </Svg>
                   </View>
                   <View style={{left: 104, top: 2, position: 'absolute'}}>
-                    <Svg width="5" height="5" viewBox="0 0 5 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <Svg width="5" height="5" viewBox="0 0 5 5" fill="none">
                       <Circle cx="2.5" cy="2.5" r="2.5" fill="#1777CF"/>
                     </Svg>
                   </View>
                   <View style={{left: 59, top: 173, position: 'absolute'}}>
-                    <Svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <Svg width="7" height="7" viewBox="0 0 7 7" fill="none">
                       <Circle cx="3.5" cy="3.5" r="3.5" fill="#1777CF"/>
                     </Svg>
                   </View>
                   <View style={{left: 121, top: 170, position: 'absolute'}}>
-                    <Svg width="2" height="2" viewBox="0 0 2 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <Svg width="2" height="2" viewBox="0 0 2 2" fill="none">
                       <Circle cx="1" cy="1" r="1" fill="#1777CF"/>
                     </Svg>
                   </View>
                   <View style={{left: 163, top: 108, position: 'absolute'}}>
-                    <Svg width="5" height="5" viewBox="0 0 5 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <Svg width="5" height="5" viewBox="0 0 5 5" fill="none">
                       <Circle cx="2.5" cy="2.5" r="2.5" fill="#1777CF"/>
                     </Svg>
                   </View>
                   <View style={{left: 0, top: 74, position: 'absolute'}}>
-                    <Svg width="2" height="2" viewBox="0 0 2 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <Svg width="2" height="2" viewBox="0 0 2 2" fill="none">
                       <Circle cx="1" cy="1" r="1" fill="#1777CF"/>
                     </Svg>
                   </View>
@@ -141,6 +141,10 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: 'center',
     marginBottom: 5,
+  },
+  contentContainer: {
+    alignItems: 'center',
+    marginTop: 10,
   },
   iconContainer: {
     marginBottom: 20,
