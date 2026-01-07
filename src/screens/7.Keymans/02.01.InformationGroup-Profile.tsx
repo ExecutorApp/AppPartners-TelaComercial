@@ -1,21 +1,6 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Image,
-  StatusBar,
-  SafeAreaView,
-  Platform,
-  Modal,
-  Pressable,
-} from 'react-native';
-import { Svg, Path, Rect, G, Defs, ClipPath, Circle } from 'react-native-svg';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import InformationGroupRank from './02.03.InformationGroup-Rank';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Platform } from 'react-native';
+import { Svg, Path, Rect, G, Defs, ClipPath } from 'react-native-svg';
 
 // Cores do tema
 const COLORS = {
@@ -30,18 +15,6 @@ const COLORS = {
   inputBorder: '#CBD5E1',
 };
 
-// Ícone de voltar
-const BackIcon = () => (
-  <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <Path
-      d="M10 19L1 10M1 10L10 1M1 10L19 10"
-      stroke={COLORS.primary}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
 
 // Ícone da câmera para foto
 const CameraIcon = () => (
@@ -99,38 +72,8 @@ const RadioUnselectedIcon = () => (
   </Svg>
 );
 
-const SearchIcon = () => (
-  <Svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-    <Path
-      d="M16 16L12.4167 12.4167M14.3333 7.66667C14.3333 11.3486 11.3486 14.3333 7.66667 14.3333C3.98477 14.3333 1 11.3486 1 7.66667C1 3.98477 3.98477 1 7.66667 1C11.3486 1 14.3333 3.98477 14.3333 7.66667Z"
-      stroke={COLORS.textSecondary}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
 
-const ContactsFilterIcon = () => (
-  <Svg width="37" height="37" viewBox="0 0 37 37" fill="none">
-    <Rect x="0.25" y="0.25" width="36.5" height="36.5" rx="3.75" fill="#F4F4F4" />
-    <Rect x="0.25" y="0.25" width="36.5" height="36.5" rx="3.75" stroke={COLORS.border} strokeWidth="0.5" />
-    <Path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M8.82724 28.4997C8.73881 28.4951 8.65551 28.4568 8.59458 28.3925C8.53366 28.3283 8.4998 28.243 8.5 28.1545C8.49994 27.0678 8.71396 25.9917 9.12984 24.9877C9.54572 23.9837 10.1553 23.0715 10.9238 22.3031C11.6922 21.5346 12.6044 20.925 13.6084 20.5091C14.6124 20.0933 15.6885 19.8792 16.7752 19.8793H20.2241C24.7948 19.8793 28.5 23.5845 28.5 28.1552C28.5 28.4803 28.1552 28.5 28.1552 28.5H8.84483L8.82724 28.4997ZM27.8024 27.8103H9.19759C9.28615 25.8602 10.1232 24.0192 11.5346 22.6704C12.9459 21.3217 14.823 20.569 16.7752 20.569H20.2241C24.2983 20.569 27.6224 23.7807 27.8024 27.8103ZM18.5 8.5C15.55 8.5 13.1552 10.8948 13.1552 13.8448C13.1552 16.7948 15.55 19.1897 18.5 19.1897C21.45 19.1897 23.8448 16.7948 23.8448 13.8448C23.8448 10.8948 21.45 8.5 18.5 8.5ZM18.5 9.18966C21.0693 9.18966 23.1552 11.2755 23.1552 13.8448C23.1552 16.4141 21.0693 18.5 18.5 18.5C15.9307 18.5 13.8448 16.4141 13.8448 13.8448C13.8448 11.2755 15.9307 9.18966 18.5 9.18966Z"
-      fill={COLORS.textSecondary}
-      stroke={COLORS.textSecondary}
-      strokeWidth="0.5"
-    />
-  </Svg>
-);
 
-const PlusBtn = () => (
-  <Svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <Path d="M12 5V19M5 12H19" stroke="#FCFCFC" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-  </Svg>
-);
 
 const WhatsAppIcon = () => (
   <Svg width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -143,64 +86,13 @@ const WhatsAppIcon = () => (
   </Svg>
 );
 
-const MapIcon = () => (
-  <Svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-    <Path
-      d="M16.978 3.59976C16.9059 3.59976 16.8367 3.5711 16.7857 3.52009C16.7347 3.46908 16.706 3.3999 16.706 3.32776V3.18486C16.706 3.11272 16.7347 3.04353 16.7857 2.99252C16.8367 2.94151 16.9059 2.91286 16.978 2.91286C17.0501 2.91286 17.1193 2.94151 17.1703 2.99252C17.2213 3.04353 17.25 3.11272 17.25 3.18486V3.32776C17.25 3.3999 17.2213 3.46908 17.1703 3.52009C17.1193 3.5711 17.0501 3.59976 16.978 3.59976Z"
-      fill={COLORS.textSecondary}
-    />
-    <Path
-      d="M16.978 2.77115C17.0501 2.77115 17.1193 2.74249 17.1703 2.69148C17.2213 2.64047 17.25 2.57128 17.25 2.49915V1.38541C17.25 1.21741 17.0921 1.08672 16.927 1.11824L12.0322 2.05317L5.81403 0.255859L0.477358 1.11708C0.413832 1.12766 0.356118 1.16043 0.314486 1.20956C0.272853 1.2587 0.250003 1.32101 0.25 1.38541V12.3364C0.25 12.5018 0.403272 12.6319 0.566642 12.6047L5.72471 11.7462L12.064 13.4334L17.0228 12.6047C17.0863 12.5941 17.144 12.5613 17.1856 12.5121C17.2272 12.463 17.25 12.4007 17.25 12.3364V4.11003C17.25 4.03789 17.2213 3.96871 17.1703 3.9177C17.1193 3.86669 17.0501 3.83803 16.978 3.83803C16.9059 3.83803 16.8367 3.86669 16.7857 3.9177C16.7347 3.96871 16.706 4.03789 16.706 4.11003V12.1061L12.2912 12.844V2.55756L16.706 1.71429V2.49915C16.706 2.57128 16.7347 2.64047 16.7857 2.69148C16.8367 2.74249 16.9059 2.77115 16.978 2.77115ZM0.794 1.61586L5.46652 0.838143V11.2377L0.794 12.0154V1.61586ZM6.01052 0.878909L11.7472 2.53709V12.8099L6.01052 11.2599V0.878909Z"
-      fill={COLORS.textSecondary}
-    />
-    <Path
-      d="M16.978 3.59976C16.9059 3.59976 16.8367 3.5711 16.7857 3.52009C16.7347 3.46908 16.706 3.3999 16.706 3.32776V3.18486C16.706 3.11272 16.7347 3.04353 16.7857 2.99252C16.8367 2.94151 16.9059 2.91286 16.978 2.91286C17.0501 2.91286 17.1193 2.94151 17.1703 2.99252C17.2213 3.04353 17.25 3.11272 17.25 3.18486V3.32776C17.25 3.3999 17.2213 3.46908 17.1703 3.52009C17.1193 3.5711 17.0501 3.59976 16.978 3.59976Z"
-      stroke={COLORS.textSecondary}
-      strokeWidth="0.5"
-    />
-    <Path
-      d="M16.978 2.77115C17.0501 2.77115 17.1193 2.74249 17.1703 2.69148C17.2213 2.64047 17.25 2.57128 17.25 2.49915V1.38541C17.25 1.21741 17.0921 1.08672 16.927 1.11824L12.0322 2.05317L5.81403 0.255859L0.477358 1.11708C0.413832 1.12766 0.356118 1.16043 0.314486 1.20956C0.272853 1.2587 0.250003 1.32101 0.25 1.38541V12.3364C0.25 12.5018 0.403272 12.6319 0.566642 12.6047L5.72471 11.7462L12.064 13.4334L17.0228 12.6047C17.0863 12.5941 17.144 12.5613 17.1856 12.5121C17.2272 12.463 17.25 12.4007 17.25 12.3364V4.11003C17.25 4.03789 17.2213 3.96871 17.1703 3.9177C17.1193 3.86669 17.0501 3.83803 16.978 3.83803C16.9059 3.83803 16.8367 3.86669 16.7857 3.9177C16.7347 3.96871 16.706 4.03789 16.706 4.11003V12.1061L12.2912 12.844V2.55756L16.706 1.71429V2.49915C16.706 2.57128 16.7347 2.64047 16.7857 2.69148C16.8367 2.74249 16.9059 2.77115 16.978 2.77115ZM0.794 1.61586L5.46652 0.838143V11.2377L0.794 12.0154V1.61586ZM6.01052 0.878909L11.7472 2.53709V12.8099L6.01052 11.2599V0.878909Z"
-      stroke={COLORS.textSecondary}
-      strokeWidth="0.5"
-    />
-  </Svg>
-);
 
-const MoreIcon = () => (
-  <Svg width="4" height="18" viewBox="0 0 4 18" fill="none">
-    <G clipPath="url(#clip0)">
-      <Path
-        d="M4 2C4 3.10457 3.10457 4 2 4C0.895431 4 0 3.10457 0 2C0 0.895431 0.895431 0 2 0C3.10457 0 4 0.895431 4 2Z"
-        fill={COLORS.textSecondary}
-      />
-      <Path
-        d="M4 9C4 10.1046 3.10457 11 2 11C0.895431 11 0 10.1046 0 9C0 7.89543 0.895431 7 2 7C3.10457 7 4 7.89543 4 9Z"
-        fill={COLORS.textSecondary}
-      />
-      <Path
-        d="M2 18C3.10457 18 4 17.1046 4 16C4 14.8954 3.10457 14 2 14C0.895431 14 0 14.8954 0 16C0 17.1046 0.895431 18 2 18Z"
-        fill={COLORS.textSecondary}
-      />
-    </G>
-    <Defs>
-      <ClipPath id="clip0">
-        <Rect width="4" height="18" rx="2" fill="white" />
-      </ClipPath>
-    </Defs>
-  </Svg>
-);
 
-const TrophyIcon = () => (
-  <Svg width="25" height="25" viewBox="0 0 25 25" fill="none">
-    <Path d="M3.87327 0.78125C3.87327 0.57405 3.95558 0.375336 4.1021 0.228823C4.24861 0.08231 4.44732 0 4.65452 0L20.2795 0C20.4867 0 20.6854 0.08231 20.832 0.228823C20.9785 0.375336 21.0608 0.57405 21.0608 0.78125C21.0608 1.62187 21.042 2.42188 21.0076 3.18125C21.625 3.28349 22.2157 3.50831 22.7448 3.84247C23.274 4.17663 23.7308 4.61335 24.0885 5.12689C24.4461 5.64042 24.6973 6.22038 24.8272 6.83254C24.9572 7.44471 24.9632 8.07669 24.845 8.69123C24.7268 9.30577 24.4867 9.89041 24.1389 10.4107C23.7912 10.931 23.3427 11.3763 22.8201 11.7205C22.2975 12.0647 21.7112 12.3008 21.0959 12.4148C20.4805 12.5288 19.8486 12.5185 19.2373 12.3844C18.003 15.2984 16.303 16.7234 14.8108 17.0891V20.4844L17.0373 21.0406C17.3405 21.1156 17.6264 21.2516 17.8764 21.4391L20.7483 23.5938C20.8794 23.6921 20.9763 23.8293 21.0252 23.9858C21.0741 24.1423 21.0725 24.3102 21.0207 24.4658C20.9688 24.6214 20.8693 24.7567 20.7363 24.8525C20.6033 24.9484 20.4435 25 20.2795 25H4.65452C4.49055 25 4.33074 24.9484 4.19772 24.8525C4.0647 24.7567 3.96522 24.6214 3.91336 24.4658C3.86151 24.3102 3.85992 24.1423 3.90881 23.9858C3.9577 23.8293 4.0546 23.6921 4.18577 23.5938L7.05765 21.4391C7.30765 21.2516 7.59359 21.1156 7.89671 21.0406L10.1233 20.4844V17.0891C8.63109 16.7234 6.93109 15.2984 5.69671 12.3828C5.08513 12.5176 4.45273 12.5286 3.83685 12.4149C3.22098 12.3013 2.63413 12.0654 2.11095 11.7211C1.58777 11.3769 1.13888 10.9313 0.790783 10.4107C0.442687 9.89005 0.202444 9.30496 0.0842445 8.68994C-0.0339554 8.07493 -0.027716 7.44246 0.102594 6.8299C0.232904 6.21734 0.484643 5.63709 0.842943 5.12345C1.20124 4.6098 1.65884 4.17315 2.18871 3.8393C2.71857 3.50545 3.30997 3.28117 3.92796 3.17969C3.89118 2.38074 3.87294 1.58104 3.87327 0.78125ZM4.02796 4.75C3.21263 4.89918 2.48995 5.36615 2.01891 6.04817C1.54787 6.73018 1.36706 7.57138 1.51624 8.38672C1.66543 9.20205 2.13239 9.92473 2.81441 10.3958C3.49642 10.8668 4.33763 11.0476 5.15296 10.8984C4.63265 9.25781 4.23421 7.23281 4.02796 4.75ZM19.7826 10.8984C20.598 11.0476 21.4392 10.8668 22.1212 10.3958C22.8032 9.92473 23.2702 9.20205 23.4194 8.38672C23.5686 7.57138 23.3877 6.73018 22.9167 6.04817C22.4457 5.36615 21.723 4.89918 20.9076 4.75C20.6998 7.23438 20.3014 9.25781 19.7826 10.8984Z" fill={COLORS.primary} />
-  </Svg>
-);
 
-type TabType = 'perfil' | 'contatos' | 'rank';
-type PersonType = 'fisica' | 'juridica';
-type ScreenMode = 'criar' | 'editar';
+export type PersonType = 'fisica' | 'juridica';
+export type ScreenMode = 'criar' | 'editar';
 
-interface ProfileFormData {
+export interface ProfileFormData {
   nome: string;
   cpfCnpj: string;
   email: string;
@@ -215,107 +107,23 @@ interface ProfileFormData {
 }
 
 interface InformationGroupProfileProps {
-  visible: boolean;
-  onClose: () => void;
   mode: ScreenMode;
-  keymanName?: string;
-  keymanId?: number;
-  onSave?: (data: ProfileFormData) => void;
-  onNavigateToContacts?: () => void;
-  onNavigateToRank?: () => void;
+  formData: ProfileFormData;
+  onUpdateFormField: (field: keyof ProfileFormData, value: string) => void;
+  personType: PersonType;
+  onSetPersonType: (type: PersonType) => void;
 }
 
 const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
-  visible,
-  onClose,
   mode,
-  keymanName = '',
-  keymanId,
-  onSave,
-  onNavigateToContacts,
-  onNavigateToRank,
+  formData,
+  onUpdateFormField,
+  personType,
+  onSetPersonType,
 }) => {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-  if (visible) {
-    try {
-      console.log('[InformationGroupProfile] aberto', { mode, keymanId, keymanName });
-    } catch {}
-  }
-  const [activeTab, setActiveTab] = useState<TabType>('perfil');
-  const [personType, setPersonType] = useState<PersonType>('fisica');
-  const [showCancelModal, setShowCancelModal] = useState(false);
-
-  const [formData, setFormData] = useState<ProfileFormData>({
-    nome: keymanName || 'Perola Marina Diniz',
-    cpfCnpj: '385.474.956-25',
-    email: 'PerolaDiniz@hotmail.com',
-    whatsapp: '17 99246-0025',
-    estado: 'São Paulo',
-    cep: '15200-000',
-    cidade: 'São José do Rio Preto',
-    bairro: 'Centro',
-    endereco: 'Piratininga',
-    numero: '650',
-    complemento: 'Sala 207',
-  });
-
-  const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-  };
-
-  const handleCancel = () => {
-    setShowCancelModal(true);
-  };
-
-  const handleConfirmCancel = () => {
-    setShowCancelModal(false);
-    onClose();
-  };
-
-  const handleSave = () => {
-    if (onSave) {
-      onSave(formData);
-    }
-    onClose();
-  };
-
   const updateFormField = (field: keyof ProfileFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    onUpdateFormField(field, value);
   };
-
-  const renderTabSelector = () => (
-    <View style={styles.tabContainer}>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'perfil' && styles.tabActive]}
-        onPress={() => handleTabChange('perfil')}
-      >
-        <Text style={[styles.tabText, activeTab === 'perfil' && styles.tabTextActive]}>
-          Perfil
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'contatos' && styles.tabActive]}
-        onPress={() => handleTabChange('contatos')}
-      >
-        <Text style={[styles.tabText, activeTab === 'contatos' && styles.tabTextActive]}>
-          Contatos
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'rank' && styles.tabActive]}
-        onPress={() => handleTabChange('rank')}
-      >
-        <Text style={[styles.tabText, activeTab === 'rank' && styles.tabTextActive]}>
-          Rank
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   const renderInputField = (
     label: string,
@@ -341,7 +149,10 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
   );
 
   const renderProfileForm = () => (
-    <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.formContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.formContent}>
         {/* Título */}
         <View style={styles.titleSection}>
@@ -366,7 +177,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
           <View style={styles.personTypeContainer}>
             <TouchableOpacity
               style={styles.radioOption}
-              onPress={() => setPersonType('fisica')}
+              onPress={() => onSetPersonType('fisica')}
             >
               {personType === 'fisica' ? <RadioSelectedIcon /> : <RadioUnselectedIcon />}
               <Text style={styles.radioLabel}>Fisica</Text>
@@ -376,7 +187,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
             <TouchableOpacity
               style={styles.radioOption}
-              onPress={() => setPersonType('juridica')}
+              onPress={() => onSetPersonType('juridica')}
             >
               {personType === 'juridica' ? <RadioSelectedIcon /> : <RadioUnselectedIcon />}
               <Text style={styles.radioLabel}>Jurídica</Text>
@@ -409,285 +220,12 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
       </View>
     </ScrollView>
   );
-
-  // Modal de confirmação de cancelamento
-  const renderCancelModal = () => (
-    <Modal
-      visible={showCancelModal}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setShowCancelModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Deseja cancelar?</Text>
-          <Text style={styles.modalMessage}>
-            Todas as alterações não salvas serão perdidas.
-          </Text>
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setShowCancelModal(false)}
-            >
-              <Text style={styles.modalCancelText}>Não</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalConfirmButton}
-              onPress={handleConfirmCancel}
-            >
-              <Text style={styles.modalConfirmText}>Sim, cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
-  if (!visible) return null;
-  if (!fontsLoaded) return null;
-
-  const ContactsTabContent: React.FC = () => {
-    const [searchText, setSearchText] = useState('');
-    const [sortFilter, setSortFilter] = useState('Todos');
-    const [contactMenuVisible, setContactMenuVisible] = useState<number | null>(null);
-    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-    const [contactToDelete, setContactToDelete] = useState<number | null>(null);
-
-    const contactsData = [
-      { id: 1, name: 'Kamila dos santos', whatsapp: '17 99246-0563', state: 'São Paulo', photo: 'https://randomuser.me/api/portraits/women/1.jpg' },
-      { id: 2, name: 'Ruan de Londres', whatsapp: '17 99246-0563', state: 'São Paulo', photo: 'https://randomuser.me/api/portraits/men/1.jpg' },
-      { id: 3, name: 'Betina do Nascimento', whatsapp: '17 98880-9978', state: 'São Paulo', photo: 'https://randomuser.me/api/portraits/women/2.jpg' },
-    ];
-
-    const filteredContacts = contactsData.filter(c => {
-      const term = searchText.trim().toLowerCase();
-      return term.length === 0 || c.name.toLowerCase().includes(term);
-    });
-
-    const handleOpenContactMenu = (contactId: number) => {
-      setContactMenuVisible(contactId);
-    };
-    const handleCloseContactMenu = () => {
-      setContactMenuVisible(null);
-    };
-    const handleDeletePress = (contactId: number) => {
-      handleCloseContactMenu();
-      setContactToDelete(contactId);
-      setDeleteModalVisible(true);
-    };
-    const handleConfirmDelete = () => {
-      setDeleteModalVisible(false);
-      setContactToDelete(null);
-    };
-
-    const renderContactCard = (contact: typeof contactsData[0]) => (
-      <View key={contact.id} style={styles.contactCard}>
-        <Image source={{ uri: contact.photo }} style={styles.contactPhoto} />
-        <View style={styles.contactInfo}>
-          <View style={styles.contactHeader}>
-            <View style={styles.contactNameContainer}>
-              <Text style={styles.contactName}>{contact.name}</Text>
-            </View>
-            <TouchableOpacity style={styles.moreButton} onPress={() => handleOpenContactMenu(contact.id)}>
-              <MoreIcon />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.contactDivider} />
-          <View style={styles.contactRow}>
-            <WhatsAppIcon />
-            <Text style={styles.contactValue}>{contact.whatsapp}</Text>
-          </View>
-          <View style={styles.contactDivider} />
-          <View style={styles.contactRow}>
-            <MapIcon />
-            <Text style={styles.contactValue}>{contact.state}</Text>
-          </View>
-        </View>
-        {contactMenuVisible === contact.id && (
-          <View style={styles.contactMenu}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleCloseContactMenu}>
-              <Text style={styles.menuItemText}>Editar</Text>
-            </TouchableOpacity>
-            <View style={styles.menuDivider} />
-            <TouchableOpacity style={styles.menuItem} onPress={handleCloseContactMenu}>
-              <Text style={styles.menuItemText}>Visualizar</Text>
-            </TouchableOpacity>
-            <View style={styles.menuDivider} />
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleDeletePress(contact.id)}>
-              <Text style={[styles.menuItemText, styles.menuItemDelete]}>Excluir</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    );
-
-    return (
-      <View style={styles.contactsContainer}>
-        <View style={styles.addButtonContainer}>
-          <TouchableOpacity style={styles.addButton} onPress={() => {}}>
-            <PlusBtn />
-            <Text style={styles.addButtonText}>Contato</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.sortSection}>
-          <Text style={styles.sortLabel}>Ordenar por</Text>
-          <TouchableOpacity style={styles.sortDropdown} onPress={() => {}}>
-            <ContactsFilterIcon />
-            <View style={styles.sortContent}>
-              <Text style={styles.sortTitle}>Contatos:</Text>
-              <Text style={styles.sortValue}>{sortFilter}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.searchContainer}>
-          <SearchIcon />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="pesquise aqui"
-            placeholderTextColor={COLORS.textTertiary}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View>
-        <ScrollView
-          style={styles.contactsList}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.contactsListContent}
-        >
-          {filteredContacts.map((c) => renderContactCard(c))}
-        </ScrollView>
-        {contactMenuVisible !== null && (
-          <TouchableOpacity style={styles.menuOverlay} activeOpacity={1} onPress={handleCloseContactMenu} />
-        )}
-        <Modal
-          visible={deleteModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setDeleteModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Excluir contato?</Text>
-              <Text style={styles.modalMessage}>Esta ação não poderá ser desfeita.</Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity style={styles.modalCancelButton} onPress={() => setDeleteModalVisible(false)}>
-                  <Text style={styles.modalCancelText}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalConfirmButton} onPress={handleConfirmDelete}>
-                  <Text style={styles.modalConfirmText}>Excluir</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  };
-
-  // Conteúdo da aba Rank removido deste arquivo. Renderização delegada ao componente externo.
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
-          <BackIcon />
-        </TouchableOpacity>
-        <View style={styles.systemDivider} />
-        <View style={styles.tabSelectorContainer}>
-          {renderTabSelector()}
-        </View>
-      </View>
-
-      {/* Content */}
-      <View style={styles.content}>
-        {activeTab === 'perfil' && renderProfileForm()}
-        {activeTab === 'contatos' && <ContactsTabContent />}
-      </View>
-
-      <View style={styles.footerContainer}>
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Salvar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {renderCancelModal()}
-      <InformationGroupRank
-        visible={activeTab === 'rank'}
-        onClose={() => setActiveTab('perfil')}
-        keymanName={formData.nome}
-        keymanId={keymanId ? String(keymanId) : undefined}
-        onNavigateToProfile={() => setActiveTab('perfil')}
-        onNavigateToContacts={() => setActiveTab('contatos')}
-      />
-    </SafeAreaView>
-  );
+  return renderProfileForm();
 };
 
+// ===== BLOCO: ESTILOS =====
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    backgroundColor: COLORS.white,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderBottomWidth: 0,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  content: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  systemDivider: {
-    height: 0.5,
-    backgroundColor: COLORS.border,
-    alignSelf: 'stretch',
-  },
-  tabSelectorContainer: {
-    alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 14,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.background,
-    borderRadius: 6,
-    padding: 4,
-    borderWidth: 0.3,
-    borderColor: COLORS.border,
-  },
-  tab: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabActive: {
-    backgroundColor: COLORS.primary,
-  },
-  tabText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  tabTextActive: {
-    color: COLORS.white,
-  },
+  // Containers
   formContainer: {
     flex: 1,
     paddingHorizontal: 16,
@@ -697,186 +235,7 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
     gap: 14,
   },
-  contactsContainer: {
-    flex: 1,
-    paddingHorizontal: 15,
-    gap: 10,
-  },
-  addButtonContainer: {
-    alignItems: 'flex-end',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    height: 32,
-    gap: 5,
-  },
-  addButtonText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.white,
-  },
-  sortSection: {
-    gap: 5,
-  },
-  sortLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    paddingHorizontal: 5,
-  },
-  sortDropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 0.6,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    padding: 10,
-    gap: 10,
-  },
-  sortContent: {
-    flex: 1,
-    gap: 5,
-  },
-  sortTitle: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  sortValue: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    paddingLeft: 14,
-    height: 36,
-    gap: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    color: COLORS.textPrimary,
-    paddingVertical: 0,
-    ...(Platform.OS === 'web'
-      ? ({ outlineStyle: 'none', outlineWidth: 0, outlineColor: 'transparent' } as any)
-      : {}),
-  },
-  contactsList: {
-    flex: 1,
-    marginTop: 5,
-  },
-  contactsListContent: {
-    gap: 10,
-    paddingBottom: 20,
-  },
-  contactCard: {
-    flexDirection: 'row',
-    borderWidth: 0.6,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    padding: 5,
-    paddingRight: 10,
-    gap: 12,
-    position: 'relative',
-  },
-  contactPhoto: {
-    width: 75,
-    height: 103,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  contactInfo: {
-    flex: 1,
-    paddingVertical: 5,
-    gap: 10,
-  },
-  contactHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 16,
-  },
-  contactNameContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  contactName: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  moreButton: {
-    padding: 4,
-  },
-  contactDivider: {
-    height: 0.5,
-    backgroundColor: COLORS.border,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 16,
-    gap: 10,
-  },
-  contactValue: {
-    flex: 1,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  contactMenu: {
-    position: 'absolute',
-    right: 10,
-    top: 30,
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 100,
-    minWidth: 120,
-  },
-  menuItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  menuItemText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  menuItemDelete: {
-    color: '#E53935',
-  },
-  menuDivider: {
-    height: 0.5,
-    backgroundColor: COLORS.border,
-  },
-  menuOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 50,
-  },
+  // Título
   titleSection: {
     gap: 10,
   },
@@ -886,11 +245,13 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     lineHeight: 24,
   },
+  // Divisória do título
   titleDivider: {
     height: 0.5,
     backgroundColor: COLORS.border,
     marginVertical: 5,
   },
+  // Foto e tipo de pessoa
   photoTypeSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -900,6 +261,7 @@ const styles = StyleSheet.create({
   photoContainer: {
     position: 'relative',
   },
+  // Foto de perfil
   profilePhoto: {
     width: 65,
     height: 80,
@@ -907,11 +269,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+  // Botão de câmera sobre a foto
   cameraButton: {
     position: 'absolute',
     bottom: -7,
     left: 21,
   },
+  // Seletores de tipo de pessoa
   personTypeContainer: {
     backgroundColor: COLORS.white,
     gap: 10,
@@ -921,15 +285,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
+  // Divisória entre opções do seletor
   radioOptionDivider: {
     height: 0.5,
     backgroundColor: COLORS.border,
   },
+  // Textos
   radioLabel: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
     color: COLORS.textPrimary,
   },
+  // Seções
   sectionContainer: {
     gap: 10,
     paddingBottom: 10,
@@ -940,6 +307,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     paddingHorizontal: 5,
   },
+  // Inputs
   inputGroup: {
     height: 64,
     gap: 6,
@@ -966,109 +334,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textPrimary,
     ...(Platform.OS === 'web'
-      ? ({ outlineStyle: 'none', outlineWidth: 0, outlineColor: 'transparent' } as any)
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          outlineColor: 'transparent',
+        } as any)
       : {}),
-  },
-  footerContainer: {
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    gap: 20,
-    marginTop: 6,
-  },
-  cancelButton: {
-    flex: 1,
-    height: 36,
-    backgroundColor: COLORS.background,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
-    color: COLORS.textPrimary,
-    textAlign: 'center',
-  },
-  saveButton: {
-    flex: 1,
-    height: 36,
-    backgroundColor: COLORS.primary,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
-    color: COLORS.white,
-    textAlign: 'center',
-  },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: 300,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-    gap: 16,
-  },
-  modalTitle: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-  modalMessage: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
-  },
-  modalCancelButton: {
-    flex: 1,
-    height: 40,
-    backgroundColor: COLORS.background,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  modalConfirmButton: {
-    flex: 1,
-    height: 40,
-    backgroundColor: COLORS.primary,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalConfirmText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    color: COLORS.white,
   },
 });
 

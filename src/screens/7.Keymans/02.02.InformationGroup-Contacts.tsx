@@ -7,13 +7,9 @@ import {
   ScrollView,
   TextInput,
   Image,
-  StatusBar,
-  SafeAreaView,
   Platform,
-  Modal,
 } from 'react-native';
 import { Svg, Path, Rect, G, ClipPath, Defs } from 'react-native-svg';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 // Cores do tema
 const COLORS = {
@@ -27,18 +23,6 @@ const COLORS = {
   border: '#D8E0F0',
 };
 
-// Ícone de voltar
-const BackIcon = () => (
-  <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <Path
-      d="M10 19L1 10M1 10L10 1M1 10L19 10"
-      stroke={COLORS.primary}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
 
 // Ícone de busca
 const SearchIcon = () => (
@@ -162,15 +146,7 @@ const contactsData = [
   },
 ];
 
-type TabType = 'perfil' | 'contatos' | 'rank';
-
 interface ContactsScreenProps {
-  visible: boolean;
-  onClose: () => void;
-  keymanId?: number;
-  keymanName?: string;
-  onNavigateToProfile?: () => void;
-  onNavigateToRank?: () => void;
   onOpenSortModal?: () => void;
   onOpenNewContact?: () => void;
   onEditContact?: (contactId: number) => void;
@@ -179,30 +155,15 @@ interface ContactsScreenProps {
 }
 
 const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
-  visible,
-  onClose,
-  keymanId,
-  keymanName,
-  onNavigateToProfile,
-  onNavigateToRank,
   onOpenSortModal,
   onOpenNewContact,
   onEditContact,
   onViewContact,
   onDeleteContact,
 }) => {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-  const [activeTab, setActiveTab] = useState<TabType>('contatos');
   const [searchText, setSearchText] = useState('');
   const [sortFilter, setSortFilter] = useState('Todos');
   const [contactMenuVisible, setContactMenuVisible] = useState<number | null>(null);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [contactToDelete, setContactToDelete] = useState<number | null>(null);
 
   // Lista filtrada
   const filteredContacts = useMemo(() => {
@@ -211,16 +172,6 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
       (c) => term.length === 0 || c.name.toLowerCase().includes(term)
     );
   }, [searchText]);
-
-  const handleTabChange = (tab: TabType) => {
-    if (tab === 'perfil' && onNavigateToProfile) {
-      onNavigateToProfile();
-    } else if (tab === 'rank' && onNavigateToRank) {
-      onNavigateToRank();
-    } else {
-      setActiveTab(tab);
-    }
-  };
 
   const handleOpenContactMenu = (contactId: number) => {
     setContactMenuVisible(contactId);
@@ -246,46 +197,8 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
 
   const handleDeletePress = (contactId: number) => {
     handleCloseContactMenu();
-    setContactToDelete(contactId);
-    setDeleteModalVisible(true);
+    onDeleteContact?.(contactId);
   };
-
-  const handleConfirmDelete = () => {
-    if (contactToDelete && onDeleteContact) {
-      onDeleteContact(contactToDelete);
-    }
-    setDeleteModalVisible(false);
-    setContactToDelete(null);
-  };
-
-  const renderTabSelector = () => (
-    <View style={styles.tabContainer}>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'perfil' && styles.tabActive]}
-        onPress={() => handleTabChange('perfil')}
-      >
-        <Text style={[styles.tabText, activeTab === 'perfil' && styles.tabTextActive]}>
-          Perfil
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'contatos' && styles.tabActive]}
-        onPress={() => handleTabChange('contatos')}
-      >
-        <Text style={[styles.tabText, activeTab === 'contatos' && styles.tabTextActive]}>
-          Contatos
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, activeTab === 'rank' && styles.tabActive]}
-        onPress={() => handleTabChange('rank')}
-      >
-        <Text style={[styles.tabText, activeTab === 'rank' && styles.tabTextActive]}>
-          Rank
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   const renderContactCard = (contact: typeof contactsData[0]) => (
     <View key={contact.id} style={styles.contactCard}>
@@ -346,108 +259,45 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
     </View>
   );
 
-  // Modal de confirmação de exclusão
-  const renderDeleteModal = () => (
-    <Modal
-      visible={deleteModalVisible}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setDeleteModalVisible(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Excluir contato?</Text>
-          <Text style={styles.modalMessage}>
-            Esta ação não poderá ser desfeita.
-          </Text>
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setDeleteModalVisible(false)}
-            >
-              <Text style={styles.modalCancelText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalConfirmButton}
-              onPress={handleConfirmDelete}
-            >
-              <Text style={styles.modalConfirmText}>Excluir</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
-  if (!visible) return null;
-  if (!fontsLoaded) return null;
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onClose}>
-          <BackIcon />
+    <View style={styles.contactsContainer}>
+      <View style={styles.addButtonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={onOpenNewContact}>
+          <PlusBtn />
+          <Text style={styles.addButtonText}>Contato</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Tab Selector */}
-        <View style={styles.tabSelectorContainer}>
-          {renderTabSelector()}
-        </View>
-
-        {/* Contacts Content */}
-        <View style={styles.contactsContainer}>
-          {/* Add Contact Button */}
-          <View style={styles.addButtonContainer}>
-            <TouchableOpacity style={styles.addButton} onPress={onOpenNewContact}>
-              <PlusBtn />
-              <Text style={styles.addButtonText}>Contato</Text>
-            </TouchableOpacity>
+      <View style={styles.sortSection}>
+        <Text style={styles.sortLabel}>Ordenar por</Text>
+        <TouchableOpacity style={styles.sortDropdown} onPress={onOpenSortModal}>
+          <ContactsFilterIcon />
+          <View style={styles.sortContent}>
+            <Text style={styles.sortTitle}>Contatos:</Text>
+            <Text style={styles.sortValue}>{sortFilter}</Text>
           </View>
-
-          {/* Sort Filter */}
-          <View style={styles.sortSection}>
-            <Text style={styles.sortLabel}>Ordenar por</Text>
-            <TouchableOpacity style={styles.sortDropdown} onPress={onOpenSortModal}>
-              <ContactsFilterIcon />
-              <View style={styles.sortContent}>
-                <Text style={styles.sortTitle}>Contatos:</Text>
-                <Text style={styles.sortValue}>{sortFilter}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <SearchIcon />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="pesquise aqui"
-              placeholderTextColor={COLORS.textTertiary}
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-          </View>
-
-          {/* Contacts List */}
-          <ScrollView
-            style={styles.contactsList}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.contactsListContent}
-          >
-            {filteredContacts.map((contact) => renderContactCard(contact))}
-          </ScrollView>
-        </View>
+        </TouchableOpacity>
       </View>
 
-      {renderDeleteModal()}
+      <View style={styles.searchContainer}>
+        <SearchIcon />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="pesquise aqui"
+          placeholderTextColor={COLORS.textTertiary}
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+      </View>
 
-      {/* Overlay para fechar menu */}
+      <ScrollView
+        style={styles.contactsList}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contactsListContent}
+      >
+        {filteredContacts.map((contact) => renderContactCard(contact))}
+      </ScrollView>
+
       {contactMenuVisible !== null && (
         <TouchableOpacity
           style={styles.menuOverlay}
@@ -455,7 +305,7 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
           onPress={handleCloseContactMenu}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

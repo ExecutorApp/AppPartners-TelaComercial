@@ -17,10 +17,8 @@ import { Svg, Path, Rect } from 'react-native-svg';
 import Header from '../5.Side Menu/2.Header';
 import BottomMenu from '../5.Side Menu/3.BottomMenu';
 import ModalSortBy from './01.01.KeymansHomeScreen-Modal-SortBy';
-import InformationGroupProfile from './02.01.InformationGroup-Profile';
 import KeymansOptionsModal from './01.02.KeymansHomeScreen-Modal-Options';
-import InformationGroupContacts from './02.02.InformationGroup-Contacts';
-import InformationGroupRank from './02.03.InformationGroup-Rank';
+import InformationGroup from './02.00.InformationGroup';
 
 const { height: winHeight } = Dimensions.get('window');
 
@@ -158,8 +156,7 @@ const KeymansScreen: React.FC = () => {
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [profileMode, setProfileMode] = useState<'criar' | 'editar'>('editar');
   const [optionsModalVisible, setOptionsModalVisible] = useState(false);
-  const [contactsModalVisible, setContactsModalVisible] = useState(false);
-  const [rankModalVisible, setRankModalVisible] = useState(false);
+  const [informationGroupInitialTab, setInformationGroupInitialTab] = useState<'perfil' | 'contatos' | 'rank'>('perfil');
   const [selectedKeyman, setSelectedKeyman] = useState<{
     id: number;
     name: string;
@@ -254,6 +251,7 @@ const KeymansScreen: React.FC = () => {
     // Abre Profile em modo CRIAR
     setSelectedKeyman(null);
     setProfileMode('criar');
+    setInformationGroupInitialTab('perfil');
     setProfileModalVisible(true);
   };
 
@@ -287,27 +285,24 @@ const KeymansScreen: React.FC = () => {
   const handleEditProfile = () => {
     setOptionsModalVisible(false);
     setProfileMode('editar');
+    setInformationGroupInitialTab('perfil');
     setProfileModalVisible(true);
   };
 
   // Handlers para navegar para Contatos
   const handleOpenContacts = () => {
     setOptionsModalVisible(false);
-    setContactsModalVisible(true);
-  };
-
-  const handleCloseContacts = () => {
-    setContactsModalVisible(false);
+    setProfileMode('editar');
+    setInformationGroupInitialTab('contatos');
+    setProfileModalVisible(true);
   };
 
   // Handlers para navegar para Rank
   const handleOpenRank = () => {
     setOptionsModalVisible(false);
-    setRankModalVisible(true);
-  };
-
-  const handleCloseRank = () => {
-    setRankModalVisible(false);
+    setProfileMode('editar');
+    setInformationGroupInitialTab('rank');
+    setProfileModalVisible(true);
   };
 
   // Handler para excluir keyman
@@ -319,7 +314,6 @@ const KeymansScreen: React.FC = () => {
 
   // Função para navegar ao clicar no card (abre Profile em modo EDITAR)
   const handleCardPress = (keyman: typeof keymansData[0]) => {
-    console.log('[KeymansHome] card press -> abrir perfil', { id: keyman.id, name: keyman.name });
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
@@ -327,6 +321,7 @@ const KeymansScreen: React.FC = () => {
       rank: keyman.rank,
     });
     setProfileMode('editar');
+    setInformationGroupInitialTab('perfil');
     setProfileModalVisible(true);
   };
 
@@ -477,21 +472,14 @@ const KeymansScreen: React.FC = () => {
       {/* Modal de Perfil do Keyman (criar/editar) */}
       {profileModalVisible && (
         <View style={styles.fullScreenOverlay}>
-          <InformationGroupProfile
+          <InformationGroup
             visible={profileModalVisible}
+            initialTab={informationGroupInitialTab}
             onClose={handleCloseProfileModal}
             mode={profileMode}
             keymanName={selectedKeyman?.name || ''}
             keymanId={selectedKeyman?.id}
             onSave={handleSaveProfile}
-            onNavigateToContacts={() => {
-              setProfileModalVisible(false);
-              setContactsModalVisible(true);
-            }}
-            onNavigateToRank={() => {
-              setProfileModalVisible(false);
-              setRankModalVisible(true);
-            }}
           />
         </View>
       )}
@@ -509,48 +497,6 @@ const KeymansScreen: React.FC = () => {
         onViewRank={handleOpenRank}
         onDelete={handleDeleteKeyman}
       />
-
-      {/* Modal de Contatos do Keyman */}
-      {contactsModalVisible && (
-        <View style={styles.fullScreenOverlay}>
-          <InformationGroupContacts
-            visible={contactsModalVisible}
-            onClose={handleCloseContacts}
-            keymanId={selectedKeyman?.id}
-            keymanName={selectedKeyman?.name || ''}
-            onNavigateToProfile={() => {
-              setContactsModalVisible(false);
-              setProfileMode('editar');
-              setProfileModalVisible(true);
-            }}
-            onNavigateToRank={() => {
-              setContactsModalVisible(false);
-              setRankModalVisible(true);
-            }}
-          />
-        </View>
-      )}
-
-      {/* Modal de Rank do Keyman */}
-      {rankModalVisible && (
-        <View style={styles.fullScreenOverlay}>
-          <InformationGroupRank
-            visible={rankModalVisible}
-            onClose={handleCloseRank}
-            keymanId={selectedKeyman?.id}
-            keymanName={selectedKeyman?.name || ''}
-            onNavigateToProfile={() => {
-              setRankModalVisible(false);
-              setProfileMode('editar');
-              setProfileModalVisible(true);
-            }}
-            onNavigateToContacts={() => {
-              setRankModalVisible(false);
-              setContactsModalVisible(true);
-            }}
-          />
-        </View>
-      )}
     </SafeAreaView>
   );
 };
