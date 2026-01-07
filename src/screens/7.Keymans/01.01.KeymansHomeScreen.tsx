@@ -160,6 +160,7 @@ const KeymansScreen: React.FC = () => {
   const [selectedKeyman, setSelectedKeyman] = useState<{
     id: number;
     name: string;
+    photo: any;
     contacts: number;
     rank: number;
   } | null>(null);
@@ -271,6 +272,7 @@ const KeymansScreen: React.FC = () => {
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
+      photo: keyman.photo,
       contacts: keyman.contacts,
       rank: keyman.rank,
     });
@@ -317,6 +319,7 @@ const KeymansScreen: React.FC = () => {
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
+      photo: keyman.photo,
       contacts: keyman.contacts,
       rank: keyman.rank,
     });
@@ -479,6 +482,10 @@ const KeymansScreen: React.FC = () => {
             mode={profileMode}
             keymanName={selectedKeyman?.name || ''}
             keymanId={selectedKeyman?.id}
+            keymanPhoto={
+              selectedKeyman?.photo ??
+              keymansData.find(k => k.id === selectedKeyman?.id)?.photo
+            }
             onSave={handleSaveProfile}
           />
         </View>

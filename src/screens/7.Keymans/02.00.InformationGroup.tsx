@@ -39,6 +39,7 @@ interface InformationGroupProps {
   mode: ScreenMode;
   keymanName?: string;
   keymanId?: number;
+  keymanPhoto?: any;
   onClose: () => void;
   onSave?: (data: ProfileFormData) => void;
   onOpenSortModal?: () => void;
@@ -54,6 +55,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   mode,
   keymanName,
   keymanId,
+  keymanPhoto,
   onClose,
   onSave,
   onOpenSortModal,
@@ -82,8 +84,9 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
       endereco: 'Piratininga',
       numero: '650',
       complemento: 'Sala 207',
+      keymanPhoto: keymanPhoto,
     }),
-    [keymanName]
+    [keymanName, keymanPhoto]
   );
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
@@ -336,7 +339,7 @@ const styles = StyleSheet.create({
   // Textos
   saveButtonText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 1402.00.InformationGroup.tsx,
+    fontSize: 14,
     color: COLORS.white,
   },
   // Containers
