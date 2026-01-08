@@ -269,6 +269,7 @@ const KeymansScreen: React.FC = () => {
 
   // Handlers para Modal de Opções
   const handleOpenOptionsModal = (keyman: typeof keymansData[0]) => {
+    console.log('[Keymans][Home] abrir options', { keymanId: keyman.id, keymanName: keyman.name });
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
@@ -280,11 +281,13 @@ const KeymansScreen: React.FC = () => {
   };
 
   const handleCloseOptionsModal = () => {
+    console.log('[Keymans][Home] fechar options');
     setOptionsModalVisible(false);
   };
 
   // Handler para editar perfil via modal de opções
   const handleEditProfile = () => {
+    console.log('[Keymans][Home] option editar perfil', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('perfil');
@@ -293,6 +296,7 @@ const KeymansScreen: React.FC = () => {
 
   // Handlers para navegar para Contatos
   const handleOpenContacts = () => {
+    console.log('[Keymans][Home] option ver contatos', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('contatos');
@@ -301,6 +305,7 @@ const KeymansScreen: React.FC = () => {
 
   // Handlers para navegar para Rank
   const handleOpenRank = () => {
+    console.log('[Keymans][Home] option ver rank', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('rank');
@@ -309,6 +314,7 @@ const KeymansScreen: React.FC = () => {
 
   // Handler para excluir keyman
   const handleDeleteKeyman = () => {
+    console.log('[Keymans][Home] confirm excluir', { keymanId: selectedKeyman?.id });
     // Implementar lógica de exclusão
     setOptionsModalVisible(false);
     setSelectedKeyman(null);

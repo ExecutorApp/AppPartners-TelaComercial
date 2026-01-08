@@ -64,6 +64,7 @@ export type RootStackParamList = {
   VideoPlayerScreen: {
     videoTitle?: string;
     videoDescription?: string;
+    initialVideoId?: number;
   };
   CompanySelection: undefined;
   PersonalInfo: undefined;

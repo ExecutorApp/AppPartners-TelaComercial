@@ -424,7 +424,7 @@ const NewAppointmentProfessionals: React.FC<NewAppointmentProfessionalsProps> = 
         onApply={({ sector, area, profile, selectedProfessionalId }) => {
           if (sector) setSelectedSector(sector);
           if (area) setSelectedArea(area);
-          setSelectedProfile(profile);
+          if (profile) setSelectedProfile(profile);
           if (selectedProfessionalId) {
             setSelectedProfessional(selectedProfessionalId);
             onSelectProfessional?.(selectedProfessionalId);
@@ -613,7 +613,7 @@ const NewAppointmentProfessionals: React.FC<NewAppointmentProfessionalsProps> = 
       onApply={({ sector, area, profile, selectedProfessionalId }) => {
         if (sector) setSelectedSector(sector);
         if (area) setSelectedArea(area);
-        setSelectedProfile(profile);
+        if (profile) setSelectedProfile(profile);
         if (selectedProfessionalId) {
           setSelectedProfessional(selectedProfessionalId);
           onSelectProfessional?.(selectedProfessionalId);

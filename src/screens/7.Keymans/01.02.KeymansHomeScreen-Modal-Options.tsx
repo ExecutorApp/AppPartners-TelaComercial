@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -96,6 +96,15 @@ const DeleteIcon = () => (
   </Svg>
 );
 
+const AlertIcon = () => (
+  <Svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+    <Path
+      d="M28.876 18.072C28.876 11.7858 23.7727 6.67149 17.5 6.67149C11.2273 6.67149 6.12404 11.7858 6.12404 18.072V27.0533H28.8759V18.072H28.876ZM17.506 23.1138C16.6974 23.1138 16.1301 22.5453 16.1301 21.8438C16.1301 21.1301 16.6974 20.5979 17.506 20.5979C18.3147 20.5979 18.8699 21.1301 18.8699 21.8438C18.8699 22.5453 18.3147 23.1138 17.506 23.1138ZM18.4113 19.2355H16.5888L16.1422 13.853H18.8699L18.4113 19.2355ZM16.4746 0H18.5254V3.63088H16.4746V0ZM29.1885 29.04H5.8115C3.7208 29.04 2.01988 30.7446 2.01988 32.8398V35H32.9801V32.8398C32.9801 30.7446 31.2792 29.04 29.1885 29.04Z"
+      fill={COLORS.primary}
+    />
+  </Svg>
+);
+
 interface KeymanOptionsModalProps {
   visible: boolean;
   onClose: () => void;
@@ -123,97 +132,168 @@ const KeymanOptionsModal: React.FC<KeymanOptionsModalProps> = ({
   onDelete,
   anchorPosition,
 }) => {
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+
+  useEffect(() => {
+    console.log('[Keymans][OptionsModal] render', {
+      visible,
+      deleteConfirmVisible,
+      keymanId,
+      keymanName,
+    });
+  }, [visible, deleteConfirmVisible, keymanId, keymanName]);
+
+  useEffect(() => {
+    if (!visible && deleteConfirmVisible) {
+      console.log('[Keymans][OptionsModal] fechou modal externo, reset confirm');
+      setDeleteConfirmVisible(false);
+    }
+  }, [visible, deleteConfirmVisible]);
+
   const handleEditProfile = () => {
+    console.log('[Keymans][OptionsModal] action editar perfil');
     onClose();
     onEditProfile();
   };
 
   const handleViewContacts = () => {
+    console.log('[Keymans][OptionsModal] action ver contatos');
     onClose();
     onViewContacts();
   };
 
   const handleViewRank = () => {
+    console.log('[Keymans][OptionsModal] action ver rank');
     onClose();
     onViewRank();
   };
 
   const handleDelete = () => {
-    onClose();
-    onDelete();
+    console.log('[Keymans][OptionsModal] action excluir (abrir confirm)');
+    setDeleteConfirmVisible(true);
   };
 
   return (
     <Modal
       visible={visible}
-      transparent
+      transparent={!deleteConfirmVisible}
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={() => {
+        console.log('[Keymans][OptionsModal] onRequestClose', { deleteConfirmVisible });
+        if (deleteConfirmVisible) {
+          setDeleteConfirmVisible(false);
+          return;
+        }
+        onClose();
+      }}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <View
-          style={[
-            styles.modalContainer,
-            anchorPosition && {
-              position: 'absolute',
-              top: anchorPosition.y,
-              right: 16,
-            },
-          ]}
-        >
-          <View style={styles.optionsContainer}>
-            {/* Editar Perfil */}
-            <TouchableOpacity
-              style={styles.optionItem}
-              onPress={handleEditProfile}
-              activeOpacity={0.7}
-            >
-              <EditIcon />
-              <Text style={styles.optionText}>Editar Perfil</Text>
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            {/* Contatos */}
-            <TouchableOpacity
-              style={styles.optionItem}
-              onPress={handleViewContacts}
-              activeOpacity={0.7}
-            >
-              <ContactsIcon />
-              <Text style={styles.optionText}>
-                Contatos ({contactsCount.toString().padStart(2, '0')})
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            {/* Rank */}
-            <TouchableOpacity
-              style={styles.optionItem}
-              onPress={handleViewRank}
-              activeOpacity={0.7}
-            >
-              <RankIcon />
-              <Text style={styles.optionText}>
-                Rank ({rankPosition.toString().padStart(2, '0')})
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            {/* Excluir */}
-            <TouchableOpacity
-              style={styles.optionItem}
-              onPress={handleDelete}
-              activeOpacity={0.7}
-            >
-              <DeleteIcon />
-              <Text style={styles.optionText}>Excluir</Text>
-            </TouchableOpacity>
+      {deleteConfirmVisible ? (
+        <View style={styles.deleteOverlay}>
+          <View style={styles.deleteCard}>
+            <View style={styles.deleteIconBox}>
+              <AlertIcon />
+            </View>
+            <View style={styles.deleteTextBlock}>
+              <Text style={styles.deleteTitle}>Deseja excluir?</Text>
+              <Text style={styles.deleteSubtitle}>Essa ação não pode ser desfeita.</Text>
+            </View>
+            <View style={styles.deleteActions}>
+              <TouchableOpacity
+                style={styles.deleteCancelButton}
+                onPress={() => {
+                  console.log('[Keymans][OptionsModal] confirm cancelar');
+                  setDeleteConfirmVisible(false);
+                }}
+              >
+                <Text style={styles.deleteCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteConfirmButton}
+                onPress={() => {
+                  console.log('[Keymans][OptionsModal] confirm excluir');
+                  setDeleteConfirmVisible(false);
+                  onClose();
+                  onDelete();
+                }}
+              >
+                <Text style={styles.deleteConfirmText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </Pressable>
+      ) : (
+        <View style={styles.overlay}>
+          <Pressable
+            onPress={() => {
+              console.log('[Keymans][OptionsModal] backdrop press');
+              onClose();
+            }}
+            style={StyleSheet.absoluteFillObject}
+          />
+          <View
+            style={[
+              styles.modalContainer,
+              anchorPosition && {
+                position: 'absolute',
+                top: anchorPosition.y,
+                right: 16,
+              },
+            ]}
+          >
+            <View style={styles.optionsContainer}>
+              {/* Editar Perfil */}
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={handleEditProfile}
+                activeOpacity={0.7}
+              >
+                <EditIcon />
+                <Text style={styles.optionText}>Editar Perfil</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              {/* Contatos */}
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={handleViewContacts}
+                activeOpacity={0.7}
+              >
+                <ContactsIcon />
+                <Text style={styles.optionText}>
+                  Contatos ({contactsCount.toString().padStart(2, '0')})
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              {/* Rank */}
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={handleViewRank}
+                activeOpacity={0.7}
+              >
+                <RankIcon />
+                <Text style={styles.optionText}>
+                  Rank ({rankPosition.toString().padStart(2, '0')})
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              {/* Excluir */}
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={handleDelete}
+                activeOpacity={0.7}
+              >
+                <DeleteIcon />
+                <Text style={styles.optionText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </Modal>
   );
 };
@@ -259,6 +339,80 @@ const styles = StyleSheet.create({
     height: 0.5,
     backgroundColor: COLORS.border,
     marginVertical: 4.5,
+  },
+  deleteOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  deleteCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 20,
+    width: '100%',
+    maxWidth: 350,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  deleteIconBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteTextBlock: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  deleteTitle: {
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+  },
+  deleteSubtitle: {
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '400',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  deleteActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  deleteCancelButton: {
+    flex: 1,
+    height: 40,
+    backgroundColor: COLORS.background,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteConfirmButton: {
+    flex: 1,
+    height: 40,
+    backgroundColor: COLORS.primary,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteCancelText: {
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  deleteConfirmText: {
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 });
 

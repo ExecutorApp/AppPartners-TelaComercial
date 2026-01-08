@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
   nextButtonTextDisabled: {
     color: '#5F758B80',
   },
-  modalOverlay: {
+  modalOverlayLegacy: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  modalTitle: {
+  modalTitleLegacy: {
     fontSize: 20,
     color: '#3A3F51',
     fontFamily: 'Inter_600SemiBold',

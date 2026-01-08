@@ -125,6 +125,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Inter_600SemiBold',
   },
+  contentContainer: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+  },
   subtitle: {
     fontSize: 16,
     color: '#3A3F51',

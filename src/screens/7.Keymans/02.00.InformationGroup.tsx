@@ -8,7 +8,7 @@ import InformationGroupProfileContent, {
   ScreenMode,
 } from './02.01.InformationGroup-Profile';
 import InformationGroupContactsContent from './02.02.InformationGroup-Contacts';
-import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact';
+import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact01';
 import InformationGroupRankContent from './02.03.InformationGroup-Rank';
 
 const COLORS = {

@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
     borderWidth: 0,
-    ...(Platform.OS === 'web' ? { outlineStyle: 'none', outlineWidth: 0, outlineColor: 'transparent' } : {}),
+    ...(Platform.OS === 'web' ? { outlineStyle: 'solid', outlineWidth: 0, outlineColor: 'transparent' } : {}),
   },
 
   list: { marginTop: 10 },

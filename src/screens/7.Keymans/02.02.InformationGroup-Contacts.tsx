@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,13 @@ import {
   TextInput,
   Image,
   Platform,
+  Modal,
+  Dimensions,
 } from 'react-native';
 import { Svg, Path, Rect, G, ClipPath, Defs } from 'react-native-svg';
+import EmptyCalendarIllustration from '../../components/illustrations/EmptyCalendarIllustration';
+import InformationGroupContactsEdit from './02.02.InformationGroup-Contacts-Edit';
+import InformationGroupContactsView from './02.02.InformationGroup-Contacts-View';
 
 // Cores do tema
 const COLORS = {
@@ -172,32 +177,49 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
       (c) => term.length === 0 || c.name.toLowerCase().includes(term)
     );
   }, [searchText]);
+  const isEmpty = filteredContacts.length === 0;
 
   const handleOpenContactMenu = (contactId: number) => {
+    try {
+      console.log('[Contacts][Menu] abrir', contactId);
+    } catch {}
     setContactMenuVisible(contactId);
   };
 
   const handleCloseContactMenu = () => {
+    try {
+      console.log('[Contacts][Menu] fechar');
+    } catch {}
     setContactMenuVisible(null);
   };
 
   const handleEditContact = (contactId: number) => {
     handleCloseContactMenu();
-    if (onEditContact) {
-      onEditContact(contactId);
-    }
+    setSelectedContactId(contactId);
+    setViewMode('editar');
+    try {
+      console.log('[Contacts][Action] editar', contactId);
+    } catch {}
+    setViewModalVisible(true);
   };
 
   const handleViewContact = (contactId: number) => {
     handleCloseContactMenu();
-    if (onViewContact) {
-      onViewContact(contactId);
-    }
+    setSelectedContactId(contactId);
+    setViewMode('visualizar');
+    try {
+      console.log('[Contacts][Action] visualizar', contactId);
+    } catch {}
+    setViewModalVisible(true);
   };
 
   const handleDeletePress = (contactId: number) => {
     handleCloseContactMenu();
-    onDeleteContact?.(contactId);
+    setSelectedContactId(contactId);
+    try {
+      console.log('[Contacts][Action] excluir', contactId);
+    } catch {}
+    setDeleteModalVisible(true);
   };
 
   const renderContactCard = (contact: typeof contactsData[0]) => (
@@ -259,6 +281,62 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
     </View>
   );
 
+  const winHeight = Dimensions.get('window').height;
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const illustrationHeight = Platform.OS === 'web' ? ('20vh' as any) : clamp(Math.floor(winHeight * 0.25), 160, 240);
+
+  const renderEmptyContactsState = () => (
+    <View style={styles.emptyStateOuter}>
+      <View style={styles.emptyCard}>
+        <View style={[styles.emptyIllustrationWrap, { height: illustrationHeight }]}>
+          <EmptyCalendarIllustration width={'100%'} height={'100%'} />
+        </View>
+        <Text style={styles.emptyTitle}>{'Nenhum contato\nencontrado!'}</Text>
+        <Text style={styles.emptySubtitle}>
+          {'Para criar um novo conte\u00FAdo, toque \nno bot\u00E3o azul "Novo conte\u00FAdo"\nno topo da tela.'}
+        </Text>
+      </View>
+    </View>
+  );
+
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<'editar' | 'visualizar'>('visualizar');
+  const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+  useEffect(() => {
+    console.log('[Contacts][State] modal', {
+      contactMenuVisible,
+      viewModalVisible,
+      viewMode,
+      selectedContactId,
+      deleteModalVisible,
+    });
+  }, [contactMenuVisible, viewModalVisible, viewMode, selectedContactId, deleteModalVisible]);
+
+  const selectedContact = useMemo(() => {
+    if (selectedContactId == null) return null;
+    return contactsData.find((c) => c.id === selectedContactId) || null;
+  }, [selectedContactId]);
+
+  const contactDataForModal = useMemo(() => {
+    if (!selectedContact) return undefined;
+    return {
+      nome: selectedContact.name,
+      email: '',
+      whatsapp: selectedContact.whatsapp,
+      estado: selectedContact.state,
+      cpfCnpj: '',
+      cep: '',
+      cidade: '',
+      bairro: '',
+      endereco: '',
+      numero: '',
+      complemento: '',
+      keymanPhoto: { uri: selectedContact.photo },
+    };
+  }, [selectedContact]);
+
   return (
     <View style={styles.contactsContainer}>
       <View style={styles.addButtonContainer}>
@@ -290,21 +368,78 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
         />
       </View>
 
-      <ScrollView
-        style={styles.contactsList}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.contactsListContent}
-      >
-        {filteredContacts.map((contact) => renderContactCard(contact))}
-      </ScrollView>
+      {isEmpty ? (
+        renderEmptyContactsState()
+      ) : (
+        <ScrollView
+          style={styles.contactsList}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.contactsListContent}
+        >
+          {filteredContacts.map((contact) => renderContactCard(contact))}
+        </ScrollView>
+      )}
 
-      {contactMenuVisible !== null && (
-        <TouchableOpacity
-          style={styles.menuOverlay}
-          activeOpacity={1}
-          onPress={handleCloseContactMenu}
+      
+
+      {viewMode === 'editar' ? (
+        <InformationGroupContactsEdit
+          visible={viewModalVisible}
+          onClose={() => setViewModalVisible(false)}
+          contactData={contactDataForModal}
+        />
+      ) : (
+        <InformationGroupContactsView
+          visible={viewModalVisible}
+          onClose={() => setViewModalVisible(false)}
+          contactData={contactDataForModal}
         />
       )}
+
+      <Modal
+        visible={deleteModalVisible}
+        transparent={false}
+        animationType="fade"
+        onRequestClose={() => {
+          console.log('[Contacts][DeleteModal] onRequestClose');
+          setDeleteModalVisible(false);
+        }}
+      >
+        <View style={styles.deleteOverlay}>
+          <View style={styles.deleteCard}>
+            <View style={styles.deleteIconBox}>
+              <Svg width={35} height={35} viewBox="0 0 35 35" fill="none">
+                <Path d="M28.876 18.072C28.876 11.7858 23.7727 6.67149 17.5 6.67149C11.2273 6.67149 6.12404 11.7858 6.12404 18.072V27.0533H28.8759V18.072H28.876ZM17.506 23.1138C16.6974 23.1138 16.1301 22.5453 16.1301 21.8438C16.1301 21.1301 16.6974 20.5979 17.506 20.5979C18.3147 20.5979 18.8699 21.1301 18.8699 21.8438C18.8699 22.5453 18.3147 23.1138 17.506 23.1138ZM18.4113 19.2355H16.5888L16.1422 13.853H18.8699L18.4113 19.2355ZM16.4746 0H18.5254V3.63088H16.4746V0ZM29.1885 29.04H5.8115C3.7208 29.04 2.01988 30.7446 2.01988 32.8398V35H32.9801V32.8398C32.9801 30.7446 31.2792 29.04 29.1885 29.04Z" fill="#1777CF" />
+              </Svg>
+            </View>
+            <View style={styles.deleteTextBlock}>
+              <Text style={styles.deleteTitle}>Deseja excluir este contato?</Text>
+              <Text style={styles.deleteSubtitle}>Essa ação não pode ser desfeita.</Text>
+            </View>
+            <View style={styles.deleteActions}>
+              <TouchableOpacity
+                style={styles.deleteCancelButton}
+                onPress={() => {
+                  console.log('[Contacts][DeleteModal] cancelar', { selectedContactId });
+                  setDeleteModalVisible(false);
+                }}
+              >
+                <Text style={styles.deleteCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteConfirmButton}
+                onPress={() => {
+                  console.log('[Contacts][DeleteModal] confirmar', { selectedContactId, hasOnDeleteContact: !!onDeleteContact });
+                  if (selectedContactId != null) onDeleteContact?.(selectedContactId);
+                  setDeleteModalVisible(false);
+                }}
+              >
+                <Text style={styles.deleteConfirmText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -443,6 +578,40 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingBottom: 20,
   },
+  emptyStateOuter: {
+    marginHorizontal: 10,
+  },
+  emptyCard: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    paddingVertical: 2,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
+    gap: 15,
+    backgroundColor: COLORS.white,
+  },
+  emptyIllustrationWrap: {
+    alignSelf: 'stretch',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTitle: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    textAlign: 'center',
+  },
   contactCard: {
     flexDirection: 'row',
     borderWidth: 0.6,
@@ -512,8 +681,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 5,
-    zIndex: 100,
+    elevation: 1000,
+    zIndex: 1000,
     minWidth: 120,
   },
   menuItem: {
@@ -543,7 +712,7 @@ const styles = StyleSheet.create({
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -595,6 +764,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalConfirmText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: COLORS.white,
+  },
+  deleteOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    zIndex: 10000,
+  },
+  deleteCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 20,
+    width: '100%',
+    maxWidth: 350,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    zIndex: 10001,
+  },
+  deleteIconBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteTextBlock: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  deleteTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+  },
+  deleteSubtitle: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  deleteActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  deleteCancelButton: {
+    flex: 1,
+    height: 40,
+    backgroundColor: COLORS.background,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteConfirmButton: {
+    flex: 1,
+    height: 40,
+    backgroundColor: COLORS.primary,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteCancelText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: COLORS.textPrimary,
+  },
+  deleteConfirmText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
     color: COLORS.white,

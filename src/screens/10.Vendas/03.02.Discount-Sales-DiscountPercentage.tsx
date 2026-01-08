@@ -107,7 +107,7 @@ const DescontoModalDiscount: React.FC<Props> = ({ visible, onCancel, onConfirm, 
             <View style={styles.pickersRow}>
               <View style={styles.pickerWrapper}>
                 <ScrollView
-                  ref={(r) => (intRef.current = r)}
+                  ref={(r) => { intRef.current = r; }}
                   showsVerticalScrollIndicator={false}
                   decelerationRate={Platform.OS === 'ios' ? 'fast' : 0.9}
                   snapToInterval={ITEM_HEIGHT}
@@ -145,7 +145,7 @@ const DescontoModalDiscount: React.FC<Props> = ({ visible, onCancel, onConfirm, 
 
               <View style={styles.pickerWrapper}>
                 <ScrollView
-                  ref={(r) => (decRef.current = r)}
+                  ref={(r) => { decRef.current = r; }}
                   showsVerticalScrollIndicator={false}
                   decelerationRate={Platform.OS === 'ios' ? 'fast' : 0.9}
                   snapToInterval={ITEM_HEIGHT}
@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  itemRowActive: {},
   itemText: { fontSize: 16, fontFamily: 'Inter_500Medium', color: '#959DA6', lineHeight: ITEM_HEIGHT, textAlign: 'center' },
   itemTextHidden: { opacity: 0 },
   itemTextActive: { fontSize: 20, color: '#1777CF', fontFamily: 'Inter_700Bold', lineHeight: ITEM_HEIGHT, textAlign: 'center' },
