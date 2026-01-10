@@ -127,6 +127,9 @@ const styles = StyleSheet.create({
   stepBoxActive: {
     backgroundColor: COLORS.primary,
   },
+  stepBoxError: {
+    borderColor: '#E53935',
+  },
   stepText: {
     textAlign: 'center',
     color: COLORS.textPrimary,
@@ -238,7 +241,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   inputGroup: {
-    height: 64,
+    minHeight: 64,
     gap: 6,
   },
   labelContainer: {
@@ -376,6 +379,13 @@ const styles = StyleSheet.create({
           outlineColor: 'transparent',
         } as any)
       : {}),
+  },
+  errorText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: '#CF3C3C',
+    paddingHorizontal: 6,
+    marginTop: 2,
   },
   footerContainer: {
     paddingHorizontal: 16,

@@ -7,7 +7,7 @@ import InformationGroupProfileContent, {
   ProfileFormData,
   ScreenMode,
 } from './02.01.InformationGroup-Profile';
-import InformationGroupContactsContent from './02.02.InformationGroup-Contacts';
+import InformationGroupContactsContent, { type Contact } from './02.02.InformationGroup-Contacts';
 import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact01';
 import InformationGroupRankContent from './02.03.InformationGroup-Rank';
 
@@ -93,6 +93,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [personType, setPersonType] = useState<PersonType>('fisica');
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
 
@@ -125,6 +126,47 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
 
   const handleCloseNewContact = () => {
     setShowNewContactModal(false);
+  };
+
+  const handleSaveNewContact = (data: ProfileFormData) => {
+    const name = String(data.nome ?? '').trim();
+    const whatsapp = String(data.whatsapp ?? '').trim();
+    const state = String(data.estado ?? '').trim();
+    const photo =
+      typeof (data as any)?.keymanPhoto?.uri === 'string' ? String((data as any).keymanPhoto.uri) : '';
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+
+    setContacts((prev) => [
+      ...prev,
+      {
+        id,
+        name: name.length ? name : 'Sem nome',
+        whatsapp,
+        state,
+        photo,
+      },
+    ]);
+  };
+
+  const handleSaveNewContacts = (items: ProfileFormData[]) => {
+    const now = Date.now();
+    setContacts((prev) => [
+      ...prev,
+      ...items.map((data, idx) => {
+        const name = String(data.nome ?? '').trim();
+        const whatsapp = String(data.whatsapp ?? '').trim();
+        const state = String(data.estado ?? '').trim();
+        const photo =
+          typeof (data as any)?.keymanPhoto?.uri === 'string' ? String((data as any).keymanPhoto.uri) : '';
+        return {
+          id: now + idx + Math.floor(Math.random() * 1000),
+          name: name.length ? name : 'Sem nome',
+          whatsapp,
+          state,
+          photo,
+        };
+      }),
+    ]);
   };
 
   const updateFormField = (field: keyof ProfileFormData, value: string) => {
@@ -195,6 +237,8 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
             onEditContact={onEditContact}
             onViewContact={onViewContact}
             onDeleteContact={onDeleteContact}
+            contacts={contacts}
+            onContactsChange={setContacts}
           />
         )}
         {activeTab === 'rank' && <InformationGroupRankContent />}
@@ -242,6 +286,8 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
         visible={showNewContactModal}
         onClose={handleCloseNewContact}
         mode="criar"
+        onSave={handleSaveNewContact}
+        onSaveMany={handleSaveNewContacts}
       />
     </SafeAreaView>
   );

@@ -21,6 +21,7 @@ type InputFieldProps = {
   placeholder?: string;
   required?: boolean;
   editable?: boolean;
+  error?: string;
 };
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -30,6 +31,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   required,
   editable = true,
+  error,
 }) => {
   return (
     <View style={styles.inputGroup}>
@@ -49,6 +51,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           editable={editable}
         />
       </View>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
 };
@@ -169,6 +172,7 @@ type StepperProps = {
   onStepLeft: () => void;
   onStepRight: () => void;
   onSelectTab: (tab: number) => void;
+  tabsWithErrors?: number[];
 };
 
 export const Stepper: React.FC<StepperProps> = ({
@@ -179,6 +183,7 @@ export const Stepper: React.FC<StepperProps> = ({
   onStepLeft,
   onStepRight,
   onSelectTab,
+  tabsWithErrors,
 }) => {
   const scrollRef = useRef<ScrollView | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -235,7 +240,13 @@ export const Stepper: React.FC<StepperProps> = ({
               }}
               style={{ marginRight: idx === tabs.length - 1 ? 0 : BOX_GAP }}
             >
-              <View style={[styles.stepBox, step === activeTab ? styles.stepBoxActive : null]}>
+              <View
+                style={[
+                  styles.stepBox,
+                  step === activeTab ? styles.stepBoxActive : null,
+                  tabsWithErrors?.includes(step) ? styles.stepBoxError : null,
+                ]}
+              >
                 <Text style={[styles.stepText, step === activeTab ? styles.stepTextActive : null]}>
                   {String(step).padStart(2, '0')}
                 </Text>
@@ -254,10 +265,11 @@ export const Stepper: React.FC<StepperProps> = ({
 
 type HeaderActionsProps = {
   onImportExcel: () => void;
+  onDeleteTab: () => void;
   onAddTab: () => void;
 };
 
-export const HeaderActions: React.FC<HeaderActionsProps> = ({ onImportExcel, onAddTab }) => {
+export const HeaderActions: React.FC<HeaderActionsProps> = ({ onImportExcel, onDeleteTab, onAddTab }) => {
   return (
     <View style={styles.headerActionsRow}>
       <View style={styles.importButtonHeader}>
@@ -272,7 +284,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({ onImportExcel, onA
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity activeOpacity={0.8}>
+      <TouchableOpacity activeOpacity={0.8} onPress={onDeleteTab}>
         <TrashButtonIcon />
       </TouchableOpacity>
 

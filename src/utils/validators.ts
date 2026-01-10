@@ -76,18 +76,11 @@ export function validateWhatsApp(phone: string): { valid: boolean; normalized: s
 
 export function maskWhatsApp(phone: string): string {
   const d = onlyDigits(phone).slice(0, 11);
-  if (d.length <= 10) {
-    // (XX) XXXX-XXXX
-    const p1 = d.slice(0, 2);
-    const p2 = d.slice(2, 6);
-    const p3 = d.slice(6, 10);
-    return `(${p1}${p1.length ? ')' : ''} ${p2}${p2.length ? '-' : ''}${p3}`.trim();
-  }
-  // (XX) XXXXX-XXXX
-  const p1 = d.slice(0, 2);
-  const p2 = d.slice(2, 7);
-  const p3 = d.slice(7, 11);
-  return `(${p1}) ${p2}-${p3}`;
+  if (d.length === 0) return '';
+  if (d.length <= 2) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`;
 }
 
 export function sanitizeEmail(email: string): string {

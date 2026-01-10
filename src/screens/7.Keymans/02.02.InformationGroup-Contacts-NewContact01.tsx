@@ -12,6 +12,7 @@ import {
   UF_NAME_MAP,
   createEmptyFormData,
   createFormDataFromContactData,
+  digitsOnly,
   detectPersonTypeFromValue,
   detectPersonTypeFromDocument,
   parseImportedContacts,
@@ -27,6 +28,23 @@ import {
 } from './02.02.InformationGroup-Contacts-NewContact02';
 import { DownloadModelIcon } from './02.02.InformationGroup-Contacts-NewContact02';
 import { InputField, StateSelector, Stepper, HeaderActions } from './02.02.InformationGroup-Contacts-NewContact05';
+import {
+  capitalizeFirstLetterLive,
+  maskCPF,
+  maskWhatsApp,
+  validateWhatsApp,
+  isValidCPF,
+  isValidCNPJ,
+  isValidEmail,
+  sanitizeEmail,
+  maskCEP,
+  isValidCEP,
+  onlyDigits,
+  sanitizeCityNeighborhood,
+  sanitizeAddress,
+  sanitizeNumberField,
+  sanitizeComplement,
+} from '../../utils/validators';
 
 type ModalMode = 'criar' | 'editar' | 'visualizar';
 
@@ -36,6 +54,7 @@ interface NewContactModalProps {
   mode: ModalMode;
   contactData?: Partial<ProfileFormData>;
   onSave?: (data: ProfileFormData) => void;
+  onSaveMany?: (data: ProfileFormData[]) => void;
   onImportExcel?: () => void;
 }
 
@@ -46,6 +65,7 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
   contactData,
   onImportExcel,
   onSave,
+  onSaveMany,
 }) => {
   const [tabs, setTabs] = useState<number[]>([1]);
   const [activeTab, setActiveTab] = useState(1);
@@ -60,6 +80,9 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [photoErrorByTab, setPhotoErrorByTab] = useState<Record<number, boolean>>({});
+  const [tabErrors, setTabErrors] = useState<Record<number, string[]>>({});
+  const [fieldErrorsByTab, setFieldErrorsByTab] = useState<Record<number, Partial<Record<keyof ProfileFormData, string>>>>({});
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
 
   useEffect(() => {
     setFocusedField(null);
@@ -262,8 +285,49 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
     }
   };
 
+  const maskCNPJ = (input: string): string => {
+    const digits = onlyDigits(input).slice(0, 14);
+    const p1 = digits.slice(0, 2);
+    const p2 = digits.slice(2, 5);
+    const p3 = digits.slice(5, 8);
+    const p4 = digits.slice(8, 12);
+    const p5 = digits.slice(12, 14);
+    let out = p1;
+    if (p2) out += (out ? '.' : '') + p2;
+    if (p3) out += (out ? '.' : '') + p3;
+    if (p4) out += '/' + p4;
+    if (p5) out += '-' + p5;
+    return out;
+  };
+
+  const areAllDigitsEqual = (digits: string): boolean => {
+    if (!digits) return false;
+    return new Set(digits.split('')).size === 1;
+  };
+
   const updateFormField = (field: keyof ProfileFormData, value: string) => {
     setFormDataByTab((prev) => ({ ...prev, [activeTab]: { ...(prev[activeTab] ?? createEmptyFormData()), [field]: value } }));
+    setFieldErrorsByTab((prev) => {
+      const current = prev[activeTab];
+      if (!current || !current[field]) return prev;
+      const nextTabErrors = { ...current };
+      delete (nextTabErrors as any)[field];
+      return { ...prev, [activeTab]: nextTabErrors };
+    });
+  };
+
+  const setFieldError = (tab: number, field: keyof ProfileFormData, error?: string) => {
+    setFieldErrorsByTab((prev) => {
+      const current = prev[tab] ?? {};
+      if (!error) {
+        if (!current[field]) return prev;
+        const nextTabErrors = { ...current };
+        delete (nextTabErrors as any)[field];
+        return { ...prev, [tab]: nextTabErrors };
+      }
+      if (current[field] === error) return prev;
+      return { ...prev, [tab]: { ...current, [field]: error } };
+    });
   };
 
   useEffect(() => {
@@ -272,6 +336,8 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
     setTabs([1]);
     setActiveTab(1);
     setPersonTypeByTab({ 1: 'fisica' });
+    setTabErrors({});
+    setFieldErrorsByTab({});
 
     if (mode === 'criar') {
       setFormDataByTab({ 1: createEmptyFormData() });
@@ -295,8 +361,144 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
     setActiveTab(next);
   };
 
+  const clearTabData = (tab: number) => {
+    setFormDataByTab((prev) => ({ ...prev, [tab]: createEmptyFormData() }));
+    setPersonTypeByTab((prev) => ({ ...prev, [tab]: 'fisica' }));
+    setPhotoErrorByTab((prev) => ({ ...prev, [tab]: false }));
+    setTabErrors((prev) => {
+      if (!prev[tab]) return prev;
+      const next = { ...prev };
+      delete next[tab];
+      return next;
+    });
+    setFieldErrorsByTab((prev) => {
+      if (!prev[tab]) return prev;
+      const next = { ...prev };
+      delete next[tab];
+      return next;
+    });
+  };
+
+  const deleteCurrentTab = () => {
+    if (activeTab === 1) {
+      clearTabData(1);
+      return;
+    }
+
+    const deletedIndex = tabs.findIndex((t) => t === activeTab);
+    const remaining = tabs.filter((t) => t !== activeTab);
+    const newTabs = remaining.map((_, idx) => idx + 1);
+
+    const newFormMap: Record<number, ProfileFormData> = {};
+    const newPersonMap: Record<number, PersonType> = {};
+    const newPhotoErrMap: Record<number, boolean> = {};
+    const newTabErrorsMap: Record<number, string[]> = {};
+    const newFieldErrorsMap: Record<number, Partial<Record<keyof ProfileFormData, string>>> = {};
+
+    remaining.forEach((oldTab, idx) => {
+      const newTab = idx + 1;
+      newFormMap[newTab] = formDataByTab[oldTab] ?? createEmptyFormData();
+      newPersonMap[newTab] = personTypeByTab[oldTab] ?? 'fisica';
+      newPhotoErrMap[newTab] = photoErrorByTab[oldTab] ?? false;
+      if (tabErrors[oldTab]?.length) newTabErrorsMap[newTab] = tabErrors[oldTab];
+      if (fieldErrorsByTab[oldTab]) newFieldErrorsMap[newTab] = fieldErrorsByTab[oldTab];
+    });
+
+    setTabs(newTabs);
+    setFormDataByTab(newFormMap);
+    setPersonTypeByTab(newPersonMap);
+    setPhotoErrorByTab(newPhotoErrMap);
+    setTabErrors(newTabErrorsMap);
+    setFieldErrorsByTab(newFieldErrorsMap);
+
+    const nextActiveIndex = Math.max(0, deletedIndex - 1);
+    setActiveTab(newTabs[nextActiveIndex] ?? 1);
+  };
+
+  const validateContactForm = (data: ProfileFormData, personType: PersonType) => {
+    const fieldErrors: Partial<Record<keyof ProfileFormData, string>> = {};
+
+    const name = String(data.nome ?? '').trim();
+    if (!name) {
+      fieldErrors.nome = personType === 'juridica' ? 'Razão social é obrigatória.' : 'Nome é obrigatório.';
+    }
+
+    const whatsappDigits = digitsOnly(String(data.whatsapp ?? ''));
+    if (!whatsappDigits) {
+      fieldErrors.whatsapp = 'WhatsApp é obrigatório.';
+    } else if (whatsappDigits.length < 10) {
+      fieldErrors.whatsapp = 'WhatsApp inválido (DDD e comprimento).';
+    } else if (areAllDigitsEqual(whatsappDigits)) {
+      fieldErrors.whatsapp = 'Número inválido';
+    } else if (!validateWhatsApp(String(data.whatsapp ?? '')).valid) {
+      fieldErrors.whatsapp = 'WhatsApp inválido (DDD e comprimento).';
+    }
+
+    const docDigits = digitsOnly(String(data.cpfCnpj ?? ''));
+    if (docDigits) {
+      if (personType === 'juridica') {
+        if (!isValidCNPJ(docDigits)) fieldErrors.cpfCnpj = 'CNPJ inválido.';
+      } else {
+        if (!isValidCPF(docDigits)) fieldErrors.cpfCnpj = 'CPF inválido.';
+      }
+    }
+
+    const email = String(data.email ?? '').trim();
+    if (email && !isValidEmail(email)) fieldErrors.email = 'Email inválido.';
+
+    const cepDigits = digitsOnly(String(data.cep ?? ''));
+    if (cepDigits && !isValidCEP(String(data.cep ?? ''))) fieldErrors.cep = 'CEP inválido.';
+
+    const responsibleCpfDigits = digitsOnly(String(data.responsavelCpf ?? ''));
+    if (responsibleCpfDigits && !isValidCPF(String(data.responsavelCpf ?? ''))) {
+      fieldErrors.responsavelCpf = 'CPF do responsável inválido.';
+    }
+
+    const messages = Object.values(fieldErrors).filter(Boolean) as string[];
+    return { fieldErrors, messages };
+  };
+
+  const tabsWithErrors = useMemo(() => {
+    return Object.keys(tabErrors)
+      .map((k) => Number(k))
+      .filter((k) => Array.isArray(tabErrors[k]) && tabErrors[k].length > 0);
+  }, [tabErrors]);
+
   const handleSave = () => {
-    onSave?.(formData);
+    if (mode !== 'criar') {
+      onSave?.(formData);
+      onClose();
+      return;
+    }
+
+    const errorsByTab: Record<number, string[]> = {};
+    const fieldErrorsMap: Record<number, Partial<Record<keyof ProfileFormData, string>>> = {};
+    const payload: ProfileFormData[] = [];
+
+    tabs.forEach((tab) => {
+      const data = formDataByTab[tab] ?? createEmptyFormData();
+      const personType = personTypeByTab[tab] ?? 'fisica';
+      const { fieldErrors, messages } = validateContactForm(data, personType);
+      fieldErrorsMap[tab] = fieldErrors;
+      if (messages.length) errorsByTab[tab] = messages;
+      payload.push(data);
+    });
+
+    setTabErrors(errorsByTab);
+    setFieldErrorsByTab(fieldErrorsMap);
+
+    const firstInvalidTab = tabs.find((t) => (errorsByTab[t]?.length ?? 0) > 0);
+    if (firstInvalidTab != null) {
+      setActiveTab(firstInvalidTab);
+      Alert.alert(
+        `Aba ${String(firstInvalidTab).padStart(2, '0')} com erro`,
+        errorsByTab[firstInvalidTab].join('\n')
+      );
+      return;
+    }
+
+    if (payload.length > 1) onSaveMany?.(payload);
+    else onSave?.(payload[0]);
     onClose();
   };
 
@@ -339,13 +541,24 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
                   <DownloadModelIcon />
                   <Text style={styles.downloadModelText}>Baixar modelo - Planilha do Excel</Text>
                 </TouchableOpacity>
-                <HeaderActions onImportExcel={readOnly ? () => {} : handleImportExcel} onAddTab={readOnly ? () => {} : handleAddTab} />
+                <HeaderActions
+                  onImportExcel={readOnly ? () => {} : handleImportExcel}
+                  onDeleteTab={
+                    readOnly
+                      ? () => {}
+                      : () => {
+                          setDeleteConfirmVisible(true);
+                        }
+                  }
+                  onAddTab={readOnly ? () => {} : handleAddTab}
+                />
                 <View style={styles.headerDivider} />
                 <Stepper
                   tabs={tabs}
                   activeTab={activeTab}
                   canGoLeft={canGoLeft}
                   canGoRight={canGoRight}
+                  tabsWithErrors={tabsWithErrors}
                   onStepLeft={() => {
                     if (!canGoLeft) return;
                     setActiveTab(tabs[activeTabIndex - 1]);
@@ -416,51 +629,104 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
               <InputField
                 label={activePersonType === 'juridica' ? 'Razão social' : 'Nome'}
                 value={formData.nome}
-                onChangeText={(value) => updateFormField('nome', value)}
+                onChangeText={(value) => updateFormField('nome', capitalizeFirstLetterLive(value))}
                 required={true}
                 placeholder={activePersonType === 'juridica' ? 'Digite a razão social' : 'Digite o nome completo'}
                 editable={!readOnly}
+                error={fieldErrorsByTab[activeTab]?.nome}
               />
               <InputField
                 label={activePersonType === 'fisica' ? 'CPF' : 'CNPJ'}
                 value={formData.cpfCnpj}
-                onChangeText={(value) => updateFormField('cpfCnpj', value)}
-                required={true}
+                onChangeText={(value) => {
+                  const masked = activePersonType === 'fisica' ? maskCPF(value) : maskCNPJ(value);
+                  updateFormField('cpfCnpj', masked);
+                  const digits = digitsOnly(masked);
+                  const expectedLen = activePersonType === 'juridica' ? 14 : 11;
+                  if (digits.length >= expectedLen) {
+                    if (activePersonType === 'juridica') {
+                      setFieldError(activeTab, 'cpfCnpj', isValidCNPJ(digits) ? undefined : 'CNPJ inválido.');
+                    } else {
+                      setFieldError(activeTab, 'cpfCnpj', isValidCPF(digits) ? undefined : 'CPF inválido.');
+                    }
+                  } else {
+                    setFieldError(activeTab, 'cpfCnpj', undefined);
+                  }
+                }}
                 placeholder={activePersonType === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00'}
                 editable={!readOnly}
+                error={fieldErrorsByTab[activeTab]?.cpfCnpj}
               />
               {activePersonType === 'juridica' ? (
                 <>
                   <InputField
                     label="Nome do Responsável"
                     value={formData.responsavelNome ?? ''}
-                    onChangeText={(value) => updateFormField('responsavelNome', value)}
+                    onChangeText={(value) => updateFormField('responsavelNome', capitalizeFirstLetterLive(value))}
                     placeholder="Digite o nome do responsável"
                     editable={!readOnly}
+                    error={fieldErrorsByTab[activeTab]?.responsavelNome}
                   />
                   <InputField
                     label="CPF do Responsável"
                     value={formData.responsavelCpf ?? ''}
-                    onChangeText={(value) => updateFormField('responsavelCpf', value)}
+                    onChangeText={(value) => {
+                      const masked = maskCPF(value);
+                      updateFormField('responsavelCpf', masked);
+                      const digits = digitsOnly(masked);
+                      if (digits.length >= 11) {
+                        setFieldError(activeTab, 'responsavelCpf', isValidCPF(digits) ? undefined : 'CPF do responsável inválido.');
+                      } else {
+                        setFieldError(activeTab, 'responsavelCpf', undefined);
+                      }
+                    }}
                     placeholder="000.000.000-00"
                     editable={!readOnly}
+                    error={fieldErrorsByTab[activeTab]?.responsavelCpf}
                   />
                 </>
               ) : null}
               <InputField
                 label="Email"
                 value={formData.email}
-                onChangeText={(value) => updateFormField('email', value)}
-                required={true}
+                onChangeText={(value) => {
+                  const sanitized = sanitizeEmail(value);
+                  updateFormField('email', sanitized);
+                  if (!sanitized) {
+                    setFieldError(activeTab, 'email', undefined);
+                    return;
+                  }
+                  setFieldError(activeTab, 'email', isValidEmail(sanitized) ? undefined : 'Email inválido.');
+                }}
                 placeholder="seuemail@aqui.com.br"
                 editable={!readOnly}
+                error={fieldErrorsByTab[activeTab]?.email}
               />
               <InputField
                 label="WhatsApp"
                 value={formData.whatsapp}
-                onChangeText={(value) => updateFormField('whatsapp', value)}
+                onChangeText={(value) => {
+                  const masked = maskWhatsApp(value);
+                  updateFormField('whatsapp', masked);
+                  const digits = digitsOnly(masked);
+                  if (!digits) {
+                    setFieldError(activeTab, 'whatsapp', undefined);
+                    return;
+                  }
+                  if (digits.length >= 10) {
+                    if (areAllDigitsEqual(digits)) {
+                      setFieldError(activeTab, 'whatsapp', 'Número inválido');
+                    } else {
+                      setFieldError(activeTab, 'whatsapp', validateWhatsApp(masked).valid ? undefined : 'WhatsApp inválido (DDD e comprimento).');
+                    }
+                  } else {
+                    setFieldError(activeTab, 'whatsapp', undefined);
+                  }
+                }}
                 placeholder="(00) 90000-0000"
                 editable={!readOnly}
+                required={true}
+                error={fieldErrorsByTab[activeTab]?.whatsapp}
               />
             </View>
 
@@ -474,47 +740,145 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
               <InputField
                 label="CEP"
                 value={formData.cep}
-                onChangeText={(value) => updateFormField('cep', value)}
+                onChangeText={(value) => {
+                  const masked = maskCEP(value);
+                  updateFormField('cep', masked);
+                  const digits = digitsOnly(masked);
+                  if (digits.length >= 8) {
+                    setFieldError(activeTab, 'cep', isValidCEP(masked) ? undefined : 'CEP inválido.');
+                  } else {
+                    setFieldError(activeTab, 'cep', undefined);
+                  }
+                }}
                 placeholder="00000-000"
                 editable={!readOnly}
+                error={fieldErrorsByTab[activeTab]?.cep}
               />
               <InputField
                 label="Cidade"
                 value={formData.cidade}
-                onChangeText={(value) => updateFormField('cidade', value)}
+                onChangeText={(value) => updateFormField('cidade', capitalizeFirstLetterLive(sanitizeCityNeighborhood(value)))}
                 placeholder="Ex: São José do Rio Preto"
                 editable={!readOnly}
               />
               <InputField
                 label="Bairro"
                 value={formData.bairro}
-                onChangeText={(value) => updateFormField('bairro', value)}
+                onChangeText={(value) => updateFormField('bairro', capitalizeFirstLetterLive(sanitizeCityNeighborhood(value)))}
                 placeholder="Ex: Centro"
                 editable={!readOnly}
               />
               <InputField
                 label="Endereço"
                 value={formData.endereco}
-                onChangeText={(value) => updateFormField('endereco', value)}
+                onChangeText={(value) => updateFormField('endereco', capitalizeFirstLetterLive(sanitizeAddress(value)))}
                 placeholder="Ex: Rua Piratininga"
                 editable={!readOnly}
               />
               <InputField
                 label="Número"
                 value={formData.numero}
-                onChangeText={(value) => updateFormField('numero', value)}
+                onChangeText={(value) => updateFormField('numero', sanitizeNumberField(value))}
                 placeholder="Ex: 650"
                 editable={!readOnly}
               />
               <InputField
                 label="Complemento"
                 value={formData.complemento}
-                onChangeText={(value) => updateFormField('complemento', value)}
+                onChangeText={(value) => updateFormField('complemento', sanitizeComplement(value))}
                 placeholder="Ex: Sala 207"
                 editable={!readOnly}
               />
             </View>
           </ScrollView>
+
+          {deleteConfirmVisible ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 10,
+                zIndex: 20000,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: COLORS.white,
+                  borderRadius: 12,
+                  padding: 20,
+                  width: '100%',
+                  maxWidth: 265,
+                  gap: 10,
+                  borderWidth: 1,
+                  borderColor: COLORS.border,
+                }}
+              >
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 8,
+                    backgroundColor: 'rgba(229, 57, 53, 0.12)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    alignSelf: 'center',
+                    marginBottom: 20,
+                  }}
+                >
+                  <TrashButtonIcon />
+                </View>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 16, color: COLORS.textPrimary, textAlign: 'center' }}>
+                    Deseja excluir este contato?
+                  </Text>
+                  <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: COLORS.textSecondary, textAlign: 'center' }}>
+                    Essa ação não pode ser desfeita.
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                  <TouchableOpacity
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      backgroundColor: COLORS.background,
+                      borderRadius: 6,
+                      borderWidth: 1,
+                      borderColor: COLORS.border,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                    onPress={() => setDeleteConfirmVisible(false)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: COLORS.textPrimary }}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      backgroundColor: '#E53935',
+                      borderRadius: 6,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                    onPress={() => {
+                      setDeleteConfirmVisible(false);
+                      deleteCurrentTab();
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: COLORS.white }}>Excluir</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ) : null}
 
           {readOnly ? null : (
             <View style={styles.footerContainer}>
