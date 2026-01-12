@@ -21,6 +21,7 @@ import { EmailValidationScreen as ChangePasswordEmailValidationScreen } from '..
 import { WhatsAppValidationScreen as ChangePasswordWhatsAppValidationScreen } from '../screens/3.Change Password/3. WhatsAppValidationScreen';
 import { SecurityScreen as ChangePasswordSecurityScreen } from '../screens/3.Change Password/4. SecurityScreen';
 import KeymansScreen from '../screens/7.Keymans/01.01.KeymansHomeScreen';
+import CustomersHomeScreen from '../screens/8.Customers/1.CustomersHomeScreen';
 import CalendarHomeScreen from '../screens/9.Agenda/1.CalendarHomeScreen';
 import SalesHomeScreen from '../screens/10.Vendas/01.01.SalesHomeScreen';
 import CommissionsHomeScreen from '../screens/11.Comissões/01.CommissionsHomeScreen';
@@ -189,6 +190,14 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <KeymansScreen />}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.CustomersHome}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <CustomersHomeScreen />}
         </Stack.Screen>
         {/* Rota Agenda (Calendar) */}
         <Stack.Screen

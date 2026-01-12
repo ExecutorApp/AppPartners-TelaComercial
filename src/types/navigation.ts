@@ -3,6 +3,7 @@ export type RootStackParamList = {
   Login: undefined;
   Enterprise: undefined;
   Keymans: undefined;
+  CustomersHome: undefined;
   Schedule: undefined;
   SalesHome: { autoOpenDiscount?: boolean } | undefined;
   CommissionsHome: undefined;
@@ -85,6 +86,7 @@ export const ScreenNames = {
   Login: 'Login' as const,
   Enterprise: 'Enterprise' as const,
   Keymans: 'Keymans' as const,
+  CustomersHome: 'CustomersHome' as const,
   Schedule: 'Schedule' as const,
   SalesHome: 'SalesHome' as const,
   CommissionsHome: 'CommissionsHome' as const,

@@ -1,0 +1,440 @@
+<div style={{width: 375, height: 812, background: '#F4F4F4', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+  <div style={{width: 375, paddingTop: 1, paddingBottom: 1, background: 'rgba(252, 252, 252, 0.80)', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', paddingTop: 10, paddingBottom: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+        <div data-svg-wrapper>
+          <svg width="27" height="10" viewBox="0 0 27 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.60269 0C1.49888 0 0 1.41254 0 3.34653V3.35974C0 5.16832 1.30396 6.50165 3.1658 6.50165C4.49664 6.50165 5.34354 5.83498 5.69978 5.08251H5.8342C5.8342 5.15512 5.82748 5.22772 5.82748 5.30033C5.75355 7.12211 5.10157 8.60066 3.56236 8.60066C2.70874 8.60066 2.11053 8.16502 1.85512 7.49835L1.83495 7.43234H0.127707L0.14115 7.50495C0.450336 8.9637 1.78118 10 3.56236 10C6.00224 10 7.47423 8.09901 7.47423 4.89109V4.87789C7.47423 1.44554 5.67289 0 3.60269 0ZM3.59597 5.19472C2.49365 5.19472 1.6938 4.40264 1.6938 3.30033V3.28713C1.6938 2.22442 2.54742 1.38614 3.61613 1.38614C4.69156 1.38614 5.53174 2.23762 5.53174 3.32673V3.33993C5.53174 4.41584 4.69156 5.19472 3.59597 5.19472Z" fill="#3A3F51"/>
+          <path d="M10.5258 3.59076C11.1441 3.59076 11.5945 3.12871 11.5945 2.54785C11.5945 1.9604 11.1441 1.50495 10.5258 1.50495C9.91411 1.50495 9.45706 1.9604 9.45706 2.54785C9.45706 3.12871 9.91411 3.59076 10.5258 3.59076ZM10.5258 8.48845C11.1441 8.48845 11.5945 8.033 11.5945 7.44554C11.5945 6.85809 11.1441 6.40264 10.5258 6.40264C9.91411 6.40264 9.45706 6.85809 9.45706 7.44554C9.45706 8.033 9.91411 8.48845 10.5258 8.48845Z" fill="#3A3F51"/>
+          <path d="M18.2823 9.76238H19.9425V7.93399H21.2465V6.52805H19.9425V0.237624H17.4892C16.1718 2.20462 14.7939 4.39604 13.537 6.54125V7.93399H18.2823V9.76238ZM15.1501 6.56766V6.46865C16.0911 4.85149 17.2136 3.08911 18.2084 1.59736H18.3092V6.56766H15.1501Z" fill="#3A3F51"/>
+          <path d="M25.2659 9.76238H27V0.237624H25.2726L22.7386 1.9868V3.59076L25.1516 1.91419H25.2659V9.76238Z" fill="#3A3F51"/>
+          </svg>
+        </div>
+      </div>
+      <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M8.36605 7.77776C9.4551 7.77776 10.4411 8.21304 11.1547 8.91679L8.36605 11.6666L5.57736 8.91679C6.29105 8.21304 7.277 7.77776 8.36605 7.77776ZM8.36606 3.88887C10.5442 3.88887 12.5161 4.75943 13.9434 6.16693L12.2702 7.81684C11.2711 6.83159 9.89073 6.2222 8.36606 6.2222C6.84139 6.2222 5.46106 6.83159 4.46189 7.81684L2.78868 6.16693C4.21606 4.75943 6.18796 3.88887 8.36606 3.88887ZM8.07344 0.00349861L8.36607 0L8.72402 0.00523754L9.03805 0.0185016L9.30872 0.0364892L9.65322 0.0682439L9.93985 0.102309L10.2506 0.147182L10.5722 0.202458L10.891 0.266261L11.1681 0.329111L11.4916 0.411422L11.8228 0.505823L12.05 0.576636L12.2984 0.659868L12.566 0.756423L12.8625 0.872033L13.1546 0.995043L13.4253 1.11739L13.6887 1.24444L13.9482 1.37757L14.2003 1.51476L14.442 1.65384L14.7015 1.81179L14.9565 1.97611L15.1936 2.13736L15.4086 2.29102L15.6932 2.50585L15.9034 2.67347L16.1143 2.84958L16.3506 3.05721L16.5992 3.28799L16.7329 3.41787L15.0589 5.067C13.3461 3.378 10.9798 2.33333 8.36607 2.33333C5.75255 2.33333 3.38643 3.37784 1.67361 5.06662L0 3.41709L0.0189664 3.39843C0.0894697 3.32922 0.160853 3.26088 0.233098 3.19343C0.375792 3.06021 0.521854 2.93045 0.671143 2.80429L0.835905 2.66759L1.03871 2.50605L1.21953 2.36799L1.41908 2.22186L1.62189 2.07973L1.73912 2.00042L2.06522 1.79024L2.30994 1.64217L2.53188 1.51472L2.85839 1.33853L3.12055 1.20641L3.38683 1.08039L3.6357 0.969824L3.92734 0.848827L4.22269 0.735423L4.48464 0.642309L4.82246 0.532304L5.05511 0.46298L5.35961 0.379997L5.66052 0.306441L5.92229 0.249155L6.22407 0.190712L6.52869 0.139841L6.82244 0.0983958L7.12735 0.0631763L7.43928 0.0352665L7.78334 0.0139037L8.07344 0.00349861Z" fill="#3A3F51"/>
+          </svg>
+        </div>
+        <div data-svg-wrapper>
+          <svg width="18" height="11" viewBox="0 0 18 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 7.72222C0 6.8938 0.671573 6.22222 1.5 6.22222H1.68722C2.51565 6.22222 3.18722 6.8938 3.18722 7.72222V8.61111C3.18722 9.43954 2.51565 10.1111 1.68722 10.1111H1.5C0.671572 10.1111 0 9.43954 0 8.61111V7.72222Z" fill="#3A3F51"/>
+          <path d="M4.78084 6.16667C4.78084 5.33824 5.45241 4.66667 6.28084 4.66667H6.46806C7.29649 4.66667 7.96806 5.33824 7.96806 6.16667V8.61111C7.96806 9.43954 7.29649 10.1111 6.46806 10.1111H6.28084C5.45241 10.1111 4.78084 9.43954 4.78084 8.61111V6.16667Z" fill="#3A3F51"/>
+          <path d="M9.56167 3.83333C9.56167 3.00491 10.2332 2.33333 11.0617 2.33333H11.2489C12.0773 2.33333 12.7489 3.00491 12.7489 3.83333V8.61111C12.7489 9.43954 12.0773 10.1111 11.2489 10.1111H11.0617C10.2332 10.1111 9.56167 9.43954 9.56167 8.61111V3.83333Z" fill="#3A3F51"/>
+          <path d="M14.3425 1.5C14.3425 0.671572 15.0141 0 15.8425 0H16.0297C16.8582 0 17.5297 0.671573 17.5297 1.5V8.61111C17.5297 9.43954 16.8582 10.1111 16.0297 10.1111H15.8425C15.0141 10.1111 14.3425 9.43954 14.3425 8.61111V1.5Z" fill="#3A3F51"/>
+          </svg>
+        </div>
+        <div data-svg-wrapper>
+          <svg width="20" height="11" viewBox="0 0 20 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect opacity="0.35" x="0.5" y="0.5" width="18.9201" height="9.88889" rx="3" stroke="#3A3F51"/>
+          </svg>
+        </div>
+        <div data-svg-wrapper>
+          <svg width="2" height="4" viewBox="0 0 2 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path opacity="0.35" d="M0 0C0 0 1.59361 0.311111 1.59361 1.55556C1.59361 2.8 0 3.11111 0 3.11111V0Z" fill="#3A3F51"/>
+          </svg>
+        </div>
+        <div data-svg-wrapper>
+          <svg width="17" height="8" viewBox="0 0 17 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="16.7329" height="7.77778" rx="3" fill="#3A3F51"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', paddingBottom: 5, background: 'rgba(0, 0, 0, 0)', justifyContent: 'flex-start', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', paddingLeft: 16, justifyContent: 'flex-start', alignItems: 'center', gap: 13, display: 'flex'}}>
+        <div style={{width: 149, background: 'rgba(0, 0, 0, 0)', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', height: 24, justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word'}}>Clientes</div>
+        </div>
+      </div>
+      <div style={{paddingRight: 16, background: 'rgba(0, 0, 0, 0)', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
+        <div style={{width: 17.50, height: 20, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div data-svg-wrapper>
+            <svg width="22" height="26" viewBox="0 0 22 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.3895 20.1344V21.0575C14.3895 22.0368 14.0067 22.976 13.3254 23.6685C12.644 24.361 11.7198 24.75 10.7562 24.75C9.79263 24.75 8.86849 24.361 8.18711 23.6685C7.50574 22.976 7.12295 22.0368 7.12295 21.0575V20.1344M20.5025 18.2563C19.0446 16.4429 18.0154 15.5198 18.0154 10.5206C18.0154 5.94251 15.715 4.31149 13.8218 3.51934C13.5703 3.41434 13.3335 3.17317 13.2569 2.91066C12.9248 1.76196 11.9938 0.75 10.7562 0.75C9.51858 0.75 8.58699 1.76254 8.25829 2.91182C8.18165 3.17721 7.94492 3.41434 7.69343 3.51934C5.79788 4.31264 3.49982 5.9379 3.49982 10.5206C3.49699 15.5198 2.46775 16.4429 1.00989 18.2563C0.405857 19.0075 0.934954 20.1354 1.99144 20.1354H19.5266C20.5774 20.1354 21.1031 19.004 20.5025 18.2563Z" stroke="#3A3F51" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style={{width: 16, height: 16, position: 'relative'}}>
+            <div data-svg-wrapper style={{left: 0, top: 0, position: 'absolute'}}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="8" r="8" fill="#1777CF"/>
+              </svg>
+            </div>
+            <div style={{width: 4, height: 8, left: 6, top: 4, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#FCFCFC', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>6</div>
+          </div>
+        </div>
+        <div data-svg-wrapper>
+          <svg width="18" height="31" viewBox="0 0 18 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.5 31H0V0H17.5V31Z" stroke="#E5E7EB"/>
+          <path d="M0 9.25C0 8.55859 0.558594 8 1.25 8H16.25C16.9414 8 17.5 8.55859 17.5 9.25C17.5 9.94141 16.9414 10.5 16.25 10.5H1.25C0.558594 10.5 0 9.94141 0 9.25ZM0 15.5C0 14.8086 0.558594 14.25 1.25 14.25H16.25C16.9414 14.25 17.5 14.8086 17.5 15.5C17.5 16.1914 16.9414 16.75 16.25 16.75H1.25C0.558594 16.75 0 16.1914 0 15.5ZM17.5 21.75C17.5 22.4414 16.9414 23 16.25 23H1.25C0.558594 23 0 22.4414 0 21.75C0 21.0586 0.558594 20.5 1.25 20.5H16.25C16.9414 20.5 17.5 21.0586 17.5 21.75Z" fill="#3A3F51"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style={{width: 375, paddingTop: 1, paddingBottom: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', height: 0}}></div>
+  </div>
+  <div style={{alignSelf: 'stretch', paddingTop: 10, background: '#FCFCFC', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 17, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', gap: 10, display: 'flex'}}>
+      <div style={{height: 32, paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, background: '#1777CF', borderRadius: 6, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <div data-svg-wrapper>
+          <svg width="8" height="15" viewBox="0 0 8 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.45454 6.27274H4.72726V3.54546C4.72726 3.24436 4.4829 3 4.18181 3H3.81819C3.5171 3 3.27274 3.24436 3.27274 3.54546V6.27274H0.545456C0.244363 6.27274 0 6.5171 0 6.81819V7.18181C0 7.4829 0.244363 7.72726 0.545456 7.72726H3.27274V10.4545C3.27274 10.7556 3.5171 11 3.81819 11H4.18181C4.4829 11 4.72726 10.7556 4.72726 10.4545V7.72726H7.45454C7.75564 7.72726 8 7.4829 8 7.18181V6.81819C8 6.5171 7.75564 6.27274 7.45454 6.27274Z" fill="#FCFCFC"/>
+          </svg>
+        </div>
+        <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Novo Cliente</div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 15, display: 'flex'}}>
+      <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+        <div style={{width: 100, padding: 10, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
+          <div style={{justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Status</div>
+          </div>
+          <div style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Todos</div>
+          </div>
+        </div>
+        <div style={{width: 100, padding: 10, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
+          <div style={{justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Produtos</div>
+          </div>
+          <div style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Todos</div>
+          </div>
+        </div>
+        <div style={{width: 100, padding: 10, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
+          <div style={{justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Fases</div>
+          </div>
+          <div style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Todas</div>
+          </div>
+        </div>
+        <div style={{padding: 10, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
+          <div style={{justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Atividades Concluidas</div>
+          </div>
+          <div style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Todas</div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', height: 35, justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+          <div style={{flex: '1 1 0', alignSelf: 'stretch', paddingLeft: 15, borderRadius: 8, outline: '1px #D8E0F0 solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 15L11.6556 11.6556M13.4444 7.22222C13.4444 10.6587 10.6587 13.4444 7.22222 13.4444C3.78578 13.4444 1 10.6587 1 7.22222C1 3.78578 3.78578 1 7.22222 1C10.6587 1 13.4444 3.78578 13.4444 7.22222Z" stroke="#7D8592" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#91929E', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>pesquise aqui</div>
+          </div>
+        </div>
+        <div style={{width: 35, height: 35, background: '#F4F4F4', borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div data-svg-wrapper>
+            <svg width="18" height="23" viewBox="0 0 18 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_325_1901)">
+            <path d="M4.73036 10.2573C6.71398 10.2573 8.31443 8.63248 8.31443 6.62944C8.31443 4.62405 6.71473 3 4.73036 3C2.75602 3 1.15632 4.62405 1.15632 6.62944C1.15632 8.63168 2.75606 10.2573 4.73036 10.2573ZM7.6023 10.8477H1.86466C0.840406 10.8477 0 11.8022 0 12.9713V18.8121C0 18.8763 0.0301155 18.935 0.0363105 19H9.43218C9.43605 18.935 9.46617 18.8763 9.46617 18.8121V12.9713C9.46617 11.8022 8.62884 10.8477 7.6023 10.8477ZM18 6.87687C17.9961 4.74697 16.0767 3.03133 13.7269 3.03681C11.3663 3.04073 9.4623 4.77049 9.46538 6.89488C9.46924 8.57295 10.6642 9.99262 12.3234 10.5149L12.3458 17.8678L13.7308 18.8779L15.1706 17.8591L15.1682 16.8834H14.5032L14.5001 15.9273H15.1667L15.1605 14.8702H14.4986L14.4955 13.9157H15.1605L15.1575 12.9604H14.4932L14.4908 12.0051L15.1582 12.0043L15.1474 10.5102C16.8089 9.98166 18 8.5565 18 6.87687ZM13.7292 4.69375C14.2583 4.69375 14.6924 5.13303 14.6924 5.66866C14.6963 6.21133 14.2622 6.64905 13.7315 6.64905C13.1978 6.64905 12.7668 6.21757 12.7668 5.67338C12.7637 5.13539 13.1955 4.69531 13.7292 4.69375Z" fill="#7D8592"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_325_1901">
+            <rect width="18" height="23" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', height: 432, paddingLeft: 15, paddingRight: 15, position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, background: 'rgba(23, 118.68, 207, 0.03)', borderRadius: 8, outline: '0.60px #1777CF solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+        <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+          <div style={{width: 79, flex: '1 1 0', padding: 5, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', flex: '1 1 0', overflow: 'hidden', borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', flex: '1 1 0', background: '#FCFCFC', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <img style={{flex: '1 1 0', alignSelf: 'stretch'}} src="https://placehold.co/69x102" />
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 60, background: '#FCFCFC', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+              <div data-svg-wrapper>
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 21.25C15.6903 21.25 16.25 21.8097 16.25 22.5V28.5C16.25 29.1903 15.6903 29.75 15 29.75C14.3097 29.75 13.75 29.1903 13.75 28.5V22.5C13.75 21.8097 14.3097 21.25 15 21.25ZM8.8125 19.4199C9.30008 18.9318 10.0925 18.9318 10.5801 19.4199C11.0682 19.9075 11.0682 20.6999 10.5801 21.1875L6.33691 25.4297V25.4307C6.09375 25.6743 5.77414 25.7968 5.4541 25.7969C5.13396 25.7969 4.81455 25.6739 4.57031 25.4297C4.08208 24.9415 4.08161 24.1506 4.56934 23.6631H4.57031L8.8125 19.4199ZM19.4199 19.4199C19.9075 18.9318 20.6999 18.9318 21.1875 19.4199L25.4307 23.6631C25.9184 24.1506 25.9189 24.9424 25.4307 25.4307C25.1865 25.6748 24.8669 25.7968 24.5469 25.7969C24.2667 25.7969 23.9863 25.7032 23.7578 25.5166L23.6631 25.4307L19.4199 21.1875C18.9317 20.6999 18.9317 19.9074 19.4199 19.4199ZM1.5 13.75H7.5C8.19027 13.75 8.75 14.3097 8.75 15C8.75 15.6903 8.19027 16.25 7.5 16.25H1.5C0.809673 16.25 0.25 15.6903 0.25 15C0.25 14.3097 0.809679 13.75 1.5 13.75ZM22.5 13.75H28.5C29.1903 13.75 29.75 14.3097 29.75 15C29.75 15.6903 29.1903 16.25 28.5 16.25H22.5C21.8097 16.25 21.25 15.6903 21.25 15C21.25 14.3097 21.8097 13.75 22.5 13.75ZM4.57031 4.57031C5.05865 4.08197 5.85022 4.08171 6.33691 4.56934V4.57031L10.5801 8.8125C11.0682 9.30008 11.0682 10.0925 10.5801 10.5801C10.3368 10.824 10.0166 10.9463 9.69629 10.9463C9.37604 10.9462 9.05666 10.8239 8.81348 10.5801H8.8125L4.57031 6.33691H4.56934C4.08161 5.84936 4.08207 5.05855 4.57031 4.57031ZM23.6631 4.56934C24.1498 4.08166 24.9423 4.08098 25.4307 4.56934C25.8884 5.02707 25.9167 5.75174 25.5166 6.24219L25.4307 6.33691L21.1875 10.5801C20.9443 10.8239 20.624 10.9462 20.3037 10.9463C20.0233 10.9463 19.7432 10.8528 19.5146 10.666L19.4199 10.5801C18.9318 10.0925 18.9318 9.30008 19.4199 8.8125L23.6631 4.56934ZM15 0.25C15.6903 0.25 16.25 0.809673 16.25 1.5V7.5C16.25 8.19027 15.6903 8.75 15 8.75C14.3097 8.75 13.75 8.19027 13.75 7.5V1.5C13.75 0.809679 14.3097 0.25 15 0.25Z" fill="#1777CF" stroke="#FCFCFC" stroke-width="0.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Camila Betanea</div>
+            </div>
+            <div data-svg-wrapper>
+              <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1493_3010)">
+              <path d="M4 2C4 3.10457 3.10457 4 2 4C0.895431 4 0 3.10457 0 2C0 0.895431 0.895431 0 2 0C3.10457 0 4 0.895431 4 2Z" fill="#7D8592"/>
+              <path d="M4 9C4 10.1046 3.10457 11 2 11C0.895431 11 0 10.1046 0 9C0 7.89543 0.895431 7 2 7C3.10457 7 4 7.89543 4 9Z" fill="#7D8592"/>
+              <path d="M2 18C3.10457 18 4 17.1046 4 16C4 14.8954 3.10457 14 2 14C0.895431 14 0 14.8954 0 16C0 17.1046 0.895431 18 2 18Z" fill="#7D8592"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_1493_3010">
+              <rect width="4" height="18" rx="2" fill="white"/>
+              </clipPath>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Produto: 01/02</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Fase: 01/15</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Contrato Social</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Atividades concluídas</div>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01/20</div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+        <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+          <div style={{width: 79, flex: '1 1 0', padding: 5, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', flex: '1 1 0', overflow: 'hidden', borderRadius: 6, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', flex: '1 1 0', background: '#FCFCFC', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <img style={{flex: '1 1 0', alignSelf: 'stretch', border: '0.50px #D8E0F0 solid'}} src="https://placehold.co/69x102" />
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 60, background: '#FCFCFC', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+              <div data-svg-wrapper>
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 0.25C18.9119 0.25 22.6635 1.80415 25.4297 4.57031C28.1958 7.33647 29.75 11.0881 29.75 15C29.75 18.9119 28.1958 22.6635 25.4297 25.4297C22.6635 28.1958 18.9119 29.75 15 29.75C11.0881 29.75 7.33647 28.1958 4.57031 25.4297C1.80415 22.6635 0.25 18.9119 0.25 15C0.25 11.0881 1.80415 7.33647 4.57031 4.57031C7.33647 1.80415 11.0881 0.25 15 0.25ZM15 2.5625C11.7014 2.5625 8.53756 3.87259 6.20508 6.20508C3.87259 8.53756 2.5625 11.7014 2.5625 15C2.5625 18.2986 3.87259 21.4624 6.20508 23.7949C8.53756 26.1274 11.7014 27.4375 15 27.4375C18.2986 27.4375 21.4624 26.1274 23.7949 23.7949C26.1274 21.4624 27.4375 18.2986 27.4375 15C27.4375 11.7014 26.1274 8.53756 23.7949 6.20508C21.4624 3.87259 18.2986 2.5625 15 2.5625ZM19.8125 10.4355C20.2579 9.98541 20.9902 9.98724 21.4453 10.4375C21.8684 10.8562 21.8964 11.5256 21.5244 11.9814L21.4443 12.0693L13.9502 19.5693L13.9492 19.5703C13.5027 20.0216 12.771 20.023 12.3174 19.5693L8.56641 15.8184C8.11627 15.373 8.1181 14.6406 8.56836 14.1855C9.01492 13.7342 9.74653 13.7329 10.2002 14.1865L13.1309 17.1172L19.8125 10.4355Z" fill="#7D8592" stroke="#FCFCFC" stroke-width="0.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Maria Madalena dos santos</div>
+            </div>
+            <div data-svg-wrapper>
+              <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1493_3043)">
+              <path d="M4 2C4 3.10457 3.10457 4 2 4C0.895431 4 0 3.10457 0 2C0 0.895431 0.895431 0 2 0C3.10457 0 4 0.895431 4 2Z" fill="#7D8592"/>
+              <path d="M4 9C4 10.1046 3.10457 11 2 11C0.895431 11 0 10.1046 0 9C0 7.89543 0.895431 7 2 7C3.10457 7 4 7.89543 4 9Z" fill="#7D8592"/>
+              <path d="M2 18C3.10457 18 4 17.1046 4 16C4 14.8954 3.10457 14 2 14C0.895431 14 0 14.8954 0 16C0 17.1046 0.895431 18 2 18Z" fill="#7D8592"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_1493_3043">
+              <rect width="4" height="18" rx="2" fill="white"/>
+              </clipPath>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Produto: 01/02</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Fase: 01/15</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Contrato Social</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Atividades concluídas</div>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01/20</div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingTop: 5, paddingBottom: 5, paddingLeft: 5, paddingRight: 10, borderRadius: 8, outline: '0.60px #D8E0F0 solid', outlineOffset: '-0.60px', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+        <div style={{width: 79, alignSelf: 'stretch', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+          <div style={{width: 79, flex: '1 1 0', padding: 5, background: '#F4F4F4', overflow: 'hidden', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', flex: '1 1 0', overflow: 'hidden', borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', flex: '1 1 0', background: '#FCFCFC', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <img style={{flex: '1 1 0', alignSelf: 'stretch'}} src="https://placehold.co/69x102" />
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 60, background: '#FCFCFC', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+              <div data-svg-wrapper>
+                <svg width="30" height="6" viewBox="0 0 30 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 0.25C18.9119 0.25 22.6635 1.80415 25.4297 4.57031C28.1958 7.33647 29.75 11.0881 29.75 15C29.75 18.9119 28.1958 22.6635 25.4297 25.4297C22.6635 28.1958 18.9119 29.75 15 29.75C11.0881 29.75 7.33647 28.1958 4.57031 25.4297C1.80415 22.6635 0.25 18.9119 0.25 15C0.25 11.0881 1.80415 7.33647 4.57031 4.57031C7.33647 1.80415 11.0881 0.25 15 0.25ZM15 2.5625C11.7014 2.5625 8.53756 3.87259 6.20508 6.20508C3.87259 8.53756 2.5625 11.7014 2.5625 15C2.5625 18.2986 3.87259 21.4624 6.20508 23.7949C8.53756 26.1274 11.7014 27.4375 15 27.4375C18.2986 27.4375 21.4624 26.1274 23.7949 23.7949C26.1274 21.4624 27.4375 18.2986 27.4375 15C27.4375 11.7014 26.1274 8.53756 23.7949 6.20508C21.4624 3.87259 18.2986 2.5625 15 2.5625ZM19.8125 10.4355C20.2579 9.98541 20.9902 9.98724 21.4453 10.4375C21.8684 10.8562 21.8964 11.5256 21.5244 11.9814L21.4443 12.0693L13.9502 19.5693L13.9492 19.5703C13.5027 20.0216 12.771 20.023 12.3174 19.5693L8.56641 15.8184C8.11627 15.373 8.1181 14.6406 8.56836 14.1855C9.01492 13.7342 9.74653 13.7329 10.2002 14.1865L13.1309 17.1172L19.8125 10.4355Z" fill="#7D8592" stroke="#FCFCFC" stroke-width="0.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{flex: '1 1 0', paddingTop: 5, paddingBottom: 5, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', height: 17, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Camila Betanea</div>
+            </div>
+            <div data-svg-wrapper>
+              <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1493_3076)">
+              <path d="M4 2C4 3.10457 3.10457 4 2 4C0.895431 4 0 3.10457 0 2C0 0.895431 0.895431 0 2 0C3.10457 0 4 0.895431 4 2Z" fill="#7D8592"/>
+              <path d="M4 9C4 10.1046 3.10457 11 2 11C0.895431 11 0 10.1046 0 9C0 7.89543 0.895431 7 2 7C3.10457 7 4 7.89543 4 9Z" fill="#7D8592"/>
+              <path d="M2 18C3.10457 18 4 17.1046 4 16C4 14.8954 3.10457 14 2 14C0.895431 14 0 14.8954 0 16C0 17.1046 0.895431 18 2 18Z" fill="#7D8592"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_1493_3076">
+              <rect width="4" height="18" rx="2" fill="white"/>
+              </clipPath>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Produto: 01/02</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="239" height="1" viewBox="0 0 239 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0.25H239" stroke="#D8E0F0" stroke-width="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 3, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Fase: 01/15</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Contrato Social</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', height: 1, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}} />
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Atividades concluídas</div>
+            <div style={{color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01/20</div>
+          </div>
+        </div>
+      </div>
+      <div style={{width: 375, left: 0, top: 427, position: 'absolute', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', borderTopLeftRadius: 20, borderTopRightRadius: 20, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+          <div style={{width: 375, height: 30, background: '#F4F4F4', borderTopLeftRadius: 21, borderTopRightRadius: 20}} />
+        </div>
+        <div style={{alignSelf: 'stretch', paddingTop: 15, paddingLeft: 27, paddingRight: 27, position: 'relative', background: '#FCFCFC', justifyContent: 'center', alignItems: 'center', gap: 88, display: 'inline-flex'}}>
+          <div style={{width: 130, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="60" height="25" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M39.5131 8.77525H37.5511H35.6815H34.4365V7.47028C34.4365 6.66119 33.7722 6 32.9496 6H27.046C26.2278 6 25.5591 6.65684 25.5591 7.47028V8.77525H24.3141H22.4445H20.4869C19.6643 8.77525 19 9.43209 19 10.2412V22.5297C19 23.3388 19.6643 24 20.4869 24H22.4489H24.3185H35.6815H37.5511H39.5131C40.3313 24 41 23.3432 41 22.5297V10.2412C40.9956 9.43209 40.3313 8.77525 39.5131 8.77525ZM26.0034 9.64524H33.9966H35.2416V23.13H24.754V9.64524H26.0034ZM26.4433 7.47028C26.4433 7.13968 26.7161 6.86999 27.0504 6.86999H32.954C33.2883 6.86999 33.5611 7.13968 33.5611 7.47028V8.77525H26.4433V7.47028ZM19.8798 22.5297V10.2412C19.8798 9.91058 20.1526 9.64089 20.4869 9.64089L24.3141 9.64524V16.6182V23.13L20.4869 23.1257C20.1526 23.13 19.8798 22.8603 19.8798 22.5297ZM24.3141 23.13V16.6182V9.64524H23.8742V23.13H24.3141ZM36.1214 23.13V9.64524H35.6815V23.13H36.1214ZM40.1158 22.5297C40.1158 22.8603 39.843 23.13 39.5087 23.13H35.6815V9.64524H39.5087C39.843 9.64524 40.1158 9.91493 40.1158 10.2455V22.5297Z" fill="#1777CF"/>
+              <path d="M24.3141 9.64524L20.4869 9.64089C20.1526 9.64089 19.8798 9.91058 19.8798 10.2412V22.5297C19.8798 22.8603 20.1526 23.13 20.4869 23.1257L24.3141 23.13M24.3141 9.64524H23.8742V23.13H24.3141M24.3141 9.64524V16.6182V23.13M35.6815 9.64524H36.1214V23.13H35.6815M35.6815 9.64524V23.13M35.6815 9.64524H39.5087C39.843 9.64524 40.1158 9.91493 40.1158 10.2455V22.5297C40.1158 22.8603 39.843 23.13 39.5087 23.13H35.6815M39.5131 8.77525H37.5511H35.6815H34.4365V7.47028C34.4365 6.66119 33.7722 6 32.9496 6H27.046C26.2278 6 25.5591 6.65684 25.5591 7.47028V8.77525H24.3141H22.4445H20.4869C19.6643 8.77525 19 9.43209 19 10.2412V22.5297C19 23.3388 19.6643 24 20.4869 24H22.4489H24.3185H35.6815H37.5511H39.5131C40.3313 24 41 23.3432 41 22.5297V10.2412C40.9956 9.43209 40.3313 8.77525 39.5131 8.77525ZM26.0034 9.64524H33.9966H35.2416V23.13H24.754V9.64524H26.0034ZM26.4433 7.47028C26.4433 7.13968 26.7161 6.86999 27.0504 6.86999H32.954C33.2883 6.86999 33.5611 7.13968 33.5611 7.47028V8.77525H26.4433V7.47028Z" stroke="#1777CF" stroke-width="0.2"/>
+              </svg>
+            </div>
+            <div data-svg-wrapper>
+              <svg width="60" height="24" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M29.7538 6C27.1997 6 25.1269 8.01269 25.1269 10.4912C25.1269 12.9703 27.1997 14.9824 29.7538 14.9824C32.3072 14.9824 34.3807 12.9703 34.3807 10.4912C34.3807 8.01269 32.3072 6 29.7538 6ZM29.7538 7.28319C31.5774 7.28319 33.0587 8.72101 33.0587 10.4912C33.0587 12.262 31.5774 13.6992 29.7538 13.6992C27.9295 13.6992 26.4489 12.262 26.4489 10.4912C26.4489 8.72101 27.9295 7.28319 29.7538 7.28319Z" fill="#3A3F51"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M21.822 22.6815H30.0367C30.4015 22.6815 30.6977 22.969 30.6977 23.3231C30.6977 23.6773 30.4015 23.9647 30.0367 23.9647H21.161C20.7955 23.9647 20.5 23.6779 20.5 23.3231C20.5 23.3231 20.5 22.7944 20.5 22.0399C20.5 18.8512 23.1631 16.2655 26.4489 16.2655H30.0367C30.4015 16.2655 30.6977 16.553 30.6977 16.9071C30.6977 17.2613 30.4015 17.5487 30.0367 17.5487H26.4489C23.8935 17.5487 21.822 19.5595 21.822 22.0399V22.6815Z" fill="#3A3F51"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M33.3416 17.5949H38.839C39.2039 17.5949 39.5 17.3075 39.5 16.9533C39.5 16.5992 39.2039 16.3117 38.839 16.3117H33.3416C32.9767 16.3117 32.6806 16.5992 32.6806 16.9533C32.6806 17.3075 32.9767 17.5949 33.3416 17.5949Z" fill="#3A3F51"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M33.3416 20.7978H38.839C39.2039 20.7978 39.5 20.5097 39.5 20.1562C39.5 19.802 39.2039 19.5146 38.839 19.5146H33.3416C32.9767 19.5146 32.6806 19.802 32.6806 20.1562C32.6806 20.5097 32.9767 20.7978 33.3416 20.7978Z" fill="#3A3F51"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M33.3416 24H38.839C39.2039 24 39.5 23.7126 39.5 23.3584C39.5 23.0042 39.2039 22.7168 38.839 22.7168H33.3416C32.9767 22.7168 32.6806 23.0042 32.6806 23.3584C32.6806 23.7126 32.9767 24 33.3416 24Z" fill="#3A3F51"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{width: 130, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper>
+              <svg width="60" height="25" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.4212 21.4286V24H40.5V7.28571H23.4212V11.1429M23.4212 11.1429H40.5C40.5 18.2143 36.5788 21.4286 36.5788 21.4286H19.5C19.5 21.4286 23.4212 18.2143 23.4212 11.1429ZM27.3859 6V8.57143M36.5788 6V8.57143M31.9606 6V8.57143" stroke="#3A3F51" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div data-svg-wrapper>
+              <svg width="60" height="25" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.8971 15.9086C32.5038 15.9086 32.1194 16.0252 31.7924 16.2437C31.4653 16.4622 31.2105 16.7728 31.0599 17.1361C30.9094 17.4995 30.8701 17.8993 30.9468 18.2851C31.0235 18.6708 31.2129 19.0252 31.491 19.3033C31.7691 19.5814 32.1234 19.7708 32.5092 19.8475C32.8949 19.9242 33.2948 19.8849 33.6581 19.7343C34.0215 19.5838 34.3321 19.3289 34.5506 19.0019C34.7691 18.6749 34.8857 18.2904 34.8857 17.8971C34.8857 17.3697 34.6762 16.8639 34.3033 16.491C33.9303 16.1181 33.4245 15.9086 32.8971 15.9086ZM32.8971 19.0286C32.6734 19.0286 32.4546 18.9622 32.2686 18.8379C32.0825 18.7136 31.9375 18.5369 31.8518 18.3301C31.7662 18.1234 31.7438 17.8959 31.7875 17.6764C31.8311 17.4569 31.9389 17.2553 32.0971 17.0971C32.2553 16.9389 32.4569 16.8311 32.6764 16.7875C32.8959 16.7438 33.1234 16.7662 33.3301 16.8518C33.5369 16.9375 33.7136 17.0825 33.8379 17.2686C33.9622 17.4546 34.0286 17.6734 34.0286 17.8971C34.0286 18.1972 33.9094 18.485 33.6972 18.6972C33.485 18.9094 33.1972 19.0286 32.8971 19.0286ZM29.0914 12.1029C29.0914 11.7096 28.9748 11.3251 28.7563 10.9981C28.5378 10.671 28.2272 10.4162 27.8639 10.2657C27.5005 10.1151 27.1007 10.0758 26.7149 10.1525C26.3292 10.2292 25.9748 10.4186 25.6967 10.6967C25.4186 10.9748 25.2292 11.3292 25.1525 11.7149C25.0758 12.1006 25.1151 12.5005 25.2657 12.8638C25.4162 13.2272 25.671 13.5378 25.9981 13.7563C26.3251 13.9748 26.7096 14.0914 27.1029 14.0914C27.6303 14.0914 28.1361 13.8819 28.509 13.509C28.8819 13.1361 29.0914 12.6303 29.0914 12.1029ZM25.9714 12.1029C25.9714 11.8791 26.0378 11.6603 26.1621 11.4743C26.2864 11.2882 26.4631 11.1432 26.6699 11.0576C26.8766 10.9719 27.1041 10.9495 27.3236 10.9932C27.5431 11.0368 27.7447 11.1446 27.9029 11.3028C28.0611 11.461 28.1689 11.6626 28.2125 11.8821C28.2562 12.1016 28.2338 12.3291 28.1482 12.5358C28.0625 12.7426 27.9175 12.9193 27.7314 13.0436C27.5454 13.1679 27.3266 13.2343 27.1029 13.2343C26.8028 13.2343 26.515 13.1151 26.3028 12.9029C26.0906 12.6907 25.9714 12.4029 25.9714 12.1029ZM34.0903 10.9097C34.0508 10.8699 34.0038 10.8383 33.952 10.8168C33.9002 10.7952 33.8447 10.7841 33.7886 10.7841C33.7325 10.7841 33.6769 10.7952 33.6252 10.8168C33.5734 10.8383 33.5264 10.8699 33.4869 10.9097L25.9097 18.4869C25.8699 18.5264 25.8383 18.5734 25.8168 18.6252C25.7952 18.6769 25.7841 18.7325 25.7841 18.7886C25.7841 18.8447 25.7952 18.9002 25.8168 18.952C25.8383 19.0038 25.8699 19.0508 25.9097 19.0903C25.949 19.1305 25.9959 19.1625 26.0477 19.1843C26.0996 19.2061 26.1552 19.2174 26.2114 19.2174C26.2677 19.2174 26.3233 19.2061 26.3751 19.1843C26.4269 19.1625 26.4739 19.1305 26.5131 19.0903L34.0903 11.5131C34.1301 11.4736 34.1617 11.4266 34.1832 11.3748C34.2048 11.3231 34.2159 11.2675 34.2159 11.2114C34.2159 11.1553 34.2048 11.0998 34.1832 11.048C34.1617 10.9962 34.1301 10.9492 34.0903 10.9097Z" fill="#3A3F51"/>
+              <path d="M30 6C28.22 6 26.4799 6.52784 24.9999 7.51677C23.5198 8.50571 22.3663 9.91131 21.6851 11.5558C21.0039 13.2004 20.8257 15.01 21.1729 16.7558C21.5202 18.5016 22.3774 20.1053 23.636 21.364C24.8947 22.6226 26.4984 23.4798 28.2442 23.8271C29.99 24.1743 31.7996 23.9961 33.4442 23.3149C35.0887 22.6337 36.4943 21.4802 37.4832 20.0001C38.4722 18.5201 39 16.78 39 15C38.9964 12.6142 38.047 10.3271 36.36 8.64004C34.6729 6.953 32.3858 6.00363 30 6ZM30 23.1429C28.3895 23.1429 26.8152 22.6653 25.4761 21.7705C24.137 20.8758 23.0933 19.604 22.477 18.1161C21.8607 16.6282 21.6994 14.991 22.0136 13.4114C22.3278 11.8318 23.1033 10.3809 24.2421 9.24213C25.3809 8.10333 26.8319 7.3278 28.4114 7.01361C29.991 6.69941 31.6282 6.86067 33.1161 7.47698C34.604 8.09329 35.8758 9.13698 36.7705 10.4761C37.6653 11.8152 38.1429 13.3895 38.1429 15C38.141 17.1591 37.2826 19.2292 35.7559 20.7559C34.2292 22.2825 32.1591 23.141 30 23.1429Z" fill="#3A3F51"/>
+              <path d="M32.8971 15.9086C32.5038 15.9086 32.1194 16.0252 31.7924 16.2437C31.4653 16.4622 31.2105 16.7728 31.0599 17.1361C30.9094 17.4995 30.8701 17.8993 30.9468 18.2851C31.0235 18.6708 31.2129 19.0252 31.491 19.3033C31.7691 19.5814 32.1234 19.7708 32.5092 19.8475C32.8949 19.9242 33.2948 19.8849 33.6581 19.7343C34.0215 19.5838 34.3321 19.3289 34.5506 19.0019C34.7691 18.6749 34.8857 18.2904 34.8857 17.8971C34.8857 17.3697 34.6762 16.8639 34.3033 16.491C33.9303 16.1181 33.4245 15.9086 32.8971 15.9086ZM32.8971 19.0286C32.6734 19.0286 32.4546 18.9622 32.2686 18.8379C32.0825 18.7136 31.9375 18.5369 31.8518 18.3301C31.7662 18.1234 31.7438 17.8959 31.7875 17.6764C31.8311 17.4569 31.9389 17.2553 32.0971 17.0971C32.2553 16.9389 32.4569 16.8311 32.6764 16.7875C32.8959 16.7438 33.1234 16.7662 33.3301 16.8518C33.5369 16.9375 33.7136 17.0825 33.8379 17.2686C33.9622 17.4546 34.0286 17.6734 34.0286 17.8971C34.0286 18.1972 33.9094 18.485 33.6972 18.6972C33.485 18.9094 33.1972 19.0286 32.8971 19.0286ZM29.0914 12.1029C29.0914 11.7096 28.9748 11.3251 28.7563 10.9981C28.5378 10.671 28.2272 10.4162 27.8639 10.2657C27.5005 10.1151 27.1007 10.0758 26.7149 10.1525C26.3292 10.2292 25.9748 10.4186 25.6967 10.6967C25.4186 10.9748 25.2292 11.3292 25.1525 11.7149C25.0758 12.1006 25.1151 12.5005 25.2657 12.8638C25.4162 13.2272 25.671 13.5378 25.9981 13.7563C26.3251 13.9748 26.7096 14.0914 27.1029 14.0914C27.6303 14.0914 28.1361 13.8819 28.509 13.509C28.8819 13.1361 29.0914 12.6303 29.0914 12.1029ZM25.9714 12.1029C25.9714 11.8791 26.0378 11.6603 26.1621 11.4743C26.2864 11.2882 26.4631 11.1432 26.6699 11.0576C26.8766 10.9719 27.1041 10.9495 27.3236 10.9932C27.5431 11.0368 27.7447 11.1446 27.9029 11.3028C28.0611 11.461 28.1689 11.6626 28.2125 11.8821C28.2562 12.1016 28.2338 12.3291 28.1482 12.5358C28.0625 12.7426 27.9175 12.9193 27.7314 13.0436C27.5454 13.1679 27.3266 13.2343 27.1029 13.2343C26.8028 13.2343 26.515 13.1151 26.3028 12.9029C26.0906 12.6907 25.9714 12.4029 25.9714 12.1029ZM34.0903 10.9097C34.0508 10.8699 34.0038 10.8383 33.952 10.8168C33.9002 10.7952 33.8447 10.7841 33.7886 10.7841C33.7325 10.7841 33.6769 10.7952 33.6252 10.8168C33.5734 10.8383 33.5264 10.8699 33.4869 10.9097L25.9097 18.4869C25.8699 18.5264 25.8383 18.5734 25.8168 18.6252C25.7952 18.6769 25.7841 18.7325 25.7841 18.7886C25.7841 18.8447 25.7952 18.9002 25.8168 18.952C25.8383 19.0038 25.8699 19.0508 25.9097 19.0903C25.949 19.1305 25.9959 19.1625 26.0477 19.1843C26.0996 19.2061 26.1552 19.2174 26.2114 19.2174C26.2677 19.2174 26.3233 19.2061 26.3751 19.1843C26.4269 19.1625 26.4739 19.1305 26.5131 19.0903L34.0903 11.5131C34.1301 11.4736 34.1617 11.4266 34.1832 11.3748C34.2048 11.3231 34.2159 11.2675 34.2159 11.2114C34.2159 11.1553 34.2048 11.0998 34.1832 11.048C34.1617 10.9962 34.1301 10.9492 34.0903 10.9097Z" stroke="#3A3F51" stroke-width="0.2"/>
+              <path d="M30 6C28.22 6 26.4799 6.52784 24.9999 7.51677C23.5198 8.50571 22.3663 9.91131 21.6851 11.5558C21.0039 13.2004 20.8257 15.01 21.1729 16.7558C21.5202 18.5016 22.3774 20.1053 23.636 21.364C24.8947 22.6226 26.4984 23.4798 28.2442 23.8271C29.99 24.1743 31.7996 23.9961 33.4442 23.3149C35.0887 22.6337 36.4943 21.4802 37.4832 20.0001C38.4722 18.5201 39 16.78 39 15C38.9964 12.6142 38.047 10.3271 36.36 8.64004C34.6729 6.953 32.3858 6.00363 30 6ZM30 23.1429C28.3895 23.1429 26.8152 22.6653 25.4761 21.7705C24.137 20.8758 23.0933 19.604 22.477 18.1161C21.8607 16.6282 21.6994 14.991 22.0136 13.4114C22.3278 11.8318 23.1033 10.3809 24.2421 9.24213C25.3809 8.10333 26.8319 7.3278 28.4114 7.01361C29.991 6.69941 31.6282 6.86067 33.1161 7.47698C34.604 8.09329 35.8758 9.13698 36.7705 10.4761C37.6653 11.8152 38.1429 13.3895 38.1429 15C38.141 17.1591 37.2826 19.2292 35.7559 20.7559C34.2292 22.2825 32.1591 23.141 30 23.1429Z" stroke="#3A3F51" stroke-width="0.2"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{left: 158, top: -23, position: 'absolute', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+            <div data-svg-wrapper style={{left: 22, top: 22, position: 'absolute'}}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 0C4.02944 0 0 4.02944 0 9C0 13.9706 4.02944 18 9 18C13.9706 18 18 13.9706 18 9C18 4.02944 13.9706 0 9 0ZM10.0407 13.5997V14.5461H8.0231V13.6053C6.37812 13.3053 5.3591 12.2231 5.3591 10.5849H7.94088C7.94088 11.196 8.44038 11.5013 8.99928 11.5013C9.5234 11.5013 10.0229 11.2345 10.0229 10.7686C10.0229 10.2028 9.32206 10.0388 8.46288 9.82645C7.15097 9.50044 5.48057 9.0954 5.48057 7.03645C5.48057 5.57035 6.38928 4.61909 7.93238 4.34315V3.45395H9.94997V4.3524C11.4836 4.65156 12.3481 5.66219 12.3481 7.16652L9.84118 7.17217C9.84118 6.64204 9.41695 6.38309 8.89859 6.38309C8.44823 6.38309 8.01824 6.56845 8.01824 6.95909C8.01824 7.4767 8.69782 7.64636 9.55847 7.86456C10.8954 8.20973 12.6411 8.64756 12.6411 10.7187C12.641 12.3358 11.5968 13.3114 10.0407 13.5997Z" fill="#FCFCFC"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', height: 34, paddingBottom: 8, background: '#FCFCFC', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <div style={{width: 134, height: 5, background: '#D5D8E2', borderRadius: 100}} />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

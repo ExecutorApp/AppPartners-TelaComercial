@@ -227,6 +227,10 @@ const SideMenuScreen: React.FC<SideMenuScreenProps> = ({ isVisible, onClose }) =
                 style={styles.menuItem}
                 onPress={() => {
                   setActiveItem(item.title);
+                  if (item.title === 'Clientes') {
+                    navigation.navigate(ScreenNames.CustomersHome);
+                    onClose();
+                  }
                   if (item.title === 'Keymans') {
                     navigation.navigate(ScreenNames.Keymans);
                     onClose();

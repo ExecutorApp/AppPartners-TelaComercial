@@ -10,17 +10,16 @@ import {
   StatusBar,
   SafeAreaView,
   Platform,
-  Dimensions,
 } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Svg, Path, Rect } from 'react-native-svg';
 import Header from '../5.Side Menu/2.Header';
 import BottomMenu from '../5.Side Menu/3.BottomMenu';
+import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import ModalSortBy from './01.01.KeymansHomeScreen-Modal-SortBy';
 import KeymansOptionsModal from './01.02.KeymansHomeScreen-Modal-Options';
 import InformationGroup from './02.00.InformationGroup';
-
-const { height: winHeight } = Dimensions.get('window');
+import EmptyContentState from '../../components/content/EmptyContentState';
 
 // Altura do BottomMenu (igual ao Layout.bottomMenuHeight do projeto)
 const BOTTOM_MENU_HEIGHT = 103;
@@ -111,39 +110,20 @@ const MoreIcon = () => (
   </Svg>
 );
 
-// Dados dos keymans
-const keymansData = [
-  {
-    id: 1,
-    name: 'Camila Betanea',
-    photo: require('../../../assets/0000001.png'),
-    contacts: 85,
-    conversions: 4,
-    rank: 1,
-  },
-  {
-    id: 2,
-    name: 'Ruan de Londres',
-    photo: require('../../../assets/0000002.png'),
-    contacts: 120,
-    conversions: 1,
-    rank: 2,
-  },
-  {
-    id: 3,
-    name: 'Gabriela de Assis',
-    photo: require('../../../assets/0000003.png'),
-    contacts: 96,
-    conversions: 1,
-    rank: 3,
-  },
-];
+type Keyman = {
+  id: number;
+  name: string;
+  photo: any;
+  contacts: number;
+  conversions: number;
+  rank: number;
+};
 
 const KeymansScreen: React.FC = () => {
+  const [keymans, setKeymans] = useState<Keyman[]>([]);
   const [searchText, setSearchText] = useState('');
   const [sideMenuVisible, setSideMenuVisible] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
-  const [newKeymanModalVisible, setNewKeymanModalVisible] = useState(false);
   
   // Estado para controlar a ordenação selecionada
   const [selectedCategory, setSelectedCategory] = useState<'contacts' | 'conversions' | 'rank'>('contacts');
@@ -164,11 +144,12 @@ const KeymansScreen: React.FC = () => {
     contacts: number;
     rank: number;
   } | null>(null);
+  const [optionsAnchor, setOptionsAnchor] = useState<{ x: number; y: number } | null>(null);
 
   // Lista derivada filtrada e ordenada (sempre chamada, antes de qualquer retorno condicional)
   const displayedKeymans = useMemo(() => {
     const term = searchText.trim().toLowerCase();
-    const base = keymansData.filter(k =>
+    const base = keymans.filter(k =>
       term.length === 0 ? true : k.name.toLowerCase().includes(term)
     );
 
@@ -182,7 +163,7 @@ const KeymansScreen: React.FC = () => {
       }
       return bVal - aVal;
     });
-  }, [searchText, selectedCategory, selectedOrder]);
+  }, [keymans, searchText, selectedCategory, selectedOrder]);
   
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -268,8 +249,7 @@ const KeymansScreen: React.FC = () => {
   };
 
   // Handlers para Modal de Opções
-  const handleOpenOptionsModal = (keyman: typeof keymansData[0]) => {
-    console.log('[Keymans][Home] abrir options', { keymanId: keyman.id, keymanName: keyman.name });
+  const handleOpenOptionsModal = (keyman: Keyman, e?: any) => {
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
@@ -277,17 +257,27 @@ const KeymansScreen: React.FC = () => {
       contacts: keyman.contacts,
       rank: keyman.rank,
     });
+    try {
+      const pageX = e?.nativeEvent?.pageX ?? null;
+      const pageY = e?.nativeEvent?.pageY ?? null;
+      if (typeof pageX === 'number' && typeof pageY === 'number') {
+        setOptionsAnchor({ x: pageX, y: pageY });
+      } else {
+        setOptionsAnchor(null);
+      }
+    } catch {
+      setOptionsAnchor(null);
+    }
     setOptionsModalVisible(true);
   };
 
   const handleCloseOptionsModal = () => {
-    console.log('[Keymans][Home] fechar options');
     setOptionsModalVisible(false);
+    setOptionsAnchor(null);
   };
 
   // Handler para editar perfil via modal de opções
   const handleEditProfile = () => {
-    console.log('[Keymans][Home] option editar perfil', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('perfil');
@@ -296,7 +286,6 @@ const KeymansScreen: React.FC = () => {
 
   // Handlers para navegar para Contatos
   const handleOpenContacts = () => {
-    console.log('[Keymans][Home] option ver contatos', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('contatos');
@@ -305,7 +294,6 @@ const KeymansScreen: React.FC = () => {
 
   // Handlers para navegar para Rank
   const handleOpenRank = () => {
-    console.log('[Keymans][Home] option ver rank', { keymanId: selectedKeyman?.id });
     setOptionsModalVisible(false);
     setProfileMode('editar');
     setInformationGroupInitialTab('rank');
@@ -314,14 +302,17 @@ const KeymansScreen: React.FC = () => {
 
   // Handler para excluir keyman
   const handleDeleteKeyman = () => {
-    console.log('[Keymans][Home] confirm excluir', { keymanId: selectedKeyman?.id });
-    // Implementar lógica de exclusão
+    const keymanId = selectedKeyman?.id ?? null;
+    if (!keymanId) return;
+
+    setKeymans(prev => prev.filter(k => k.id !== keymanId));
+    setSelectedCardId(prev => (prev === keymanId ? null : prev));
     setOptionsModalVisible(false);
     setSelectedKeyman(null);
   };
 
   // Função para navegar ao clicar no card (abre Profile em modo EDITAR)
-  const handleCardPress = (keyman: typeof keymansData[0]) => {
+  const handleCardPress = (keyman: Keyman) => {
     setSelectedKeyman({
       id: keyman.id,
       name: keyman.name,
@@ -339,7 +330,7 @@ const KeymansScreen: React.FC = () => {
     setSelectedCardId(prevId => prevId === cardId ? null : cardId);
   };
 
-  const renderKeymanCard = (keyman: typeof keymansData[0], isSelected: boolean = false) => (
+  const renderKeymanCard = (keyman: Keyman, isSelected: boolean = false) => (
     <TouchableOpacity 
       key={keyman.id} 
       activeOpacity={0.7}
@@ -357,7 +348,7 @@ const KeymansScreen: React.FC = () => {
             style={styles.moreButton}
             onPress={(e) => {
               e.stopPropagation();
-              handleOpenOptionsModal(keyman);
+              handleOpenOptionsModal(keyman, e);
             }}
           >
             <MoreIcon />
@@ -403,7 +394,7 @@ const KeymansScreen: React.FC = () => {
       
       {/* Header padrão */}
       <Header 
-        title={"Keymans (22)"}
+        title={`Keymans (${String(keymans.length).padStart(2, '0')})`}
         notificationCount={6}
         onMenuPress={() => setSideMenuVisible(true)}
         showBackButton={false}
@@ -420,7 +411,7 @@ const KeymansScreen: React.FC = () => {
               <Text style={styles.addButtonText}>KeyMan</Text>
             </TouchableOpacity>
           </View>
-          
+
           {/* Sort Dropdown */}
           <View style={styles.sortSection}>
             <Text style={styles.sortLabel}>Ordenar por</Text>
@@ -434,37 +425,48 @@ const KeymansScreen: React.FC = () => {
               </View>
             </TouchableOpacity>
           </View>
-          
+
           {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <SearchIcon />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="pesquise aqui"
-              placeholderTextColor={COLORS.textTertiary}
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-          </View>
+          {keymans.length > 0 ? (
+            <View style={styles.searchContainer}>
+              <SearchIcon />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="pesquise aqui"
+                placeholderTextColor={COLORS.textTertiary}
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+            </View>
+          ) : null}
         </View>
 
         {/* ÁREA SCROLLÁVEL: Wrapper do Scroll - A CHAVE PARA FUNCIONAR NO WEB */}
         <View style={styles.scrollWrapper}>
-          <ScrollView 
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={true}
-            keyboardShouldPersistTaps="handled"
-          >
-            {displayedKeymans.map((keyman) => (
-              <View key={keyman.id} style={styles.cardWrapper}>
-                {renderKeymanCard(keyman, selectedCardId === keyman.id)}
-              </View>
-            ))}
-            
-            {/* Espaçador final para o BottomMenu */}
-            <View style={styles.bottomSpacer} />
-          </ScrollView>
+          {keymans.length === 0 ? (
+            <View style={styles.emptyStateWrapper}>
+              <EmptyContentState
+                title="Nenhum keyman encontrado!"
+                subtitle={'Para criar um novo keyman, toque no botão azul "+ KeyMan" no topo da tela.'}
+              />
+            </View>
+          ) : (
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={true}
+              keyboardShouldPersistTaps="handled"
+            >
+              {displayedKeymans.map((keyman) => (
+                <View key={keyman.id} style={styles.cardWrapper}>
+                  {renderKeymanCard(keyman, selectedCardId === keyman.id)}
+                </View>
+              ))}
+
+              {/* Espaçador final para o BottomMenu */}
+              <View style={styles.bottomSpacer} />
+            </ScrollView>
+          )}
         </View>
       </View>
 
@@ -490,7 +492,7 @@ const KeymansScreen: React.FC = () => {
             keymanId={selectedKeyman?.id}
             keymanPhoto={
               selectedKeyman?.photo ??
-              keymansData.find(k => k.id === selectedKeyman?.id)?.photo
+              keymans.find(k => k.id === selectedKeyman?.id)?.photo
             }
             onSave={handleSaveProfile}
           />
@@ -509,6 +511,12 @@ const KeymansScreen: React.FC = () => {
         onViewContacts={handleOpenContacts}
         onViewRank={handleOpenRank}
         onDelete={handleDeleteKeyman}
+        anchorPosition={optionsAnchor ?? undefined}
+      />
+
+      <SideMenuScreen
+        isVisible={sideMenuVisible}
+        onClose={() => setSideMenuVisible(false)}
       />
     </SafeAreaView>
   );
@@ -623,6 +631,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     // overflow hidden garante que os cards desapareçam antes de encostar na barra de pesquisa
     overflow: 'hidden',
+  },
+  emptyStateWrapper: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingTop: 6,
+    paddingBottom: BOTTOM_MENU_HEIGHT + 20,
   },
   // SCROLLVIEW - No web usa position absolute para ter altura definida
   scrollView: {

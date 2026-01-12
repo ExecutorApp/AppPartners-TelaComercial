@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Modal } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
@@ -32,7 +32,80 @@ const BackIcon = () => (
   </Svg>
 );
 
+const AlertIcon = () => (
+  <Svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+    <Path
+      d="M28.876 18.072C28.876 11.7858 23.7727 6.67149 17.5 6.67149C11.2273 6.67149 6.12404 11.7858 6.12404 18.072V27.0533H28.8759V18.072H28.876ZM17.506 23.1138C16.6974 23.1138 16.1301 22.5453 16.1301 21.8438C16.1301 21.1301 16.6974 20.5979 17.506 20.5979C18.3147 20.5979 18.8699 21.1301 18.8699 21.8438C18.8699 22.5453 18.3147 23.1138 17.506 23.1138ZM18.4113 19.2355H16.5888L16.1422 13.853H18.8699L18.4113 19.2355ZM16.4746 0H18.5254V3.63088H16.4746V0ZM26.5719 6.97478L29.1334 4.40775L30.5833 5.86078L28.0218 8.42781L26.5719 6.97478ZM4.41164 5.85845L5.86154 4.40542L8.42304 6.97245L6.97313 8.42548L4.41164 5.85845ZM31.377 14.3065H35V16.3618H31.377V14.3065ZM0 14.3065H3.62305V16.3618H0V14.3065ZM29.1885 29.04H5.8115C3.7208 29.04 2.01988 30.7446 2.01988 32.8398V35H32.9801V32.8398C32.9801 30.7446 31.2792 29.04 29.1885 29.04Z"
+      fill="#1777CF"
+    />
+  </Svg>
+);
+
 type TabType = 'perfil' | 'contatos' | 'rank';
+
+type ConfirmContext = 'sair' | 'cancelar';
+
+type ProfileSnapshot = {
+  personType: PersonType;
+  formData: {
+    nome: string;
+    cpfCnpj: string;
+    email: string;
+    whatsapp: string;
+    estado: string;
+    cep: string;
+    cidade: string;
+    bairro: string;
+    endereco: string;
+    numero: string;
+    complemento: string;
+    keymanPhotoToken: string;
+  };
+};
+
+const normalizePhotoToken = (photo: any): string => {
+  if (!photo) return '';
+  if (typeof photo === 'number') return `asset:${photo}`;
+  if (typeof photo === 'string') return `str:${photo}`;
+  if (typeof photo?.uri === 'string') return `uri:${photo.uri}`;
+  return 'other';
+};
+
+const buildProfileSnapshot = (formData: ProfileFormData, personType: PersonType): ProfileSnapshot => ({
+  personType,
+  formData: {
+    nome: String(formData.nome ?? ''),
+    cpfCnpj: String(formData.cpfCnpj ?? ''),
+    email: String(formData.email ?? ''),
+    whatsapp: String(formData.whatsapp ?? ''),
+    estado: String(formData.estado ?? ''),
+    cep: String(formData.cep ?? ''),
+    cidade: String(formData.cidade ?? ''),
+    bairro: String(formData.bairro ?? ''),
+    endereco: String(formData.endereco ?? ''),
+    numero: String(formData.numero ?? ''),
+    complemento: String(formData.complemento ?? ''),
+    keymanPhotoToken: normalizePhotoToken((formData as any)?.keymanPhoto),
+  },
+});
+
+const isSameProfileSnapshot = (a: ProfileSnapshot, b: ProfileSnapshot): boolean => {
+  if (a.personType !== b.personType) return false;
+  return (
+    a.formData.nome === b.formData.nome &&
+    a.formData.cpfCnpj === b.formData.cpfCnpj &&
+    a.formData.email === b.formData.email &&
+    a.formData.whatsapp === b.formData.whatsapp &&
+    a.formData.estado === b.formData.estado &&
+    a.formData.cep === b.formData.cep &&
+    a.formData.cidade === b.formData.cidade &&
+    a.formData.bairro === b.formData.bairro &&
+    a.formData.endereco === b.formData.endereco &&
+    a.formData.numero === b.formData.numero &&
+    a.formData.complemento === b.formData.complemento &&
+    a.formData.keymanPhotoToken === b.formData.keymanPhotoToken
+  );
+};
 
 interface InformationGroupProps {
   visible?: boolean;
@@ -74,20 +147,20 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
 
   const initialFormData = useMemo<ProfileFormData>(
     () => ({
-      nome: keymanName || 'Perola Marina Diniz',
-      cpfCnpj: '385.474.956-25',
-      email: 'PerolaDiniz@hotmail.com',
-      whatsapp: '17 99246-0025',
-      estado: 'São Paulo',
-      cep: '15200-000',
-      cidade: 'São José do Rio Preto',
-      bairro: 'Centro',
-      endereco: 'Piratininga',
-      numero: '650',
-      complemento: 'Sala 207',
-      keymanPhoto: keymanPhoto,
+      nome: mode === 'criar' ? '' : (keymanName || 'Perola Marina Diniz'),
+      cpfCnpj: mode === 'criar' ? '' : '385.474.956-25',
+      email: mode === 'criar' ? '' : 'PerolaDiniz@hotmail.com',
+      whatsapp: mode === 'criar' ? '' : '17 99246-0025',
+      estado: mode === 'criar' ? '' : 'São Paulo',
+      cep: mode === 'criar' ? '' : '15200-000',
+      cidade: mode === 'criar' ? '' : 'São José do Rio Preto',
+      bairro: mode === 'criar' ? '' : 'Centro',
+      endereco: mode === 'criar' ? '' : 'Piratininga',
+      numero: mode === 'criar' ? '' : '650',
+      complemento: mode === 'criar' ? '' : 'Sala 207',
+      keymanPhoto: mode === 'criar' ? undefined : keymanPhoto,
     }),
-    [keymanName, keymanPhoto]
+    [keymanName, keymanPhoto, mode]
   );
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
@@ -95,7 +168,9 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [confirmContext, setConfirmContext] = useState<ConfirmContext>('cancelar');
   const [showNewContactModal, setShowNewContactModal] = useState(false);
+  const initialProfileSnapshotRef = useRef<ProfileSnapshot>(buildProfileSnapshot(initialFormData, 'fisica'));
 
   useEffect(() => {
     if (!visible) return;
@@ -103,10 +178,34 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
     setPersonType('fisica');
     setFormData(initialFormData);
     setShowNewContactModal(false);
+    if (mode === 'criar') setContacts([]);
+    initialProfileSnapshotRef.current = buildProfileSnapshot(initialFormData, 'fisica');
   }, [visible, initialTab, initialFormData, keymanId, mode]);
 
-  const handleCancel = () => {
+  const isProfileDirty = useMemo(() => {
+    const current = buildProfileSnapshot(formData, personType);
+    return !isSameProfileSnapshot(current, initialProfileSnapshotRef.current);
+  }, [formData, personType]);
+
+  const openConfirmModal = (context: ConfirmContext) => {
+    setConfirmContext(context);
     setShowCancelModal(true);
+  };
+
+  const handleBackPress = () => {
+    if (activeTab === 'perfil' && isProfileDirty) {
+      openConfirmModal('sair');
+      return;
+    }
+    onClose();
+  };
+
+  const handleCancelPress = () => {
+    if (activeTab === 'perfil' && isProfileDirty) {
+      openConfirmModal('cancelar');
+      return;
+    }
+    onClose();
   };
 
   const handleConfirmCancel = () => {
@@ -185,7 +284,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
 
       {/* ===== Header ===== */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <BackIcon />
         </TouchableOpacity>
         <View style={styles.systemDivider} />
@@ -247,7 +346,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
       {/* ===== Footer ===== */}
       <View style={styles.footerContainer}>
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancelPress}>
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.saveButton} onPress={handlePrimaryAction}>
@@ -265,7 +364,10 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Deseja cancelar?</Text>
+            <View style={styles.modalIconBox}>
+              <AlertIcon />
+            </View>
+            <Text style={styles.modalTitle}>{confirmContext === 'sair' ? 'Deseja sair' : 'Deseja cancelar'}</Text>
             <Text style={styles.modalMessage}>Todas as alterações não salvas serão perdidas.</Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -275,7 +377,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
                 <Text style={styles.modalCancelText}>Não</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalConfirmButton} onPress={handleConfirmCancel}>
-                <Text style={styles.modalConfirmText}>Sim, cancelar</Text>
+                <Text style={styles.modalConfirmText}>Sim</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -412,7 +514,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    padding: 10,
   },
   // Containers
   modalContainer: {
@@ -420,8 +522,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     width: '100%',
-    maxWidth: 350,
+    maxWidth: 265,
     gap: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  modalIconBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    backgroundColor: 'rgba(23, 119, 207, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   // Textos
   modalTitle: {

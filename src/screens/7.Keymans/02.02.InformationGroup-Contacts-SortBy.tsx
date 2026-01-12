@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
+import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
 
 // Cores do tema
 const COLORS = {
@@ -123,11 +124,11 @@ interface ContactsSortByModalProps {
   visible: boolean;
   onClose: () => void;
   onApply: (filters: {
-    contactFilter: ContactFilterType;
+    contactFilter: ContactFilterType | null;
     conversionFilter: ConversionFilterType;
     stateFilter: StateFilterType;
   }) => void;
-  initialContactFilter?: ContactFilterType;
+  initialContactFilter?: ContactFilterType | null;
   initialConversionFilter?: ConversionFilterType;
   initialStateFilter?: StateFilterType;
 }
@@ -140,10 +141,24 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
   initialConversionFilter = null,
   initialStateFilter = null,
 }) => {
-  const [contactFilter, setContactFilter] = useState<ContactFilterType>(initialContactFilter);
+  const [contactFilter, setContactFilter] = useState<ContactFilterType | null>(initialContactFilter);
   const [conversionFilter, setConversionFilter] = useState<ConversionFilterType>(initialConversionFilter);
   const [stateFilter, setStateFilter] = useState<StateFilterType>(initialStateFilter);
   const [stateSearchText, setStateSearchText] = useState('');
+  const [selectedSection, setSelectedSection] = useState<'contatos' | 'conversoes' | 'estados'>(() => {
+    if (initialStateFilter) return 'estados';
+    if (initialConversionFilter) return 'conversoes';
+    return 'contatos';
+  });
+
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   // Filtrar estados pela busca
   const filteredStates = brazilianStates.filter((state) =>
@@ -153,15 +168,32 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
 
   const handleApply = () => {
     onApply({
-      contactFilter,
-      conversionFilter,
-      stateFilter,
+      contactFilter: selectedSection === 'contatos' ? 'todos' : null,
+      conversionFilter: selectedSection === 'conversoes' ? conversionFilter : null,
+      stateFilter: selectedSection === 'estados' ? stateFilter : null,
     });
     onClose();
   };
 
+  const handleSelectContacts = () => {
+    setSelectedSection('contatos');
+    setContactFilter('todos');
+    setConversionFilter(null);
+    setStateFilter(null);
+  };
+
+  const handleSelectConversion = (value: Exclude<ConversionFilterType, null>) => {
+    setSelectedSection('conversoes');
+    setConversionFilter(value);
+    setContactFilter(null);
+    setStateFilter(null);
+  };
+
   const handleSelectState = (uf: string) => {
-    setStateFilter(stateFilter === uf ? null : uf);
+    setSelectedSection('estados');
+    setStateFilter(uf);
+    setContactFilter(null);
+    setConversionFilter(null);
   };
 
   return (
@@ -195,12 +227,12 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
             <View style={styles.sectionDivider} />
             <TouchableOpacity
               style={styles.optionItem}
-              onPress={() => setContactFilter('todos')}
+              onPress={handleSelectContacts}
             >
               <Text
                 style={[
                   styles.optionText,
-                  contactFilter === 'todos' && styles.optionTextSelected,
+                  selectedSection === 'contatos' && styles.optionTextSelected,
                 ]}
               >
                 Todos
@@ -217,16 +249,14 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
             <View style={styles.sectionDivider} />
             <TouchableOpacity
               style={styles.optionItem}
-              onPress={() =>
-                setConversionFilter(
-                  conversionFilter === 'convertidos' ? null : 'convertidos'
-                )
-              }
+              onPress={() => handleSelectConversion('convertidos')}
             >
               <Text
                 style={[
                   styles.optionText,
-                  conversionFilter === 'convertidos' && styles.optionTextSelected,
+                  selectedSection === 'conversoes' &&
+                    conversionFilter === 'convertidos' &&
+                    styles.optionTextSelected,
                 ]}
               >
                 Convertidos
@@ -235,16 +265,14 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
             <View style={styles.sectionDivider} />
             <TouchableOpacity
               style={styles.optionItem}
-              onPress={() =>
-                setConversionFilter(
-                  conversionFilter === 'nao_convertidos' ? null : 'nao_convertidos'
-                )
-              }
+              onPress={() => handleSelectConversion('nao_convertidos')}
             >
               <Text
                 style={[
                   styles.optionText,
-                  conversionFilter === 'nao_convertidos' && styles.optionTextSelected,
+                  selectedSection === 'conversoes' &&
+                    conversionFilter === 'nao_convertidos' &&
+                    styles.optionTextSelected,
                 ]}
               >
                 Não convertidos
@@ -279,33 +307,45 @@ const ContactsSortByModal: React.FC<ContactsSortByModalProps> = ({
               showsVerticalScrollIndicator={false}
               nestedScrollEnabled
             >
-              {filteredStates.map((state, index) => (
-                <View key={state.uf}>
-                  <TouchableOpacity
-                    style={styles.stateItem}
-                    onPress={() => handleSelectState(state.uf)}
-                  >
-                    <View style={styles.stateNameContainer}>
-                      <Text style={styles.stateUf}>{state.uf} - </Text>
-                      <Text
-                        style={[
-                          styles.stateName,
-                          stateFilter === state.uf && styles.stateNameSelected,
-                        ]}
-                      >
-                        {state.name}
+              {filteredStates.map((state, index) => {
+                const isSelected = selectedSection === 'estados' && stateFilter === state.uf;
+
+                return (
+                  <View key={state.uf}>
+                    <TouchableOpacity
+                      style={styles.stateItem}
+                      onPress={() => handleSelectState(state.uf)}
+                    >
+                      <View style={styles.stateNameContainer}>
+                        <Text style={[styles.stateUf, isSelected && styles.stateTextSelected]}>
+                          {state.uf} -{' '}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.stateName,
+                            isSelected && styles.stateTextSelected,
+                          ]}
+                        >
+                          {state.name}
+                        </Text>
+                      </View>
+                      <Text style={[styles.stateCount, isSelected && styles.stateTextSelected]}>
+                        {state.count.toString().padStart(2, '0')}
                       </Text>
-                    </View>
-                    <Text style={styles.stateCount}>
-                      {state.count.toString().padStart(2, '0')}
-                    </Text>
-                  </TouchableOpacity>
-                  {index < filteredStates.length - 1 && (
-                    <View style={styles.stateDivider} />
-                  )}
-                </View>
-              ))}
+                    </TouchableOpacity>
+                    {index < filteredStates.length - 1 && (
+                      <View style={styles.stateDivider} />
+                    )}
+                  </View>
+                );
+              })}
             </ScrollView>
+          </View>
+
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+              <Text style={styles.applyButtonText}>Aplicar</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -340,9 +380,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   modalTitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
-    fontWeight: '600',
     color: COLORS.textPrimary,
   },
   section: {
@@ -359,9 +398,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   sectionTitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 12,
-    fontWeight: '600',
     color: COLORS.textSecondary,
   },
   sectionDivider: {
@@ -373,13 +411,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   optionText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textPrimary,
   },
   optionTextSelected: {
     color: COLORS.primary,
+    fontFamily: 'Inter_600SemiBold',
   },
   statesSection: {
     borderWidth: 1,
@@ -411,9 +449,8 @@ const styles = StyleSheet.create({
   },
   stateSearchInput: {
     flex: 1,
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 12,
-    fontWeight: '400',
     color: COLORS.textPrimary,
     paddingVertical: 0,
     ...(Platform.OS === 'web'
@@ -434,30 +471,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   stateUf: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textSecondary,
   },
   stateName: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textPrimary,
   },
-  stateNameSelected: {
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
   stateCount: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textSecondary,
+  },
+  stateTextSelected: {
+    color: COLORS.primary,
+    fontFamily: 'Inter_600SemiBold',
   },
   stateDivider: {
     height: 0.5,
     backgroundColor: COLORS.border,
+  },
+  footer: {
+    paddingTop: 10,
+  },
+  applyButton: {
+    height: 44,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  applyButtonText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: COLORS.white,
   },
 });
 

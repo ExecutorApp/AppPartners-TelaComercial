@@ -16,6 +16,7 @@ import { Svg, Path, Rect, G, ClipPath, Defs } from 'react-native-svg';
 import EmptyCalendarIllustration from '../../components/illustrations/EmptyCalendarIllustration';
 import InformationGroupContactsEdit from './02.02.InformationGroup-Contacts-Edit';
 import InformationGroupContactsView from './02.02.InformationGroup-Contacts-View';
+import ContactsSortByModal from './02.02.InformationGroup-Contacts-SortBy';
 
 // Cores do tema
 const COLORS = {
@@ -155,13 +156,26 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
   onContactsChange,
 }) => {
   const [searchText, setSearchText] = useState('');
-  const [sortFilter] = useState('Todos');
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [contactFilter, setContactFilter] = useState<'todos' | null>('todos');
+  const [conversionFilter, setConversionFilter] = useState<'convertidos' | 'nao_convertidos' | null>(
+    null
+  );
+  const [stateFilter, setStateFilter] = useState<string | null>(null);
   const [contactMenuVisible, setContactMenuVisible] = useState<number | null>(null);
   const [contactMenuAnchor, setContactMenuAnchor] = useState<{ x: number; y: number } | null>(null);
   const contactsContainerRef = useRef<any>(null);
   const [internalContacts, setInternalContacts] = useState<Contact[]>([]);
   const contacts = externalContacts ?? internalContacts;
   const setContacts = onContactsChange ?? setInternalContacts;
+
+  const sortFilterLabel = useMemo(() => {
+    if (stateFilter) return stateFilter;
+    if (conversionFilter === 'convertidos') return 'Convertidos';
+    if (conversionFilter === 'nao_convertidos') return 'Não convertidos';
+    if (contactFilter === 'todos') return 'Todos';
+    return 'Todos';
+  }, [conversionFilter, stateFilter]);
 
   // Lista filtrada
   const filteredContacts = useMemo(() => {
@@ -171,6 +185,7 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
     );
   }, [contacts, searchText]);
   const isEmpty = filteredContacts.length === 0;
+  const isEmptyState = contacts.length === 0;
 
   const handleOpenContactMenu = (contactId: number, evt?: any) => {
     evt?.stopPropagation?.();
@@ -213,6 +228,25 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
   const handleCloseContactMenu = () => {
     setContactMenuVisible(null);
     setContactMenuAnchor(null);
+  };
+
+  const handleOpenSortBy = () => {
+    setSortModalVisible(true);
+    onOpenSortModal?.();
+  };
+
+  const handleCloseSortBy = () => {
+    setSortModalVisible(false);
+  };
+
+  const handleApplySortBy = (filters: {
+    contactFilter: 'todos' | null;
+    conversionFilter: 'convertidos' | 'nao_convertidos' | null;
+    stateFilter: string | null;
+  }) => {
+    setContactFilter(filters.contactFilter);
+    setConversionFilter(filters.conversionFilter);
+    setStateFilter(filters.stateFilter);
   };
 
   const handleEditContact = (contactId: number) => {
@@ -340,25 +374,27 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
 
       <View style={styles.sortSection}>
         <Text style={styles.sortLabel}>Ordenar por</Text>
-        <TouchableOpacity style={styles.sortDropdown} onPress={onOpenSortModal}>
+        <TouchableOpacity style={styles.sortDropdown} onPress={handleOpenSortBy}>
           <ContactsFilterIcon />
           <View style={styles.sortContent}>
             <Text style={styles.sortTitle}>Contatos:</Text>
-            <Text style={styles.sortValue}>{sortFilter}</Text>
+            <Text style={styles.sortValue}>{sortFilterLabel}</Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
-        <SearchIcon />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="pesquise aqui"
-          placeholderTextColor={COLORS.textTertiary}
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-      </View>
+      {!isEmptyState && (
+        <View style={styles.searchContainer}>
+          <SearchIcon />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="pesquise aqui"
+            placeholderTextColor={COLORS.textTertiary}
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+      )}
 
       {isEmpty ? (
         renderEmptyContactsState()
@@ -413,6 +449,15 @@ const InformationGroupContacts: React.FC<ContactsScreenProps> = ({
           contactData={contactDataForModal}
         />
       )}
+
+      <ContactsSortByModal
+        visible={sortModalVisible}
+        onClose={handleCloseSortBy}
+        onApply={handleApplySortBy}
+        initialContactFilter={contactFilter}
+        initialConversionFilter={conversionFilter}
+        initialStateFilter={stateFilter}
+      />
 
       {/* Modal de exclusão: ajuste transparência/backdrop e animação aqui */}
       <Modal

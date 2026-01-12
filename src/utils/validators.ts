@@ -45,6 +45,15 @@ export function formatNameInput(text: string): string {
     .join(' ');
 }
 
+export function formatNameFirstWordOnly(text: string): string {
+  const normalized = (text || '').replace(/\s+/g, ' ');
+  if (!normalized.trim()) return '';
+  const parts = normalized.split(' ');
+  return parts
+    .map((w, idx) => w ? (idx === 0 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase()) : '')
+    .join(' ');
+}
+
 export function formatCompanyNameInput(text: string): string {
   // Exige ao menos duas palavras para Razão Social e normaliza capitalização
   // Não usar trim para permitir espaço enquanto digita

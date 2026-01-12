@@ -1,21 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import EmptyCalendarIllustration from '../illustrations/EmptyCalendarIllustration';
-import { Layout } from '../../constants/theme';
 
 /**
  * Estado vazio padrão para listas de conteúdo.
  * Segue o layout do Figma "Lista": card com ilustração, título e instrução.
  */
-const EmptyContentState: React.FC = () => {
+type EmptyContentStateProps = {
+  title?: string;
+  subtitle?: string;
+};
+
+const EmptyContentState: React.FC<EmptyContentStateProps> = ({ title, subtitle }) => {
   return (
     <View style={styles.card}>
       <View style={styles.illustrationWrap}>
         <EmptyCalendarIllustration width={'100%'} height={'100%'} />
       </View>
-      <Text style={styles.title}>{'Nenhum conte\u00FAdo\nencontrado!'}</Text>
+      <Text style={styles.title}>{title ?? 'Nenhum conte\u00FAdo\nencontrado!'}</Text>
       <Text style={styles.subtitle}>
-        {'Para criar um novo conte\u00FAdo, toque \nno bot\u00E3o azul "Novo conte\u00FAdo"\nno topo da tela.'}
+        {subtitle ?? 'Para criar um novo conte\u00FAdo, toque \nno bot\u00E3o azul "Novo conte\u00FAdo"\nno topo da tela.'}
       </Text>
     </View>
   );

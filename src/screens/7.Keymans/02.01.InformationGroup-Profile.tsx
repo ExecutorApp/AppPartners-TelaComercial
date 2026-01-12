@@ -1,7 +1,26 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Platform } from 'react-native';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Platform, Modal, TouchableWithoutFeedback, Animated } from 'react-native';
 import { Svg, Path, Rect, G, Defs, ClipPath } from 'react-native-svg';
 import * as ImagePicker from 'expo-image-picker';
+import {
+  UF_LIST,
+  formatNameInput,
+  maskCPF,
+  isValidCPF,
+  isValidCNPJ,
+  sanitizeEmail,
+  isValidEmail,
+  maskWhatsApp,
+  validateWhatsApp,
+  maskCEP,
+  isValidCEP,
+  sanitizeCityNeighborhood,
+  sanitizeAddress,
+  sanitizeNumberField,
+  sanitizeComplement,
+  capitalizeFirstLetterLive,
+  formatNameFirstWordOnly,
+} from '../../utils/validators';
 
 // Cores do tema
 const COLORS = {
@@ -20,6 +39,50 @@ const KEYMAN_PHOTO_BY_NAME: Record<string, any> = {
   'Camila Betanea': require('../../../assets/0000001.png'),
   'Ruan de Londres': require('../../../assets/0000002.png'),
   'Gabriela de Assis': require('../../../assets/0000003.png'),
+};
+
+const DEFAULT_AVATAR = require('../../../assets/AvatarPlaceholder02.png');
+
+const ChevronDownIcon = () => (
+  <Svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <Path d="M7 10l5 5 5-5" stroke="#7D8592" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const ClearIcon = () => (
+  <Svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <Path d="M18 6L6 18M6 6l12 12" stroke="#7D8592" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+function maskCNPJ(input: string): string {
+  const digits = (input || '').replace(/\D+/g, '').slice(0, 14);
+  const p1 = digits.slice(0, 2);
+  const p2 = digits.slice(2, 5);
+  const p3 = digits.slice(5, 8);
+  const p4 = digits.slice(8, 12);
+  const p5 = digits.slice(12, 14);
+  let out = p1;
+  if (p2) out += (out ? '.' : '') + p2;
+  if (p3) out += (out ? '.' : '') + p3;
+  if (p4) out += '/' + p4;
+  if (p5) out += '-' + p5;
+  return out;
+}
+
+const getPlaceholderForField = (field: keyof ProfileFormData, personType: PersonType): string => {
+  if (field === 'nome') return 'Nome completo';
+  if (field === 'cpfCnpj') return personType === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00';
+  if (field === 'email') return 'Email@teste.com';
+  if (field === 'whatsapp') return '00 00000-0000';
+  if (field === 'estado') return 'São Paulo';
+  if (field === 'cep') return '00000-000';
+  if (field === 'cidade') return 'Digite o nome da sua cidade';
+  if (field === 'bairro') return 'Digite o nome do seu bairro';
+  if (field === 'endereco') return 'Digite seu endereço';
+  if (field === 'numero') return 'Digite o número do seu endereço';
+  if (field === 'complemento') return 'Ex: bloco A, sala 10, apartamento 5';
+  return '';
 };
 
 
@@ -131,12 +194,59 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
   personType,
   onSetPersonType,
 }) => {
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [touched, setTouched] = useState<{ [key in keyof ProfileFormData]?: boolean }>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof ProfileFormData, string>>>({});
+  const BRAZIL_STATES: string[] = useMemo(() => ([
+    'AC - Acre','AL - Alagoas','AP - Amapá','AM - Amazonas','BA - Bahia','CE - Ceará','DF - Distrito Federal',
+    'ES - Espírito Santo','GO - Goiás','MA - Maranhão','MT - Mato Grosso','MS - Mato Grosso do Sul','MG - Minas Gerais',
+    'PA - Pará','PB - Paraíba','PR - Paraná','PE - Pernambuco','PI - Piauí','RJ - Rio de Janeiro','RN - Rio Grande do Norte',
+    'RS - Rio Grande do Sul','RO - Rondônia','RR - Roraima','SC - Santa Catarina','SP - São Paulo','SE - Sergipe','TO - Tocantins',
+  ]), []);
+  const UF_NAME_MAP: Record<string, string> = useMemo(() => {
+    return BRAZIL_STATES.reduce((acc, label) => {
+      const [uf] = label.split(' - ');
+      acc[uf] = label;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [BRAZIL_STATES]);
+  const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
+  const [stateSearch, setStateSearch] = useState('');
+  const chevronAnim = useRef(new Animated.Value(0)).current;
+  const chevronRotate = chevronAnim.interpolate({ inputRange: [0, 1], outputRange: ['-90deg', '0deg'] });
+  useEffect(() => {
+    Animated.timing(chevronAnim, { toValue: stateDropdownOpen ? 1 : 0, duration: 200, useNativeDriver: true }).start();
+  }, [stateDropdownOpen]);
+  const filteredStates = useMemo(
+    () => {
+      const normalizeText = (str: string) =>
+        (str || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .trim();
+      const q = normalizeText(stateSearch);
+      return BRAZIL_STATES.filter((s) => normalizeText(s).includes(q));
+    },
+    [BRAZIL_STATES, stateSearch]
+  );
+  useEffect(() => {
+    const val = String(formData.estado || '');
+    if (val && !UF_LIST.includes(val) && val.length > 2) {
+      const m = BRAZIL_STATES.find((label) => label.endsWith(' - ' + val));
+      if (m) {
+        const uf = m.split(' - ')[0];
+        onUpdateFormField('estado', uf);
+      }
+    }
+  }, [formData.estado]);
   // ===== BLOCO: FOTO DO KEYMAN =====
   const getProfilePhotoSource = () => {
     if (formData.keymanPhoto) return formData.keymanPhoto;
+    if (mode === 'criar') return DEFAULT_AVATAR;
     const mapped = KEYMAN_PHOTO_BY_NAME[(formData.nome || '').trim()];
     if (mapped) return mapped;
-    return { uri: 'https://placehold.co/65x80' };
+    return DEFAULT_AVATAR;
   };
 
   const onPickProfilePhoto = async () => {
@@ -166,27 +276,369 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
     onUpdateFormField(field, value);
   };
 
-  const renderInputField = (
-    label: string,
-    field: keyof ProfileFormData,
-    required: boolean = false
-  ) => (
-    <View style={styles.inputGroup}>
-      <View style={styles.labelContainer}>
-        <Text style={styles.inputLabel}>
-          {label}
-          {required && '*'}
-        </Text>
+  const renderPersonalInputs = () => (
+    <>
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Nome*</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'nome' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.nome}
+            onChangeText={(value) => {
+              const formatted = formatNameFirstWordOnly(value);
+              updateFormField('nome', formatted);
+              const valid = formatted.trim().split(/\s+/).filter(Boolean).length >= 2;
+              setErrors({ ...errors, nome: valid ? undefined : 'Informe nome completo (mínimo duas palavras).' });
+            }}
+            onFocus={() => setFocusedField('nome')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, nome: true }); }}
+            placeholder={getPlaceholderForField('nome', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.nome && touched.nome) ? <Text style={styles.errorText}>{errors.nome}</Text> : null}
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={formData[field]}
-          onChangeText={(value) => updateFormField(field, value)}
-          placeholderTextColor={COLORS.textTertiary}
-        />
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'CPF*' : 'CNPJ*'}</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'cpfCnpj' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.cpfCnpj}
+            onChangeText={(value) => {
+              if (personType === 'fisica') {
+                const masked = maskCPF(value);
+                updateFormField('cpfCnpj', masked);
+                const valid = isValidCPF(masked);
+                setErrors({ ...errors, cpfCnpj: valid || masked.length < 14 ? undefined : 'CPF inválido.' });
+              } else {
+                const masked = maskCNPJ(value);
+                updateFormField('cpfCnpj', masked);
+                const valid = isValidCNPJ(masked);
+                setErrors({ ...errors, cpfCnpj: valid || masked.length < 18 ? undefined : 'CNPJ inválido.' });
+              }
+            }}
+            onFocus={() => setFocusedField('cpfCnpj')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, cpfCnpj: true }); }}
+            placeholder={getPlaceholderForField('cpfCnpj', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            keyboardType="numeric"
+            maxLength={personType === 'fisica' ? 14 : 18}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.cpfCnpj && touched.cpfCnpj) ? <Text style={styles.errorText}>{errors.cpfCnpj}</Text> : null}
       </View>
-    </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Email*</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'email' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.email}
+            onChangeText={(value) => {
+              const sanitized = sanitizeEmail(value);
+              updateFormField('email', sanitized);
+              const valid = isValidEmail(sanitized);
+              setErrors({ ...errors, email: valid ? undefined : 'Email inválido.' });
+            }}
+            onFocus={() => setFocusedField('email')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, email: true }); }}
+            placeholder={getPlaceholderForField('email', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.email && touched.email) ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>WhatsApp</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'whatsapp' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.whatsapp}
+            onChangeText={(value) => {
+              const masked = maskWhatsApp(value);
+              updateFormField('whatsapp', masked);
+              const info = validateWhatsApp(masked);
+              const digits = (masked || '').replace(/\D+/g, '');
+              setErrors({ ...errors, whatsapp: info.valid || digits.length < 10 ? undefined : 'WhatsApp inválido (DDD e comprimento).' });
+            }}
+            onFocus={() => setFocusedField('whatsapp')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, whatsapp: true }); }}
+            placeholder={getPlaceholderForField('whatsapp', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            keyboardType="phone-pad"
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.whatsapp && touched.whatsapp) ? <Text style={styles.errorText}>{errors.whatsapp}</Text> : null}
+      </View>
+    </>
+  );
+
+  const renderLocationInputs = () => (
+    <>
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Estado</Text>
+        </View>
+        <TouchableOpacity
+          style={[styles.inputContainer, styles.stateSelectRow, focusedField === 'estado' ? styles.inputFocused : null]}
+          onPress={() => { setFocusedField('estado'); setStateDropdownOpen((o) => !o); }}
+          accessibilityLabel="Seletor de estado"
+        >
+          <Text style={[styles.dropdownText, !formData.estado ? styles.placeholderText : null]}>
+            {formData.estado ? (UF_NAME_MAP[formData.estado] || formData.estado) : 'Selecione um estado'}
+          </Text>
+          <Animated.View style={[styles.dropdownChevron, { transform: [{ rotate: chevronRotate }] }]}>
+            <ChevronDownIcon />
+          </Animated.View>
+        </TouchableOpacity>
+        {(errors.estado && touched.estado) ? <Text style={styles.errorText}>{errors.estado}</Text> : null}
+      </View>
+
+      <Modal
+        visible={stateDropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setStateDropdownOpen(false);
+          setTouched({ ...touched, estado: true });
+          setErrors({ ...errors, estado: formData.estado && (UF_LIST.includes(formData.estado) || !!UF_NAME_MAP[formData.estado]) ? undefined : 'Selecione um estado válido.' });
+        }}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setStateDropdownOpen(false);
+            setTouched({ ...touched, estado: true });
+            setErrors({ ...errors, estado: formData.estado && (UF_LIST.includes(formData.estado) || !!UF_NAME_MAP[formData.estado]) ? undefined : 'Selecione um estado válido.' });
+          }}
+        >
+          <View style={styles.modalBackdrop} />
+        </TouchableWithoutFeedback>
+        <View style={styles.dropdownModalContainer} pointerEvents="box-none">
+          <View style={styles.dropdownContainer}>
+            <View style={styles.searchBar}>
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.searchInput,
+                  Platform.OS === 'web' ? ({ outlineStyle: 'none', outlineWidth: 0 } as any) : null,
+                ]}
+                placeholder="Buscar estado"
+                placeholderTextColor={COLORS.textTertiary}
+                value={stateSearch}
+                onChangeText={setStateSearch}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                selectionColor={COLORS.primary}
+                cursorColor={COLORS.primary}
+              />
+              {stateSearch.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearBtn}
+                  onPress={() => setStateSearch('')}
+                  accessibilityLabel="Limpar busca"
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <ClearIcon />
+                </TouchableOpacity>
+              )}
+            </View>
+            <Animated.ScrollView style={styles.stateList as any}>
+              {filteredStates.map((label) => (
+                <View key={label}>
+                  <TouchableOpacity
+                    style={[styles.stateItem, (UF_NAME_MAP[formData.estado] === label) && styles.stateItemSelected]}
+                    onPress={() => {
+                      const uf = label.split(' - ')[0];
+                      updateFormField('estado', uf);
+                      setErrors({ ...errors, estado: undefined });
+                      setStateSearch('');
+                      setStateDropdownOpen(false);
+                      setFocusedField(null);
+                      setTouched({ ...touched, estado: true });
+                    }}
+                    accessibilityLabel={'Selecionar estado ' + label}
+                  >
+                    <Text style={styles.stateItemText}>{label}</Text>
+                  </TouchableOpacity>
+                  <View style={styles.stateDivider} />
+                </View>
+              ))}
+            </Animated.ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>CEP</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'cep' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.cep}
+            onChangeText={(value) => {
+              const masked = maskCEP(value);
+              updateFormField('cep', masked);
+              const valid = isValidCEP(masked);
+              setErrors({ ...errors, cep: valid || masked.length < 9 ? undefined : 'CEP inválido.' });
+            }}
+            onFocus={() => setFocusedField('cep')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, cep: true }); }}
+            placeholder={getPlaceholderForField('cep', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            keyboardType="numeric"
+            maxLength={9}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.cep && touched.cep) ? <Text style={styles.errorText}>{errors.cep}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Cidade</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'cidade' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.cidade}
+            onChangeText={(value) => {
+              const sanitized = sanitizeCityNeighborhood(value);
+              const cleaned = capitalizeFirstLetterLive(sanitized);
+              updateFormField('cidade', cleaned);
+              setErrors({ ...errors, cidade: cleaned.trim() ? undefined : 'Cidade é obrigatória.' });
+            }}
+            onFocus={() => setFocusedField('cidade')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, cidade: true }); }}
+            placeholder={getPlaceholderForField('cidade', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.cidade && touched.cidade) ? <Text style={styles.errorText}>{errors.cidade}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Bairro</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'bairro' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.bairro}
+            onChangeText={(value) => {
+              const sanitized = sanitizeCityNeighborhood(value);
+              const cleaned = capitalizeFirstLetterLive(sanitized);
+              updateFormField('bairro', cleaned);
+              setErrors({ ...errors, bairro: cleaned.trim() ? undefined : 'Bairro é obrigatório.' });
+            }}
+            onFocus={() => setFocusedField('bairro')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, bairro: true }); }}
+            placeholder={getPlaceholderForField('bairro', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.bairro && touched.bairro) ? <Text style={styles.errorText}>{errors.bairro}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Endereço</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'endereco' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.endereco}
+            onChangeText={(value) => {
+              const sanitized = sanitizeAddress(value);
+              const cleaned = capitalizeFirstLetterLive(sanitized);
+              updateFormField('endereco', cleaned);
+              setErrors({ ...errors, endereco: cleaned.trim() ? undefined : 'Endereço é obrigatório.' });
+            }}
+            onFocus={() => setFocusedField('endereco')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, endereco: true }); }}
+            placeholder={getPlaceholderForField('endereco', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.endereco && touched.endereco) ? <Text style={styles.errorText}>{errors.endereco}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Número</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'numero' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.numero}
+            onChangeText={(value) => {
+              const cleaned = sanitizeNumberField(value, 6);
+              updateFormField('numero', cleaned);
+              setErrors({ ...errors, numero: cleaned.trim() ? undefined : 'Número é obrigatório.' });
+            }}
+            onFocus={() => setFocusedField('numero')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, numero: true }); }}
+            placeholder={getPlaceholderForField('numero', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            keyboardType="numeric"
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+        {(errors.numero && touched.numero) ? <Text style={styles.errorText}>{errors.numero}</Text> : null}
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <Text style={styles.inputLabel}>Complemento</Text>
+        </View>
+        <View style={[styles.inputContainer, focusedField === 'complemento' ? styles.inputFocused : null]}>
+          <TextInput
+            style={styles.input}
+            value={formData.complemento}
+            onChangeText={(value) => {
+              const sanitized = sanitizeComplement(value);
+              const cleaned = capitalizeFirstLetterLive(sanitized);
+              updateFormField('complemento', cleaned);
+            }}
+            onFocus={() => setFocusedField('complemento')}
+            onBlur={() => { setFocusedField(null); setTouched({ ...touched, complemento: true }); }}
+            placeholder={getPlaceholderForField('complemento', personType)}
+            placeholderTextColor={COLORS.textTertiary}
+            selectionColor={COLORS.primary}
+            cursorColor={COLORS.primary}
+          />
+        </View>
+      </View>
+    </>
   );
 
   const renderProfileForm = () => (
@@ -244,24 +696,13 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         {/* Dados pessoais */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Dados pessoais:</Text>
-
-          {renderInputField('Nome', 'nome', true)}
-          {renderInputField(personType === 'fisica' ? 'CPF' : 'CNPJ', 'cpfCnpj', true)}
-          {renderInputField('Email', 'email', true)}
-          {renderInputField('WhatsApp', 'whatsapp')}
+          {renderPersonalInputs()}
         </View>
 
         {/* Localização */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Localização:</Text>
-
-          {renderInputField('Estado', 'estado')}
-          {renderInputField('CEP', 'cep')}
-          {renderInputField('Cidade', 'cidade')}
-          {renderInputField('Bairro', 'bairro')}
-          {renderInputField('Endereço', 'endereco')}
-          {renderInputField('Número', 'numero')}
-          {renderInputField('Complemento', 'complemento')}
+          {renderLocationInputs()}
         </View>
       </View>
     </ScrollView>
@@ -359,7 +800,7 @@ const styles = StyleSheet.create({
   },
   // Inputs
   inputGroup: {
-    height: 64,
+    minHeight: 64,
     gap: 6,
   },
   labelContainer: {
@@ -390,6 +831,109 @@ const styles = StyleSheet.create({
           outlineColor: 'transparent',
         } as any)
       : {}),
+  },
+  inputFocused: {
+    borderColor: COLORS.primary,
+  },
+  errorText: {
+    color: '#D94F4F',
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 10,
+    paddingHorizontal: 6,
+  },
+  stateSelectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dropdownText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textPrimary,
+    flex: 1,
+  },
+  placeholderText: {
+    color: COLORS.textTertiary,
+  },
+  dropdownChevron: {
+    marginLeft: 8,
+  },
+  dropdownModalContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  dropdownContainer: {
+    width: '90%',
+    maxWidth: 420,
+    minWidth: 320,
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: COLORS.border,
+    padding: 10,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.inputBorder,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 44,
+    marginBottom: 10,
+    backgroundColor: COLORS.white,
+  },
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    color: COLORS.textPrimary,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    backgroundColor: 'transparent',
+  },
+  clearBtn: {
+    marginLeft: 8,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stateList: {
+    height: 320,
+  },
+  stateItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 5,
+  },
+  stateItemSelected: {
+    backgroundColor: '#F4F4F4',
+    borderRadius: 6,
+  },
+  stateItemText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: COLORS.textPrimary,
+  },
+  stateDivider: {
+    height: 0.5,
+    backgroundColor: COLORS.border,
   },
 });
 

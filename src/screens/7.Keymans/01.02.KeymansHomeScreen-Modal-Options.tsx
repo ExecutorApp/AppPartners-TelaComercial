@@ -7,6 +7,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
+import { Dimensions } from 'react-native';
 import { Svg, Path, Rect, G, ClipPath, Defs } from 'react-native-svg';
 
 // Cores do tema
@@ -100,7 +101,7 @@ const AlertIcon = () => (
   <Svg width="35" height="35" viewBox="0 0 35 35" fill="none">
     <Path
       d="M28.876 18.072C28.876 11.7858 23.7727 6.67149 17.5 6.67149C11.2273 6.67149 6.12404 11.7858 6.12404 18.072V27.0533H28.8759V18.072H28.876ZM17.506 23.1138C16.6974 23.1138 16.1301 22.5453 16.1301 21.8438C16.1301 21.1301 16.6974 20.5979 17.506 20.5979C18.3147 20.5979 18.8699 21.1301 18.8699 21.8438C18.8699 22.5453 18.3147 23.1138 17.506 23.1138ZM18.4113 19.2355H16.5888L16.1422 13.853H18.8699L18.4113 19.2355ZM16.4746 0H18.5254V3.63088H16.4746V0ZM29.1885 29.04H5.8115C3.7208 29.04 2.01988 30.7446 2.01988 32.8398V35H32.9801V32.8398C32.9801 30.7446 31.2792 29.04 29.1885 29.04Z"
-      fill={COLORS.primary}
+      fill="#EF4444"
     />
   </Svg>
 );
@@ -133,6 +134,8 @@ const KeymanOptionsModal: React.FC<KeymanOptionsModalProps> = ({
   anchorPosition,
 }) => {
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [modalHeight, setModalHeight] = useState(0);
+  const viewport = Dimensions.get('window');
 
   useEffect(() => {
     console.log('[Keymans][OptionsModal] render', {
@@ -176,7 +179,7 @@ const KeymanOptionsModal: React.FC<KeymanOptionsModalProps> = ({
   return (
     <Modal
       visible={visible}
-      transparent={!deleteConfirmVisible}
+      transparent
       animationType="fade"
       onRequestClose={() => {
         console.log('[Keymans][OptionsModal] onRequestClose', { deleteConfirmVisible });
@@ -190,9 +193,7 @@ const KeymanOptionsModal: React.FC<KeymanOptionsModalProps> = ({
       {deleteConfirmVisible ? (
         <View style={styles.deleteOverlay}>
           <View style={styles.deleteCard}>
-            <View style={styles.deleteIconBox}>
-              <AlertIcon />
-            </View>
+            <View style={styles.deleteIconBox}><AlertIcon /></View>
             <View style={styles.deleteTextBlock}>
               <Text style={styles.deleteTitle}>Deseja excluir?</Text>
               <Text style={styles.deleteSubtitle}>Essa ação não pode ser desfeita.</Text>
@@ -233,12 +234,25 @@ const KeymanOptionsModal: React.FC<KeymanOptionsModalProps> = ({
           <View
             style={[
               styles.modalContainer,
-              anchorPosition && {
-                position: 'absolute',
-                top: anchorPosition.y,
-                right: 16,
-              },
+              anchorPosition && (() => {
+                const width = styles.modalContainer.width as number;
+                const rawLeft = anchorPosition.x - width - 20;
+                const clampedLeft = Math.max(8, Math.min(rawLeft, viewport.width - width - 8));
+                const offsetDown = 85;
+                const rawTop = modalHeight > 0 ? anchorPosition.y - modalHeight / 2 + offsetDown : anchorPosition.y + offsetDown;
+                const clampedTop = Math.max(8, Math.min(rawTop, viewport.height - modalHeight - 8));
+                return {
+                  position: 'absolute',
+                  left: clampedLeft,
+                  top: clampedTop,
+                  right: undefined,
+                } as any;
+              })(),
             ]}
+            onLayout={(e) => {
+              const h = e.nativeEvent.layout.height;
+              if (h && h !== modalHeight) setModalHeight(h);
+            }}
           >
             <View style={styles.optionsContainer}>
               {/* Editar Perfil */}
@@ -330,9 +344,8 @@ const styles = StyleSheet.create({
     height: 20,
   },
   optionText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textPrimary,
   },
   divider: {
@@ -342,53 +355,60 @@ const styles = StyleSheet.create({
   },
   deleteOverlay: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(0,0,0,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
   },
   deleteCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    rowGap: 25,
+    borderRadius: 18,
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 20,
-    width: '100%',
-    maxWidth: 350,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    paddingTop: 30,
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    width: 300,
+    minHeight: 265,
   },
   deleteIconBox: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#F4F4F4',
   },
   deleteTextBlock: {
     alignItems: 'center',
     gap: 6,
+    width: 270,
   },
   deleteTitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_700Bold',
     fontSize: 16,
-    fontWeight: '700',
     color: COLORS.textPrimary,
     textAlign: 'center',
   },
   deleteSubtitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    fontWeight: '400',
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
   deleteActions: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    columnGap: 10,
+    width: 270,
   },
   deleteCancelButton: {
     flex: 1,
-    height: 40,
+    height: 42,
+    borderRadius: 10,
     backgroundColor: COLORS.background,
-    borderRadius: 6,
     borderWidth: 1,
     borderColor: COLORS.border,
     justifyContent: 'center',
@@ -396,22 +416,20 @@ const styles = StyleSheet.create({
   },
   deleteConfirmButton: {
     flex: 1,
-    height: 40,
-    backgroundColor: COLORS.primary,
-    borderRadius: 6,
+    height: 42,
+    borderRadius: 10,
+    backgroundColor: '#EF4444',
     justifyContent: 'center',
     alignItems: 'center',
   },
   deleteCancelText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_500Medium',
     fontSize: 14,
-    fontWeight: '600',
     color: COLORS.textPrimary,
   },
   deleteConfirmText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter_500Medium',
     fontSize: 14,
-    fontWeight: '600',
     color: COLORS.white,
   },
 });
