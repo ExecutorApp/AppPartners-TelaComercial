@@ -1,0 +1,195 @@
+<div style={{width: 340, height: 812, background: '#F4F4F4', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', paddingTop: 15, paddingBottom: 1, paddingLeft: 15, paddingRight: 15, background: 'rgba(252, 252, 252, 0.80)', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', justifyContent: 'flex-end', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+        <div data-svg-wrapper>
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="38" height="38" rx="8" fill="#F4F4F4"/>
+          <rect width="38" height="38" rx="8" stroke="#EDF2F6"/>
+          <path d="M19 28L10 19M10 19L19 10M10 19L28 19" stroke="#1777CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div data-svg-wrapper>
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="8" fill="#F4F4F4"/>
+        <rect width="38" height="38" rx="8" stroke="#EDF2F6"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19 9C13.481 9 9 13.481 9 19C9 24.519 13.481 29 19 29C24.519 29 29 24.519 29 19C29 13.481 24.519 9 19 9ZM19 10.5385C23.6697 10.5385 27.4615 14.3303 27.4615 19C27.4615 23.6697 23.6697 27.4615 19 27.4615C14.3303 27.4615 10.5385 23.6697 10.5385 19C10.5385 14.3303 14.3303 10.5385 19 10.5385Z" fill="#3A3F51"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.2308 18.4872V22.5897C18.2308 22.7938 18.3118 22.9894 18.4561 23.1337C18.6003 23.2779 18.796 23.359 19 23.359C19.204 23.359 19.3997 23.2779 19.5439 23.1337C19.6882 22.9894 19.7692 22.7938 19.7692 22.5897V18.4872C19.7692 18.2832 19.6882 18.0875 19.5439 17.9433C19.3997 17.799 19.204 17.7179 19 17.7179C18.796 17.7179 18.6003 17.799 18.4561 17.9433C18.3118 18.0875 18.2308 18.2832 18.2308 18.4872Z" fill="#3A3F51"/>
+        <path d="M19 16.4359C19.4248 16.4359 19.7692 16.0915 19.7692 15.6667C19.7692 15.2418 19.4248 14.8974 19 14.8974C18.5752 14.8974 18.2308 15.2418 18.2308 15.6667C18.2308 16.0915 18.5752 16.4359 19 16.4359Z" fill="#3A3F51"/>
+        </svg>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 5, display: 'flex'}}>
+        <div style={{width: 300, color: '#3A3F51', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Contrato de venda</div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-end', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', height: 38, padding: 14, background: '#F4F4F4', borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <div style={{textAlign: 'center', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Baixar </div>
+          <div data-svg-wrapper>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.40348 5.85249C6.70263 5.85249 6.94889 6.078 6.98258 6.36811L6.98649 6.4355V10.2773L8.32438 8.9394C8.53462 8.72942 8.86517 8.71384 9.09391 8.89155L9.14957 8.9394C9.35986 9.14968 9.37536 9.48107 9.19743 9.70991L9.14957 9.7646L6.81559 12.0986C6.60529 12.3085 6.27475 12.3243 6.04606 12.1464L5.99137 12.0986L3.65739 9.7646C3.42984 9.53677 3.42967 9.16712 3.65739 8.9394C3.86767 8.72921 4.19909 8.71365 4.42789 8.89155L4.48258 8.9394L5.82047 10.2773V6.4355C5.82058 6.11342 6.08138 5.85249 6.40348 5.85249ZM5.37223 0.0243629C7.15852 0.262563 8.65725 1.45743 9.28825 3.1103L9.35075 3.28511H9.61149C10.9822 3.28511 12.2267 4.25366 12.7033 5.64741L12.7492 5.78803C12.9484 6.71789 12.7739 7.62172 12.2736 8.47944C12.1112 8.75763 11.754 8.85171 11.4757 8.6894C11.1978 8.527 11.1036 8.1697 11.2658 7.89155C11.6256 7.27468 11.743 6.66443 11.6193 6.07807C11.3465 5.16917 10.5596 4.50654 9.71696 4.45503L9.61149 4.4521H8.91129C8.64055 4.45188 8.40564 4.26551 8.34391 4.0019C7.9946 2.50487 6.74507 1.38406 5.23746 1.18257C3.73004 1.03182 2.26358 1.83726 1.56266 3.18843C0.945244 4.47513 1.06053 6.5902 1.81657 7.74995C1.99256 8.0198 1.91649 8.38158 1.64664 8.55757C1.37688 8.73324 1.01595 8.65727 0.840004 8.38764C-0.141695 6.88237 -0.281457 4.33333 0.518715 2.66694C1.44642 0.877812 3.36766 -0.176411 5.37223 0.0243629Z" fill="#3A3F51"/>
+            </svg>
+          </div>
+        </div>
+        <div style={{flex: '1 1 0', height: 38, padding: 14, background: '#F4F4F4', borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <div style={{textAlign: 'center', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Visualizar </div>
+          <div data-svg-wrapper>
+            <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 0C4.75546 0 0.317297 5.4 0.129769 5.634C0.0456258 5.73892 0 5.8676 0 6C0 6.1324 0.0456258 6.26109 0.129769 6.366C0.317297 6.6 4.75546 12 10 12C15.2445 12 19.6827 6.6 19.8702 6.366C19.9544 6.26109 20 6.1324 20 6C20 5.8676 19.9544 5.73892 19.8702 5.634C19.6827 5.4 15.2445 0 10 0ZM10 10.8C6.10567 10.8 2.49887 7.2 1.43621 6C2.49887 4.8 6.09941 1.2 10 1.2C13.9006 1.2 17.5011 4.8 18.5638 6C17.5011 7.2 13.9006 10.8 10 10.8Z" fill="#3A3F51"/>
+            <path d="M13.1255 5.4C13.2286 5.39992 13.3302 5.37533 13.4211 5.32842C13.5119 5.28151 13.5893 5.21374 13.6462 5.13116C13.7032 5.04858 13.7379 4.95375 13.7474 4.85514C13.7569 4.75652 13.7408 4.65719 13.7006 4.566C13.3567 3.90877 12.8276 3.35735 12.1734 2.97444C11.5192 2.59153 10.7662 2.39251 10 2.4C9.00529 2.4 8.05132 2.77929 7.34795 3.45442C6.64458 4.12955 6.24944 5.04522 6.24944 6C6.24944 6.95478 6.64458 7.87045 7.34795 8.54559C8.05132 9.22072 9.00529 9.6 10 9.6C10.7662 9.60749 11.5192 9.40847 12.1734 9.02556C12.8276 8.64266 13.3567 8.09123 13.7006 7.434C13.7408 7.34281 13.7569 7.24348 13.7474 7.14487C13.7379 7.04625 13.7032 6.95143 13.6462 6.86884C13.5893 6.78626 13.5119 6.71849 13.4211 6.67158C13.3302 6.62467 13.2286 6.60008 13.1255 6.6C13.0412 6.60849 12.956 6.5988 12.8762 6.57165C12.7963 6.5445 12.7238 6.50057 12.6639 6.44306C12.604 6.38556 12.5582 6.31594 12.5299 6.23928C12.5016 6.16263 12.4915 6.08088 12.5004 6C12.4915 5.91912 12.5016 5.83737 12.5299 5.76072C12.5582 5.68406 12.604 5.61444 12.6639 5.55694C12.7238 5.49944 12.7963 5.4555 12.8762 5.42835C12.956 5.4012 13.0412 5.39151 13.1255 5.4Z" fill="#3A3F51"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingTop: 15, paddingBottom: 20, paddingLeft: 15, paddingRight: 15, background: '#FCFCFC', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', background: 'rgba(0, 0, 0, 0)', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', height: 24, justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word'}}>Boletos</div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <img style={{width: 60, height: 70, paddingLeft: 14, paddingRight: 14, paddingTop: 30, paddingBottom: 30, borderRadius: 4}} src="https://placehold.co/60x70" />
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 5, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Holding Patrimonial</div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Reunião de entrada</div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#91929E', fontSize: 12, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 800,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingTop: 20, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', background: 'rgba(23, 118.68, 207, 0.03)', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+            <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#1777CF', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Baixar todos boletos </div>
+              <div data-svg-wrapper>
+                <svg width="19" height="17" viewBox="0 0 19 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18.4556 8.28784C18.1532 8.28784 17.9113 8.52141 17.9113 8.81337V13.5938C17.9113 14.894 16.8145 15.9489 15.4718 15.9489H3.52823C2.18145 15.9489 1.08871 14.8901 1.08871 13.5938V8.73552C1.08871 8.44355 0.846774 8.20998 0.544355 8.20998C0.241935 8.20998 0 8.44355 0 8.73552V13.5938C0 15.474 1.58468 17 3.52823 17H15.4718C17.4194 17 19 15.4701 19 13.5938V8.81337C19 8.5253 18.7581 8.28784 18.4556 8.28784Z" fill="#1777CF"/>
+                <path d="M9.11694 12.8269C9.22177 12.9281 9.3629 12.9826 9.5 12.9826C9.6371 12.9826 9.77823 12.932 9.88306 12.8269L13.3427 9.48683C13.5565 9.28051 13.5565 8.94962 13.3427 8.7433C13.129 8.53698 12.7863 8.53698 12.5726 8.7433L10.0444 11.188V0.525532C10.0444 0.23357 9.80242 0 9.5 0C9.19758 0 8.95565 0.23357 8.95565 0.525532V11.188L6.42339 8.7433C6.20968 8.53698 5.86694 8.53698 5.65323 8.7433C5.43952 8.94962 5.43952 9.28051 5.65323 9.48683L9.11694 12.8269Z" fill="#1777CF"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', paddingTop: 1, paddingBottom: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+        </div>
+        <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 15, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 15, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01 - 12/01/26</div>
+                </div>
+                <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 500,00</div>
+                </div>
+              </div>
+              <div style={{width: 35, height: 35, paddingLeft: 3, paddingRight: 3, borderRadius: 6, outline: '0.50px #1777CF solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.4556 9.78784C18.1532 9.78784 17.9113 10.0214 17.9113 10.3134V15.0938C17.9113 16.394 16.8145 17.4489 15.4718 17.4489H3.52823C2.18145 17.4489 1.08871 16.3901 1.08871 15.0938V10.2355C1.08871 9.94355 0.846774 9.70998 0.544355 9.70998C0.241935 9.70998 0 9.94355 0 10.2355V15.0938C0 16.974 1.58468 18.5 3.52823 18.5H15.4718C17.4194 18.5 19 16.9701 19 15.0938V10.3134C19 10.0253 18.7581 9.78784 18.4556 9.78784Z" fill="#1777CF"/>
+                  <path d="M9.11694 14.3269C9.22177 14.4281 9.3629 14.4826 9.5 14.4826C9.6371 14.4826 9.77823 14.432 9.88306 14.3269L13.3427 10.9868C13.5565 10.7805 13.5565 10.4496 13.3427 10.2433C13.129 10.037 12.7863 10.037 12.5726 10.2433L10.0444 12.688V2.02553C10.0444 1.73357 9.80242 1.5 9.5 1.5C9.19758 1.5 8.95565 1.73357 8.95565 2.02553V12.688L6.42339 10.2433C6.20968 10.037 5.86694 10.037 5.65323 10.2433C5.43952 10.4496 5.43952 10.7805 5.65323 10.9868L9.11694 14.3269Z" fill="#1777CF"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>02 - 12/01/26</div>
+                </div>
+                <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 500,00</div>
+                </div>
+              </div>
+              <div style={{width: 35, height: 35, paddingLeft: 3, paddingRight: 3, borderRadius: 6, outline: '0.50px #1777CF solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.4556 9.78784C18.1532 9.78784 17.9113 10.0214 17.9113 10.3134V15.0938C17.9113 16.394 16.8145 17.4489 15.4718 17.4489H3.52823C2.18145 17.4489 1.08871 16.3901 1.08871 15.0938V10.2355C1.08871 9.94355 0.846774 9.70998 0.544355 9.70998C0.241935 9.70998 0 9.94355 0 10.2355V15.0938C0 16.974 1.58468 18.5 3.52823 18.5H15.4718C17.4194 18.5 19 16.9701 19 15.0938V10.3134C19 10.0253 18.7581 9.78784 18.4556 9.78784Z" fill="#1777CF"/>
+                  <path d="M9.11694 14.3269C9.22177 14.4281 9.3629 14.4826 9.5 14.4826C9.6371 14.4826 9.77823 14.432 9.88306 14.3269L13.3427 10.9868C13.5565 10.7805 13.5565 10.4496 13.3427 10.2433C13.129 10.037 12.7863 10.037 12.5726 10.2433L10.0444 12.688V2.02553C10.0444 1.73357 9.80242 1.5 9.5 1.5C9.19758 1.5 8.95565 1.73357 8.95565 2.02553V12.688L6.42339 10.2433C6.20968 10.037 5.86694 10.037 5.65323 10.2433C5.43952 10.4496 5.43952 10.7805 5.65323 10.9868L9.11694 14.3269Z" fill="#1777CF"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>03 - 12/01/26</div>
+                </div>
+                <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 500,00</div>
+                </div>
+              </div>
+              <div style={{width: 35, height: 35, paddingLeft: 3, paddingRight: 3, borderRadius: 6, outline: '0.50px #1777CF solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.4556 9.78784C18.1532 9.78784 17.9113 10.0214 17.9113 10.3134V15.0938C17.9113 16.394 16.8145 17.4489 15.4718 17.4489H3.52823C2.18145 17.4489 1.08871 16.3901 1.08871 15.0938V10.2355C1.08871 9.94355 0.846774 9.70998 0.544355 9.70998C0.241935 9.70998 0 9.94355 0 10.2355V15.0938C0 16.974 1.58468 18.5 3.52823 18.5H15.4718C17.4194 18.5 19 16.9701 19 15.0938V10.3134C19 10.0253 18.7581 9.78784 18.4556 9.78784Z" fill="#1777CF"/>
+                  <path d="M9.11694 14.3269C9.22177 14.4281 9.3629 14.4826 9.5 14.4826C9.6371 14.4826 9.77823 14.432 9.88306 14.3269L13.3427 10.9868C13.5565 10.7805 13.5565 10.4496 13.3427 10.2433C13.129 10.037 12.7863 10.037 12.5726 10.2433L10.0444 12.688V2.02553C10.0444 1.73357 9.80242 1.5 9.5 1.5C9.19758 1.5 8.95565 1.73357 8.95565 2.02553V12.688L6.42339 10.2433C6.20968 10.037 5.86694 10.037 5.65323 10.2433C5.43952 10.4496 5.43952 10.7805 5.65323 10.9868L9.11694 14.3269Z" fill="#1777CF"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>04 - 12/01/26</div>
+                </div>
+                <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 500,00</div>
+                </div>
+              </div>
+              <div style={{width: 35, height: 35, paddingLeft: 3, paddingRight: 3, borderRadius: 6, outline: '0.50px #1777CF solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.4556 9.78784C18.1532 9.78784 17.9113 10.0214 17.9113 10.3134V15.0938C17.9113 16.394 16.8145 17.4489 15.4718 17.4489H3.52823C2.18145 17.4489 1.08871 16.3901 1.08871 15.0938V10.2355C1.08871 9.94355 0.846774 9.70998 0.544355 9.70998C0.241935 9.70998 0 9.94355 0 10.2355V15.0938C0 16.974 1.58468 18.5 3.52823 18.5H15.4718C17.4194 18.5 19 16.9701 19 15.0938V10.3134C19 10.0253 18.7581 9.78784 18.4556 9.78784Z" fill="#1777CF"/>
+                  <path d="M9.11694 14.3269C9.22177 14.4281 9.3629 14.4826 9.5 14.4826C9.6371 14.4826 9.77823 14.432 9.88306 14.3269L13.3427 10.9868C13.5565 10.7805 13.5565 10.4496 13.3427 10.2433C13.129 10.037 12.7863 10.037 12.5726 10.2433L10.0444 12.688V2.02553C10.0444 1.73357 9.80242 1.5 9.5 1.5C9.19758 1.5 8.95565 1.73357 8.95565 2.02553V12.688L6.42339 10.2433C6.20968 10.037 5.86694 10.037 5.65323 10.2433C5.43952 10.4496 5.43952 10.7805 5.65323 10.9868L9.11694 14.3269Z" fill="#1777CF"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 35, paddingLeft: 10, paddingRight: 10, borderRadius: 6, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'flex-start', alignItems: 'center', gap: 5, display: 'flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>05 - 12/01/26</div>
+                </div>
+                <div style={{justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#7D8592', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 500,00</div>
+                </div>
+              </div>
+              <div style={{width: 35, height: 35, paddingLeft: 3, paddingRight: 3, borderRadius: 6, outline: '0.50px #1777CF solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="19" height="9" viewBox="0 0 19 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.4556 9.78784C18.1532 9.78784 17.9113 10.0214 17.9113 10.3134V15.0938C17.9113 16.394 16.8145 17.4489 15.4718 17.4489H3.52823C2.18145 17.4489 1.08871 16.3901 1.08871 15.0938V10.2355C1.08871 9.94355 0.846774 9.70998 0.544355 9.70998C0.241935 9.70998 0 9.94355 0 10.2355V15.0938C0 16.974 1.58468 18.5 3.52823 18.5H15.4718C17.4194 18.5 19 16.9701 19 15.0938V10.3134C19 10.0253 18.7581 9.78784 18.4556 9.78784Z" fill="#1777CF"/>
+                  <path d="M9.11694 14.3269C9.22177 14.4281 9.3629 14.4826 9.5 14.4826C9.6371 14.4826 9.77823 14.432 9.88306 14.3269L13.3427 10.9868C13.5565 10.7805 13.5565 10.4496 13.3427 10.2433C13.129 10.037 12.7863 10.037 12.5726 10.2433L10.0444 12.688V2.02553C10.0444 1.73357 9.80242 1.5 9.5 1.5C9.19758 1.5 8.95565 1.73357 8.95565 2.02553V12.688L6.42339 10.2433C6.20968 10.037 5.86694 10.037 5.65323 10.2433C5.43952 10.4496 5.43952 10.7805 5.65323 10.9868L9.11694 14.3269Z" fill="#1777CF"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', padding: 16, background: '#FAF9E9', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', display: 'flex', flexDirection: 'column'}}><span style="color: 'black', fontSize: 14, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'">Regras:
+              </span><span style="color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'">Baixe cada um dos boletos acima apresentados e salve para pagamento nas datas estabelecidas. Esta página após baixar os boletos não ficará disponível.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', height: 35, justifyContent: 'flex-end', alignItems: 'center', gap: 15, display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', height: 40, paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, background: 'rgba(23, 119, 207, 0.40)', borderRadius: 6, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+          <div style={{color: '#FCFCFC', fontSize: 14, fontFamily: 'Inter', fontWeight: '500', wordWrap: 'break-word'}}>Enviar comprovante</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

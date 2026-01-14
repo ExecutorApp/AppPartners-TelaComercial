@@ -15,6 +15,7 @@ import Header from '../5.Side Menu/2.Header';
 import BottomMenu from '../5.Side Menu/3.BottomMenu';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import { Layout } from '../../constants/theme';
+import CustomersHomeScreenOptions from './1.CustomersHomeScreen-Options';
 
 type CustomerCard = {
   id: string;
@@ -181,6 +182,8 @@ const CustomersHomeScreen: React.FC = () => {
   const [activitiesValue, setActivitiesValue] = useState<string>('Todas');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [isKeymanMode, setIsKeymanMode] = useState<boolean>(false);
+  const [optionsModalVisible, setOptionsModalVisible] = useState<boolean>(false);
+  const [optionsAnchorPosition, setOptionsAnchorPosition] = useState<{ x: number; y: number } | null>(null);
 
   const customers: CustomerCard[] = useMemo(
     () => [
@@ -383,7 +386,16 @@ const CustomersHomeScreen: React.FC = () => {
                       {c.name}
                     </Text>
                     <TouchableOpacity
-                      onPress={() => console.log('[CustomersHomeScreen] Menu cliente', c.id)}
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        const { pageX, pageY } = e.nativeEvent as any;
+                        if (typeof pageX === 'number' && typeof pageY === 'number') {
+                          setOptionsAnchorPosition({ x: pageX, y: pageY });
+                        } else {
+                          setOptionsAnchorPosition(null);
+                        }
+                        setOptionsModalVisible(true);
+                      }}
                       hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
                       activeOpacity={0.7}
                     >
@@ -455,6 +467,11 @@ const CustomersHomeScreen: React.FC = () => {
         </ScrollView>
       </View>
 
+      <CustomersHomeScreenOptions
+        visible={optionsModalVisible}
+        anchorPosition={optionsAnchorPosition ?? undefined}
+        onClose={() => setOptionsModalVisible(false)}
+      />
       <BottomMenu activeScreen="Clients" />
       <SideMenuScreen isVisible={sideMenuVisible} onClose={() => setSideMenuVisible(false)} />
     </SafeAreaView>

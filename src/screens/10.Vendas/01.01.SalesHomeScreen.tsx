@@ -327,8 +327,16 @@ const SalesHomeScreen: React.FC = () => {
   };
 
   const handleSendWhatsApp = async () => {
-    const link = `https://partners.app/reuniao/${selectedAppointment?.id ?? 'novo'}`;
-    const message = encodeURIComponent(`Olá! Segue o link para pagamento: ${link}`);
+    const appointmentId = selectedAppointment?.id ?? 'novo';
+    const baseUrl = (() => {
+      if (Platform.OS !== 'web' || typeof window === 'undefined') return 'https://partners.app';
+      const origin = String(window.location.origin || '');
+      return origin
+        .replace('://localhost', '://127.0.0.1')
+        .replace('://[::1]', '://127.0.0.1');
+    })();
+    const link = `${baseUrl}/pagamento/${appointmentId}`;
+    const message = encodeURIComponent(`Segue o link para pagamento:\n${link}`);
     const appUrl = `whatsapp://send?text=${message}`;
     const webUrl = `https://wa.me/?text=${message}`;
     try {
@@ -344,7 +352,7 @@ const SalesHomeScreen: React.FC = () => {
   };
 
   const handleSendEmail = async () => {
-    const link = `https://partners.app/reuniao/${selectedAppointment?.id ?? 'novo'}`;
+    const link = `https://partners.app/pagamento/${selectedAppointment?.id ?? 'novo'}`;
     const subject = encodeURIComponent('Link de Pagamento - Partners');
     const body = encodeURIComponent(`Olá!\n\nSegue o link para pagamento:\n${link}\n\nAtenciosamente,\nEquipe Partners`);
     const mailUrl = `mailto:?subject=${subject}&body=${body}`;

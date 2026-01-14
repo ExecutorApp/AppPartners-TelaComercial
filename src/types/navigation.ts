@@ -6,6 +6,11 @@ export type RootStackParamList = {
   CustomersHome: undefined;
   Schedule: undefined;
   SalesHome: { autoOpenDiscount?: boolean } | undefined;
+  PaymentFlowHome: { appointmentId?: string } | undefined;
+  PaymentFlowPix: undefined;
+  PaymentFlowCreditCard: undefined;
+  PaymentFlowBankSlip: undefined;
+  PaymentFlowTed: undefined;
   CommissionsHome: undefined;
   DiscountSales: undefined;
   DiscountManage: undefined;
@@ -89,6 +94,11 @@ export const ScreenNames = {
   CustomersHome: 'CustomersHome' as const,
   Schedule: 'Schedule' as const,
   SalesHome: 'SalesHome' as const,
+  PaymentFlowHome: 'PaymentFlowHome' as const,
+  PaymentFlowPix: 'PaymentFlowPix' as const,
+  PaymentFlowCreditCard: 'PaymentFlowCreditCard' as const,
+  PaymentFlowBankSlip: 'PaymentFlowBankSlip' as const,
+  PaymentFlowTed: 'PaymentFlowTed' as const,
   CommissionsHome: 'CommissionsHome' as const,
   DiscountSales: 'DiscountSales' as const,
   DiscountManage: 'DiscountManage' as const,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, getStateFromPath as navigationGetStateFromPath } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SplashScreen } from '../screens/0.SplashScreen/SplashScreen';
 import { LoginScreen } from '../screens/1.Login/1. LoginScreen';
@@ -25,12 +25,33 @@ import CustomersHomeScreen from '../screens/8.Customers/1.CustomersHomeScreen';
 import CalendarHomeScreen from '../screens/9.Agenda/1.CalendarHomeScreen';
 import SalesHomeScreen from '../screens/10.Vendas/01.01.SalesHomeScreen';
 import CommissionsHomeScreen from '../screens/11.Comissões/01.CommissionsHomeScreen';
+import HomeScreenPaymentFlow from '../screens/12.FluxoDePagamento/1.HomeScreen-PaymentFlow';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
   return (
-    <NavigationContainer onStateChange={(state) => { try { console.log('[Nav] state changed', state); } catch {} }}>
+    <NavigationContainer
+      linking={{
+        prefixes: [
+          'https://partners.app',
+          'http://localhost',
+          'http://localhost:8081',
+          'http://localhost:19006',
+          'http://localhost:19000',
+        ],
+        config: {
+          screens: {
+            [ScreenNames.PaymentFlowHome]: 'pagamento/:appointmentId?',
+          },
+        },
+        getStateFromPath: (path, options) => {
+          const normalized = String(path).replace(/^\/?reuniao(\/|$)/, 'pagamento$1');
+          return navigationGetStateFromPath(normalized, options);
+        },
+      }}
+      onStateChange={(state) => { try { console.log('[Nav] state changed', state); } catch {} }}
+    >
       <Stack.Navigator
         initialRouteName={ScreenNames.Splash}
         screenOptions={{
@@ -216,6 +237,58 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <SalesHomeScreen />}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.PaymentFlowHome}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <HomeScreenPaymentFlow />}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.PaymentFlowPix}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => {
+            const Comp = require('../screens/12.FluxoDePagamento/2.PaymentFlow-Pix').default;
+            return <Comp />;
+          }}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.PaymentFlowCreditCard}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => {
+            const Comp = require('../screens/12.FluxoDePagamento/2.PaymentFlow-CreditCard').default;
+            return <Comp />;
+          }}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.PaymentFlowBankSlip}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => {
+            const Comp = require('../screens/12.FluxoDePagamento/2.PaymentFlow-BankSlip').default;
+            return <Comp />;
+          }}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.PaymentFlowTed}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => {
+            const Comp = require('../screens/12.FluxoDePagamento/2.PaymentFlow-Ted').default;
+            return <Comp />;
+          }}
         </Stack.Screen>
         <Stack.Screen
           name={ScreenNames.CommissionsHome}
