@@ -1,0 +1,264 @@
+<div style={{width: 325, paddingTop: 10, paddingBottom: 10, background: '#FCFCFC', borderRadius: 12, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 5, paddingBottom: 5, background: '#FCFCFC', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 15, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', background: 'rgba(0, 0, 0, 0)', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+        <div style={{alignSelf: 'stretch', height: 24, justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word'}}>Novo cliente</div>
+      </div>
+      <div data-svg-wrapper>
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="8" fill="#F4F4F4"/>
+        <rect width="38" height="38" rx="8" stroke="#EDF2F6"/>
+        <path d="M25.155 13.2479C24.7959 12.9179 24.2339 12.9173 23.874 13.2466L19 17.7065L14.126 13.2466C13.7661 12.9173 13.2041 12.9179 12.845 13.2479L12.7916 13.297C12.4022 13.6549 12.4029 14.257 12.7931 14.614L17.5863 19L12.7931 23.386C12.4029 23.743 12.4022 24.3451 12.7916 24.703L12.845 24.7521C13.2041 25.0821 13.7661 25.0827 14.126 24.7534L19 20.2935L23.874 24.7534C24.2339 25.0827 24.7959 25.0821 25.155 24.7521L25.2084 24.703C25.5978 24.3451 25.5971 23.743 25.2069 23.386L20.4137 19L25.2069 14.614C25.5971 14.257 25.5978 13.6549 25.2084 13.297L25.155 13.2479Z" fill="#3A3F51"/>
+        </svg>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 25, display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', paddingLeft: 3, justifyContent: 'flex-start', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+          <div style={{position: 'relative', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <img style={{width: 65, height: 80, borderRadius: 8}} src="https://placehold.co/65x80" />
+            <div data-svg-wrapper style={{left: 20, top: 68, position: 'absolute'}}>
+              <svg width="35" height="34" viewBox="0 0 35 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g filter="url(#filter0_dd_79_1788)">
+              <rect x="5" y="3" width="25" height="24" rx="12" fill="#FCFCFC"/>
+              <rect x="5.1" y="3.1" width="24.8" height="23.8" rx="11.9" stroke="#D8E0F0" stroke-width="0.2"/>
+              <path d="M21.5909 12.3714H20.0159C19.9411 12.3714 19.8674 12.3528 19.8014 12.3173C19.7355 12.2818 19.6792 12.2304 19.6377 12.1678L19.1334 11.4071C19.0504 11.2819 18.9379 11.1792 18.806 11.1082C18.674 11.0372 18.5267 11 18.377 11H16.623C16.4733 11 16.326 11.0372 16.194 11.1082C16.0621 11.1792 15.9496 11.2819 15.8666 11.4071L15.3623 12.1678C15.3208 12.2304 15.2645 12.2818 15.1986 12.3173C15.1326 12.3528 15.0589 12.3714 14.9841 12.3714H14.7727V12.1429C14.7727 12.0822 14.7488 12.0241 14.7062 11.9812C14.6635 11.9384 14.6057 11.9143 14.5455 11.9143H13.8636C13.8034 11.9143 13.7456 11.9384 13.7029 11.9812C13.6603 12.0241 13.6364 12.0822 13.6364 12.1429V12.3714H13.4091C13.168 12.3714 12.9368 12.4678 12.7663 12.6392C12.5958 12.8107 12.5 13.0432 12.5 13.2857V18.0857C12.5 18.3282 12.5958 18.5607 12.7663 18.7322C12.9368 18.9037 13.168 19 13.4091 19H21.5909C21.832 19 22.0632 18.9037 22.2337 18.7322C22.4042 18.5607 22.5 18.3282 22.5 18.0857V13.2857C22.5 13.0432 22.4042 12.8107 22.2337 12.6392C22.0632 12.4678 21.832 12.3714 21.5909 12.3714ZM17.5 18.0857C16.9831 18.0857 16.4778 17.9316 16.0479 17.6427C15.6181 17.3539 15.2831 16.9434 15.0853 16.4631C14.8875 15.9827 14.8357 15.4542 14.9366 14.9443C15.0374 14.4344 15.2864 13.9661 15.6519 13.5985C16.0174 13.2308 16.4831 12.9805 16.9901 12.8791C17.4971 12.7777 18.0226 12.8297 18.5002 13.0287C18.9778 13.2276 19.386 13.5645 19.6732 13.9968C19.9603 14.4291 20.1136 14.9373 20.1136 15.4571C20.1136 16.1543 19.8383 16.8229 19.3481 17.3158C18.858 17.8088 18.1932 18.0857 17.5 18.0857Z" fill="#3A3F51"/>
+              <path d="M17.5 13.7429C17.1629 13.7429 16.8333 13.8434 16.553 14.0318C16.2727 14.2201 16.0542 14.4879 15.9252 14.8011C15.7962 15.1144 15.7624 15.459 15.8282 15.7916C15.894 16.1241 16.0563 16.4296 16.2947 16.6693C16.5331 16.9091 16.8368 17.0723 17.1675 17.1385C17.4981 17.2046 17.8408 17.1707 18.1523 17.0409C18.4638 16.9112 18.73 16.6915 18.9173 16.4095C19.1046 16.1276 19.2045 15.7962 19.2045 15.4571C19.2045 15.0025 19.025 14.5665 18.7053 14.245C18.3856 13.9235 17.9521 13.7429 17.5 13.7429ZM17.5 16.4857C17.2288 16.4854 16.9689 16.3769 16.7772 16.1841C16.5854 15.9913 16.4776 15.7298 16.4773 15.4571C16.4773 15.3965 16.5012 15.3384 16.5438 15.2955C16.5865 15.2527 16.6443 15.2286 16.7045 15.2286C16.7648 15.2286 16.8226 15.2527 16.8653 15.2955C16.9079 15.3384 16.9318 15.3965 16.9318 15.4571C16.9318 15.6087 16.9917 15.754 17.0982 15.8612C17.2048 15.9684 17.3493 16.0286 17.5 16.0286C17.5603 16.0286 17.6181 16.0527 17.6607 16.0955C17.7033 16.1384 17.7273 16.1965 17.7273 16.2571C17.7273 16.3178 17.7033 16.3759 17.6607 16.4188C17.6181 16.4616 17.5603 16.4857 17.5 16.4857Z" fill="#3A3F51"/>
+              </g>
+              <defs>
+              <filter id="filter0_dd_79_1788" x="0" y="0" width="35" height="34" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+              <feOffset dy="2"/>
+              <feGaussianBlur stdDeviation="2.5"/>
+              <feComposite in2="hardAlpha" operator="out"/>
+              <feColorMatrix type="matrix" values="0 0 0 0 0.403922 0 0 0 0 0.431373 0 0 0 0 0.462745 0 0 0 0.08 0"/>
+              <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_79_1788"/>
+              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+              <feOffset dy="1"/>
+              <feGaussianBlur stdDeviation="0.5"/>
+              <feComposite in2="hardAlpha" operator="out"/>
+              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"/>
+              <feBlend mode="normal" in2="effect1_dropShadow_79_1788" result="effect2_dropShadow_79_1788"/>
+              <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_79_1788" result="shape"/>
+              </filter>
+              </defs>
+              </svg>
+            </div>
+          </div>
+          <div style={{background: '#FCFCFC', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div data-svg-wrapper style={{position: 'relative'}}>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_79_1792)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#1777CF"/>
+                <rect x="5" y="5" width="10" height="10" rx="5" fill="#1777CF"/>
+                </g>
+                <defs>
+                <clipPath id="clip0_79_1792">
+                <rect width="20" height="20" fill="white"/>
+                </clipPath>
+                </defs>
+                </svg>
+              </div>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Fisica</div>
+            </div>
+            <div style={{alignSelf: 'stretch', paddingTop: 1, paddingBottom: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+            </div>
+            <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div data-svg-wrapper>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_79_1799)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#6F7DA0" stroke="#FCFCFC"/>
+                </g>
+                <defs>
+                <clipPath id="clip0_79_1799">
+                <rect width="20" height="20" fill="white"/>
+                </clipPath>
+                </defs>
+                </svg>
+              </div>
+              <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Jurídica</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingTop: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 15, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{flex: '1 1 0', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#FCFCFC', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>01</div>
+            </div>
+            <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#FCFCFC', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>02</div>
+            </div>
+            <div style={{width: 40, height: 35, paddingLeft: 6, paddingRight: 6, paddingTop: 4, paddingBottom: 4, background: '#1777CF', borderRadius: 4, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#FCFCFC', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>03</div>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', height: 0, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.25px'}}></div>
+        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Keyman</div>
+            </div>
+            <div style={{alignSelf: 'stretch', paddingLeft: 10, paddingRight: 10, paddingTop: 5, paddingBottom: 5, background: '#FCFCFC', borderRadius: 8, outline: '1px #D8E0F0 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>João Fernando</div>
+              <div style={{justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.4 8.29995L6 9.69995L12 15.7L18 9.69995L16.6 8.29995L12 12.9L7.4 8.29995Z" fill="#7D8592"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+            <div style={{paddingLeft: 5, paddingRight: 5, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{color: '#0A1629', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Dados pessoais:</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Nome*</div>
+              </div>
+              <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Perola Marina Diniz</div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>CPF *</div>
+              </div>
+              <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>385.474.956-25</div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Email *</div>
+              </div>
+              <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>PerolaDiniz@hotmail.com</div>
+              </div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>WhatsApp</div>
+              </div>
+              <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>17 99246-0025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', paddingBottom: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+          <div style={{paddingLeft: 5, paddingRight: 5, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{color: '#0A1629', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Localização:</div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Estado</div>
+            </div>
+            <div style={{alignSelf: 'stretch', paddingLeft: 10, paddingRight: 10, paddingTop: 5, paddingBottom: 5, background: '#FCFCFC', borderRadius: 8, outline: '1px #D8E0F0 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>São Paulo</div>
+              <div style={{justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                <div data-svg-wrapper>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.3002 7.4L9.7002 6L15.7002 12L9.7002 18L8.3002 16.6L12.9002 12L8.3002 7.4Z" fill="#7D8592"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>CEP</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>15200-000</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Cidade</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>São José do Rio Preto</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Bairro</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Centro</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Endereço</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Piratininga </div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Número</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>650</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Complemento</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Sala 207</div>
+            </div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', paddingBottom: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+          <div style={{paddingLeft: 5, paddingRight: 5, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{color: '#0A1629', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Operação:</div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Valor patrimonial</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingTop: 5, paddingBottom: 5, paddingLeft: 10, paddingRight: 5, background: '#FCFCFC', borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 10.000.000,00</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Crédito tributário</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 200.000,00</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 63, overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', paddingLeft: 6, paddingRight: 6, justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', alignSelf: 'stretch', color: '#7D8592', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Planejamento tributário</div>
+            </div>
+            <div style={{alignSelf: 'stretch', height: 35, paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 8, outline: '0.50px #D8E0F0 solid', outlineOffset: '-0.50px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#3A3F51', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>R$ 200.000,00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{width: 293, height: 35, justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', alignSelf: 'stretch', paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, background: '#F4F4F4', borderRadius: 6, outline: '1px #D8E0F0 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+        <div style={{color: '#3A3F51', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Cancelar</div>
+      </div>
+      <div style={{flex: '1 1 0', alignSelf: 'stretch', paddingLeft: 10, paddingRight: 10, paddingTop: 15, paddingBottom: 15, background: '#1777CF', borderRadius: 6, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+        <div style={{color: '#FCFCFC', fontSize: 12, fontFamily: 'Inter', fontWeight: '600', wordWrap: 'break-word'}}>Criar</div>
+      </div>
+    </div>
+  </div>
+</div>

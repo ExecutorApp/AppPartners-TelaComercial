@@ -9,6 +9,7 @@ import InformationGroupProfileContent, {
 } from './02.01.InformationGroup-Profile';
 import InformationGroupContactsContent, { type Contact } from './02.02.InformationGroup-Contacts';
 import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact01';
+import type { ProfileFormData as ContactFormData } from './02.02.InformationGroup-Contacts-NewContact03';
 import InformationGroupRankContent from './02.03.InformationGroup-Rank';
 
 const COLORS = {
@@ -50,6 +51,8 @@ type ProfileSnapshot = {
   formData: {
     nome: string;
     cpfCnpj: string;
+    responsavelNome: string;
+    responsavelCpf: string;
     email: string;
     whatsapp: string;
     estado: string;
@@ -76,6 +79,8 @@ const buildProfileSnapshot = (formData: ProfileFormData, personType: PersonType)
   formData: {
     nome: String(formData.nome ?? ''),
     cpfCnpj: String(formData.cpfCnpj ?? ''),
+    responsavelNome: String(formData.responsavelNome ?? ''),
+    responsavelCpf: String(formData.responsavelCpf ?? ''),
     email: String(formData.email ?? ''),
     whatsapp: String(formData.whatsapp ?? ''),
     estado: String(formData.estado ?? ''),
@@ -94,6 +99,8 @@ const isSameProfileSnapshot = (a: ProfileSnapshot, b: ProfileSnapshot): boolean 
   return (
     a.formData.nome === b.formData.nome &&
     a.formData.cpfCnpj === b.formData.cpfCnpj &&
+    a.formData.responsavelNome === b.formData.responsavelNome &&
+    a.formData.responsavelCpf === b.formData.responsavelCpf &&
     a.formData.email === b.formData.email &&
     a.formData.whatsapp === b.formData.whatsapp &&
     a.formData.estado === b.formData.estado &&
@@ -149,6 +156,8 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
     () => ({
       nome: mode === 'criar' ? '' : (keymanName || 'Perola Marina Diniz'),
       cpfCnpj: mode === 'criar' ? '' : '385.474.956-25',
+      responsavelNome: '',
+      responsavelCpf: '',
       email: mode === 'criar' ? '' : 'PerolaDiniz@hotmail.com',
       whatsapp: mode === 'criar' ? '' : '17 99246-0025',
       estado: mode === 'criar' ? '' : 'São Paulo',
@@ -227,7 +236,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
     setShowNewContactModal(false);
   };
 
-  const handleSaveNewContact = (data: ProfileFormData) => {
+  const handleSaveNewContact = (data: ContactFormData) => {
     const name = String(data.nome ?? '').trim();
     const whatsapp = String(data.whatsapp ?? '').trim();
     const state = String(data.estado ?? '').trim();
@@ -247,7 +256,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
     ]);
   };
 
-  const handleSaveNewContacts = (items: ProfileFormData[]) => {
+  const handleSaveNewContacts = (items: ContactFormData[]) => {
     const now = Date.now();
     setContacts((prev) => [
       ...prev,

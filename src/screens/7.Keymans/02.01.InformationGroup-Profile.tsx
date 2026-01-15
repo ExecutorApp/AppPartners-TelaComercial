@@ -71,8 +71,10 @@ function maskCNPJ(input: string): string {
 }
 
 const getPlaceholderForField = (field: keyof ProfileFormData, personType: PersonType): string => {
-  if (field === 'nome') return 'Nome completo';
+  if (field === 'nome') return personType === 'fisica' ? 'Nome completo' : 'Razão social';
   if (field === 'cpfCnpj') return personType === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00';
+  if (field === 'responsavelNome') return 'Nome do responsável';
+  if (field === 'responsavelCpf') return '00000000000';
   if (field === 'email') return 'Email@teste.com';
   if (field === 'whatsapp') return '00 00000-0000';
   if (field === 'estado') return 'São Paulo';
@@ -167,6 +169,8 @@ export type ScreenMode = 'criar' | 'editar';
 export interface ProfileFormData {
   nome: string;
   cpfCnpj: string;
+  responsavelNome: string;
+  responsavelCpf: string;
   email: string;
   whatsapp: string;
   estado: string;
@@ -185,6 +189,9 @@ interface InformationGroupProfileProps {
   onUpdateFormField: (field: keyof ProfileFormData, value: string) => void;
   personType: PersonType;
   onSetPersonType: (type: PersonType) => void;
+  onLocalizacaoOffsetChange?: (offsetY: number) => void;
+  scrollRef?: React.RefObject<ScrollView | null>;
+  localizacaoSectionRef?: React.RefObject<View | null>;
 }
 
 const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
@@ -193,10 +200,14 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
   onUpdateFormField,
   personType,
   onSetPersonType,
+  onLocalizacaoOffsetChange,
+  scrollRef,
+  localizacaoSectionRef,
 }) => {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [touched, setTouched] = useState<{ [key in keyof ProfileFormData]?: boolean }>({});
   const [errors, setErrors] = useState<Partial<Record<keyof ProfileFormData, string>>>({});
+  const inputRefs = useRef<Partial<Record<keyof ProfileFormData, TextInput | null>>>({});
   const BRAZIL_STATES: string[] = useMemo(() => ([
     'AC - Acre','AL - Alagoas','AP - Amapá','AM - Amazonas','BA - Bahia','CE - Ceará','DF - Distrito Federal',
     'ES - Espírito Santo','GO - Goiás','MA - Maranhão','MT - Mato Grosso','MS - Mato Grosso do Sul','MG - Minas Gerais',
@@ -276,22 +287,147 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
     onUpdateFormField(field, value);
   };
 
+  const applyFieldValue = (field: keyof ProfileFormData, value: string) => {
+    if (field === 'nome') {
+      const formatted = formatNameFirstWordOnly(value);
+      updateFormField('nome', formatted);
+      const valid = formatted.trim().split(/\s+/).filter(Boolean).length >= 2;
+      setErrors({ ...errors, nome: valid ? undefined : 'Informe nome completo (mínimo duas palavras).' });
+      return;
+    }
+
+    if (field === 'cpfCnpj') {
+      if (personType === 'fisica') {
+        const masked = maskCPF(value);
+        updateFormField('cpfCnpj', masked);
+        const valid = isValidCPF(masked);
+        setErrors({ ...errors, cpfCnpj: valid || masked.length < 14 ? undefined : 'CPF inválido.' });
+      } else {
+        const masked = maskCNPJ(value);
+        updateFormField('cpfCnpj', masked);
+        const valid = isValidCNPJ(masked);
+        setErrors({ ...errors, cpfCnpj: valid || masked.length < 18 ? undefined : 'CNPJ inválido.' });
+      }
+      return;
+    }
+
+    if (field === 'responsavelNome') {
+      const normalized = (value || '').replace(/\s+/g, ' ');
+      const capped = capitalizeFirstLetterLive(normalized);
+      updateFormField('responsavelNome', capped);
+      setErrors({ ...errors, responsavelNome: capped.trim() ? undefined : 'Informe nome do responsável.' });
+      return;
+    }
+
+    if (field === 'responsavelCpf') {
+      const digits = sanitizeNumberField(value, 11);
+      updateFormField('responsavelCpf', digits);
+      const valid = isValidCPF(digits);
+      setErrors({ ...errors, responsavelCpf: valid || digits.length < 11 ? undefined : 'CPF inválido.' });
+      return;
+    }
+
+    if (field === 'email') {
+      const sanitized = sanitizeEmail(value);
+      updateFormField('email', sanitized);
+      const valid = isValidEmail(sanitized);
+      setErrors({ ...errors, email: valid ? undefined : 'Email inválido.' });
+      return;
+    }
+
+    if (field === 'whatsapp') {
+      const masked = maskWhatsApp(value);
+      updateFormField('whatsapp', masked);
+      const info = validateWhatsApp(masked);
+      const digits = (masked || '').replace(/\D+/g, '');
+      setErrors({ ...errors, whatsapp: info.valid || digits.length < 10 ? undefined : 'WhatsApp inválido (DDD e comprimento).' });
+      return;
+    }
+
+    if (field === 'cep') {
+      const masked = maskCEP(value);
+      updateFormField('cep', masked);
+      const valid = isValidCEP(masked);
+      setErrors({ ...errors, cep: valid || masked.length < 9 ? undefined : 'CEP inválido.' });
+      return;
+    }
+
+    if (field === 'cidade') {
+      const sanitized = sanitizeCityNeighborhood(value);
+      const cleaned = capitalizeFirstLetterLive(sanitized);
+      updateFormField('cidade', cleaned);
+      setErrors({ ...errors, cidade: cleaned.trim() ? undefined : 'Cidade é obrigatória.' });
+      return;
+    }
+
+    if (field === 'bairro') {
+      const sanitized = sanitizeCityNeighborhood(value);
+      const cleaned = capitalizeFirstLetterLive(sanitized);
+      updateFormField('bairro', cleaned);
+      setErrors({ ...errors, bairro: cleaned.trim() ? undefined : 'Bairro é obrigatório.' });
+      return;
+    }
+
+    if (field === 'endereco') {
+      const sanitized = sanitizeAddress(value);
+      const cleaned = capitalizeFirstLetterLive(sanitized);
+      updateFormField('endereco', cleaned);
+      setErrors({ ...errors, endereco: cleaned.trim() ? undefined : 'Endereço é obrigatório.' });
+      return;
+    }
+
+    if (field === 'numero') {
+      const cleaned = sanitizeNumberField(value, 6);
+      updateFormField('numero', cleaned);
+      setErrors({ ...errors, numero: cleaned.trim() ? undefined : 'Número é obrigatório.' });
+      return;
+    }
+
+    if (field === 'complemento') {
+      const sanitized = sanitizeComplement(value);
+      const cleaned = capitalizeFirstLetterLive(sanitized);
+      updateFormField('complemento', cleaned);
+      return;
+    }
+
+    updateFormField(field, value);
+  };
+
+  const clearField = (field: keyof ProfileFormData) => {
+    applyFieldValue(field, '');
+    setTimeout(() => {
+      setFocusedField(field);
+      inputRefs.current[field]?.focus?.();
+    }, 0);
+  };
+
+  const renderInputClearButton = (field: keyof ProfileFormData, value: string) => {
+    if (!value) return null;
+    return (
+      <TouchableOpacity
+        style={styles.inputClearButton}
+        activeOpacity={0.8}
+        onPress={() => clearField(field)}
+        accessibilityRole="button"
+        accessibilityLabel="Limpar campo"
+      >
+        <ClearIcon />
+      </TouchableOpacity>
+    );
+  };
+
   const renderPersonalInputs = () => (
     <>
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
-          <Text style={styles.inputLabel}>Nome*</Text>
+          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'Nome*' : 'Razão social*'}</Text>
         </View>
         <View style={[styles.inputContainer, focusedField === 'nome' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.nome = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.nome}
-            onChangeText={(value) => {
-              const formatted = formatNameFirstWordOnly(value);
-              updateFormField('nome', formatted);
-              const valid = formatted.trim().split(/\s+/).filter(Boolean).length >= 2;
-              setErrors({ ...errors, nome: valid ? undefined : 'Informe nome completo (mínimo duas palavras).' });
-            }}
+            onChangeText={(value) => applyFieldValue('nome', value)}
             onFocus={() => setFocusedField('nome')}
             onBlur={() => { setFocusedField(null); setTouched({ ...touched, nome: true }); }}
             placeholder={getPlaceholderForField('nome', personType)}
@@ -299,6 +435,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('nome', formData.nome)}
         </View>
         {(errors.nome && touched.nome) ? <Text style={styles.errorText}>{errors.nome}</Text> : null}
       </View>
@@ -309,21 +446,10 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'cpfCnpj' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.cpfCnpj = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.cpfCnpj}
-            onChangeText={(value) => {
-              if (personType === 'fisica') {
-                const masked = maskCPF(value);
-                updateFormField('cpfCnpj', masked);
-                const valid = isValidCPF(masked);
-                setErrors({ ...errors, cpfCnpj: valid || masked.length < 14 ? undefined : 'CPF inválido.' });
-              } else {
-                const masked = maskCNPJ(value);
-                updateFormField('cpfCnpj', masked);
-                const valid = isValidCNPJ(masked);
-                setErrors({ ...errors, cpfCnpj: valid || masked.length < 18 ? undefined : 'CNPJ inválido.' });
-              }
-            }}
+            onChangeText={(value) => applyFieldValue('cpfCnpj', value)}
             onFocus={() => setFocusedField('cpfCnpj')}
             onBlur={() => { setFocusedField(null); setTouched({ ...touched, cpfCnpj: true }); }}
             placeholder={getPlaceholderForField('cpfCnpj', personType)}
@@ -333,9 +459,68 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('cpfCnpj', formData.cpfCnpj)}
         </View>
         {(errors.cpfCnpj && touched.cpfCnpj) ? <Text style={styles.errorText}>{errors.cpfCnpj}</Text> : null}
       </View>
+
+      {personType === 'juridica' ? (
+        <>
+          <View style={styles.inputGroup}>
+            <View style={styles.labelContainer}>
+              <Text style={styles.inputLabel}>Nome do responsável*</Text>
+            </View>
+            <View style={[styles.inputContainer, focusedField === 'responsavelNome' ? styles.inputFocused : null]}>
+              <TextInput
+                ref={(r) => { inputRefs.current.responsavelNome = r; }}
+                style={[styles.input, styles.inputWithClear]}
+                value={formData.responsavelNome}
+                onChangeText={(value) => applyFieldValue('responsavelNome', value)}
+                onFocus={() => setFocusedField('responsavelNome')}
+                onBlur={() => {
+                  setFocusedField(null);
+                  setTouched({ ...touched, responsavelNome: true });
+                  setErrors({ ...errors, responsavelNome: formData.responsavelNome.trim() ? undefined : 'Informe nome do responsável.' });
+                }}
+                placeholder={getPlaceholderForField('responsavelNome', personType)}
+                placeholderTextColor={COLORS.textTertiary}
+                selectionColor={COLORS.primary}
+                cursorColor={COLORS.primary}
+              />
+              {renderInputClearButton('responsavelNome', formData.responsavelNome)}
+            </View>
+            {(errors.responsavelNome && touched.responsavelNome) ? <Text style={styles.errorText}>{errors.responsavelNome}</Text> : null}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <View style={styles.labelContainer}>
+              <Text style={styles.inputLabel}>CPF do responsável*</Text>
+            </View>
+            <View style={[styles.inputContainer, focusedField === 'responsavelCpf' ? styles.inputFocused : null]}>
+              <TextInput
+                ref={(r) => { inputRefs.current.responsavelCpf = r; }}
+                style={[styles.input, styles.inputWithClear]}
+                value={formData.responsavelCpf}
+                onChangeText={(value) => applyFieldValue('responsavelCpf', value)}
+                onFocus={() => setFocusedField('responsavelCpf')}
+                onBlur={() => {
+                  setFocusedField(null);
+                  setTouched({ ...touched, responsavelCpf: true });
+                  setErrors({ ...errors, responsavelCpf: formData.responsavelCpf.trim() ? errors.responsavelCpf : 'CPF do responsável é obrigatório.' });
+                }}
+                placeholder={getPlaceholderForField('responsavelCpf', personType)}
+                placeholderTextColor={COLORS.textTertiary}
+                keyboardType="numeric"
+                maxLength={11}
+                selectionColor={COLORS.primary}
+                cursorColor={COLORS.primary}
+              />
+              {renderInputClearButton('responsavelCpf', formData.responsavelCpf)}
+            </View>
+            {(errors.responsavelCpf && touched.responsavelCpf) ? <Text style={styles.errorText}>{errors.responsavelCpf}</Text> : null}
+          </View>
+        </>
+      ) : null}
 
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
@@ -343,14 +528,10 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'email' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.email = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.email}
-            onChangeText={(value) => {
-              const sanitized = sanitizeEmail(value);
-              updateFormField('email', sanitized);
-              const valid = isValidEmail(sanitized);
-              setErrors({ ...errors, email: valid ? undefined : 'Email inválido.' });
-            }}
+            onChangeText={(value) => applyFieldValue('email', value)}
             onFocus={() => setFocusedField('email')}
             onBlur={() => { setFocusedField(null); setTouched({ ...touched, email: true }); }}
             placeholder={getPlaceholderForField('email', personType)}
@@ -360,6 +541,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('email', formData.email)}
         </View>
         {(errors.email && touched.email) ? <Text style={styles.errorText}>{errors.email}</Text> : null}
       </View>
@@ -370,15 +552,10 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'whatsapp' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.whatsapp = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.whatsapp}
-            onChangeText={(value) => {
-              const masked = maskWhatsApp(value);
-              updateFormField('whatsapp', masked);
-              const info = validateWhatsApp(masked);
-              const digits = (masked || '').replace(/\D+/g, '');
-              setErrors({ ...errors, whatsapp: info.valid || digits.length < 10 ? undefined : 'WhatsApp inválido (DDD e comprimento).' });
-            }}
+            onChangeText={(value) => applyFieldValue('whatsapp', value)}
             onFocus={() => setFocusedField('whatsapp')}
             onBlur={() => { setFocusedField(null); setTouched({ ...touched, whatsapp: true }); }}
             placeholder={getPlaceholderForField('whatsapp', personType)}
@@ -387,6 +564,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('whatsapp', formData.whatsapp)}
         </View>
         {(errors.whatsapp && touched.whatsapp) ? <Text style={styles.errorText}>{errors.whatsapp}</Text> : null}
       </View>
@@ -435,6 +613,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </TouchableWithoutFeedback>
         <View style={styles.dropdownModalContainer} pointerEvents="box-none">
           <View style={styles.dropdownContainer}>
+            {/* Título do modal de seleção de estado (melhora legibilidade e padroniza UX) */}
+            <Text style={styles.dropdownTitle}>Selecione um estado</Text>
             <View style={styles.searchBar}>
               <TextInput
                 style={[
@@ -481,7 +661,10 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
                   >
                     <Text style={styles.stateItemText}>{label}</Text>
                   </TouchableOpacity>
+                  {/* Divisória entre as opções (mesmo padrão visual anterior) */}
                   <View style={styles.stateDivider} />
+                  {/* Espaçamento visual entre opções de estado (15px) */}
+                  <View style={styles.stateItemSpacing} />
                 </View>
               ))}
             </Animated.ScrollView>
@@ -495,7 +678,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'cep' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.cep = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.cep}
             onChangeText={(value) => {
               const masked = maskCEP(value);
@@ -512,6 +696,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('cep', formData.cep)}
         </View>
         {(errors.cep && touched.cep) ? <Text style={styles.errorText}>{errors.cep}</Text> : null}
       </View>
@@ -522,7 +707,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'cidade' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.cidade = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.cidade}
             onChangeText={(value) => {
               const sanitized = sanitizeCityNeighborhood(value);
@@ -537,6 +723,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('cidade', formData.cidade)}
         </View>
         {(errors.cidade && touched.cidade) ? <Text style={styles.errorText}>{errors.cidade}</Text> : null}
       </View>
@@ -547,7 +734,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'bairro' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.bairro = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.bairro}
             onChangeText={(value) => {
               const sanitized = sanitizeCityNeighborhood(value);
@@ -562,6 +750,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('bairro', formData.bairro)}
         </View>
         {(errors.bairro && touched.bairro) ? <Text style={styles.errorText}>{errors.bairro}</Text> : null}
       </View>
@@ -572,7 +761,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'endereco' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.endereco = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.endereco}
             onChangeText={(value) => {
               const sanitized = sanitizeAddress(value);
@@ -587,6 +777,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('endereco', formData.endereco)}
         </View>
         {(errors.endereco && touched.endereco) ? <Text style={styles.errorText}>{errors.endereco}</Text> : null}
       </View>
@@ -597,7 +788,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'numero' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.numero = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.numero}
             onChangeText={(value) => {
               const cleaned = sanitizeNumberField(value, 6);
@@ -612,6 +804,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('numero', formData.numero)}
         </View>
         {(errors.numero && touched.numero) ? <Text style={styles.errorText}>{errors.numero}</Text> : null}
       </View>
@@ -622,7 +815,8 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
         <View style={[styles.inputContainer, focusedField === 'complemento' ? styles.inputFocused : null]}>
           <TextInput
-            style={styles.input}
+            ref={(r) => { inputRefs.current.complemento = r; }}
+            style={[styles.input, styles.inputWithClear]}
             value={formData.complemento}
             onChangeText={(value) => {
               const sanitized = sanitizeComplement(value);
@@ -636,6 +830,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
             selectionColor={COLORS.primary}
             cursorColor={COLORS.primary}
           />
+          {renderInputClearButton('complemento', formData.complemento)}
         </View>
       </View>
     </>
@@ -643,18 +838,11 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
   const renderProfileForm = () => (
     <ScrollView
+      ref={scrollRef as any}
       style={styles.formContainer}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.formContent}>
-        {/* Título */}
-        <View style={styles.titleSection}>
-          <Text style={styles.screenTitle}>
-            {mode === 'criar' ? 'Criar Perfil' : 'Editar Perfil'}
-          </Text>
-          <View style={styles.titleDivider} />
-        </View>
-
         {/* Foto e tipo de pessoa */}
         <View style={styles.photoTypeSection}>
           <View style={styles.photoContainer}>
@@ -700,7 +888,11 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         </View>
 
         {/* Localização */}
-        <View style={styles.sectionContainer}>
+        <View
+          style={styles.sectionContainer}
+          ref={localizacaoSectionRef as any}
+          onLayout={(e) => onLocalizacaoOffsetChange?.(e.nativeEvent.layout.y)}
+        >
           <Text style={styles.sectionTitle}>Localização:</Text>
           {renderLocationInputs()}
         </View>
@@ -715,12 +907,12 @@ const styles = StyleSheet.create({
   // Containers
   formContainer: {
     flex: 1,
-    paddingHorizontal: 16,
   },
   formContent: {
     paddingTop: 2,
     paddingBottom: 0,
     gap: 15,
+    paddingHorizontal: 15,
   },
   // Título
   titleSection: {
@@ -818,6 +1010,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     justifyContent: 'center',
     paddingHorizontal: 10,
+    position: 'relative',
   },
   input: {
     flex: 1,
@@ -831,6 +1024,18 @@ const styles = StyleSheet.create({
           outlineColor: 'transparent',
         } as any)
       : {}),
+  },
+  inputWithClear: {
+    paddingRight: 28,
+  },
+  inputClearButton: {
+    position: 'absolute',
+    right: 6,
+    top: 0,
+    bottom: 0,
+    width: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   inputFocused: {
     borderColor: COLORS.primary,
@@ -887,6 +1092,13 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     padding: 10,
   },
+  dropdownTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+    color: COLORS.textPrimary,
+    marginBottom: 10,
+    paddingHorizontal: 2,
+  },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -934,6 +1146,9 @@ const styles = StyleSheet.create({
   stateDivider: {
     height: 0.5,
     backgroundColor: COLORS.border,
+  },
+  stateItemSpacing: {
+    height: 15,
   },
 });
 

@@ -16,6 +16,8 @@ import BottomMenu from '../5.Side Menu/3.BottomMenu';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import { Layout } from '../../constants/theme';
 import CustomersHomeScreenOptions from './1.CustomersHomeScreen-Options';
+import CreateAndEditProfile from './2.CreateAndEditProfile';
+import CustomersInformationGroupOrchestrator from './3.0.InformationGroup-Orchestrator';
 
 type CustomerCard = {
   id: string;
@@ -184,9 +186,18 @@ const CustomersHomeScreen: React.FC = () => {
   const [isKeymanMode, setIsKeymanMode] = useState<boolean>(false);
   const [optionsModalVisible, setOptionsModalVisible] = useState<boolean>(false);
   const [optionsAnchorPosition, setOptionsAnchorPosition] = useState<{ x: number; y: number } | null>(null);
+  const [createEditVisible, setCreateEditVisible] = useState<boolean>(false);
+  // Controla qual cliente foi usado para abrir o modal de opções (ex.: Editar Perfil)
+  const [optionsCustomerId, setOptionsCustomerId] = useState<string | null>(null);
+  // Controla o modo do modal de perfil (criar/editar)
+  const [createEditMode, setCreateEditMode] = useState<'criar' | 'editar'>('criar');
+  // Guarda o cliente que está sendo editado (usado para salvar alterações no card correto)
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
+  // Dados iniciais do modal de perfil (reutiliza o tipo do próprio componente para manter consistência)
+  const [createEditInitialData, setCreateEditInitialData] = useState<React.ComponentProps<typeof CreateAndEditProfile>['initialData']>(undefined);
+  const [infoGroupVisible, setInfoGroupVisible] = useState<boolean>(false);
 
-  const customers: CustomerCard[] = useMemo(
-    () => [
+  const [customers, setCustomers] = useState<CustomerCard[]>(() => [
       {
         id: '1',
         name: 'Camila Betanea',
@@ -224,9 +235,7 @@ const CustomersHomeScreen: React.FC = () => {
         keyman: 'Maria Madalena',
         statusId: 6,
       },
-    ],
-    []
-  );
+    ]);
 
   const filteredCustomers = useMemo(() => {
     const q = searchText.trim().toLowerCase();
@@ -260,7 +269,11 @@ const CustomersHomeScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.newCustomerButton}
             onPress={() => {
-              console.log('[CustomersHomeScreen] Novo Cliente');
+              // Abertura do modal em modo "criar" (Novo Cliente)
+              setCreateEditMode('criar');
+              setEditingCustomerId(null);
+              setCreateEditInitialData(undefined);
+              setCreateEditVisible(true);
             }}
             activeOpacity={0.7}
           >
@@ -363,6 +376,7 @@ const CustomersHomeScreen: React.FC = () => {
                 activeOpacity={0.8}
                 onPress={() => {
                   setSelectedCustomerId(c.id);
+                  setInfoGroupVisible(true);
                 }}
               >
                 <View style={styles.cardLeft}>
@@ -394,6 +408,8 @@ const CustomersHomeScreen: React.FC = () => {
                         } else {
                           setOptionsAnchorPosition(null);
                         }
+                        // Mantém referência do card que abriu o menu de opções (3 pontinhos)
+                        setOptionsCustomerId(c.id);
                         setOptionsModalVisible(true);
                       }}
                       hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -467,12 +483,93 @@ const CustomersHomeScreen: React.FC = () => {
         </ScrollView>
       </View>
 
+      {infoGroupVisible && (
+        <View style={styles.fullScreenOverlay}>
+          <CustomersInformationGroupOrchestrator
+            visible={infoGroupVisible}
+            onClose={() => setInfoGroupVisible(false)}
+            initialTab="perfil"
+            customerName={customers.find((x) => x.id === selectedCustomerId)?.name}
+            initialData={{
+              whatsapp: customers.find((x) => x.id === selectedCustomerId)?.whatsapp || '',
+              estado: 'São Paulo',
+              cep: '15200-000',
+              cidade: 'São José do Rio Preto',
+              bairro: 'Centro',
+              endereco: 'Piratininga',
+              numero: '650',
+              complemento: 'Sala 207',
+            }}
+          />
+        </View>
+      )}
+
       <CustomersHomeScreenOptions
         visible={optionsModalVisible}
         anchorPosition={optionsAnchorPosition ?? undefined}
         onClose={() => setOptionsModalVisible(false)}
+        onEditProfile={() => {
+          // Abre o modal de perfil no modo "editar" ao clicar em "Editar Perfil"
+          const id = optionsCustomerId;
+          if (!id) return;
+          const customer = customers.find((c) => c.id === id);
+          if (!customer) return;
+          setCreateEditMode('editar');
+          setEditingCustomerId(id);
+          setCreateEditInitialData({
+            personType: 'fisica',
+            nome: customer.name,
+            whatsapp: customer.whatsapp,
+          });
+          setCreateEditVisible(true);
+        }}
       />
-      <BottomMenu activeScreen="Clients" />
+      <CreateAndEditProfile
+        visible={createEditVisible}
+        mode={createEditMode}
+        initialData={createEditInitialData}
+        onClose={() => {
+          // Limpa estado do modal ao fechar (evita reaproveitar dados de edição em futuras aberturas)
+          setCreateEditVisible(false);
+          setCreateEditMode('criar');
+          setEditingCustomerId(null);
+          setCreateEditInitialData(undefined);
+        }}
+        onSave={(payload) => {
+          if (createEditMode === 'editar') {
+            // Salva alterações do perfil no card existente (modo edição)
+            const id = editingCustomerId;
+            if (!id) return;
+            const name = (payload?.nome || '').trim() || 'Editar perfil';
+            setCustomers((prev) =>
+              prev.map((c) =>
+                c.id === id
+                  ? { ...c, name, whatsapp: payload?.whatsapp || c.whatsapp }
+                  : c
+              )
+            );
+            return;
+          }
+          // Cria novo cliente (modo criação)
+          const id = `${Date.now()}`;
+          const name = (payload?.nome || '').trim() || 'Novo cliente';
+          const newCustomer: CustomerCard = {
+            id,
+            name,
+            productDate: '—',
+            productName: '—',
+            phaseDate: '—',
+            phaseName: '—',
+            activitiesProgress: '00/00',
+            whatsapp: payload?.whatsapp || '',
+            keyman: 'Sem indicação',
+            statusId: 1,
+          };
+          setCustomers((prev) => [newCustomer, ...prev]);
+          setSelectedCustomerId(id);
+        }}
+      />
+      {!infoGroupVisible ? <BottomMenu activeScreen="Clients" /> : null}
       <SideMenuScreen isVisible={sideMenuVisible} onClose={() => setSideMenuVisible(false)} />
     </SafeAreaView>
   );
@@ -744,6 +841,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
     color: '#3A3F51',
+  },
+  fullScreenOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FCFCFC',
+    zIndex: 1000,
+    ...(Platform.OS !== 'web' ? { elevation: 100 } : {}),
   },
 });
 

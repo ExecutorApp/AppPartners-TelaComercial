@@ -173,6 +173,7 @@ type StepperProps = {
   onStepRight: () => void;
   onSelectTab: (tab: number) => void;
   tabsWithErrors?: number[];
+  showArrows?: boolean;
 };
 
 export const Stepper: React.FC<StepperProps> = ({
@@ -184,6 +185,7 @@ export const Stepper: React.FC<StepperProps> = ({
   onStepRight,
   onSelectTab,
   tabsWithErrors,
+  showArrows = true,
 }) => {
   const scrollRef = useRef<ScrollView | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -218,17 +220,24 @@ export const Stepper: React.FC<StepperProps> = ({
 
   return (
     <View style={styles.stepperRow}>
-      <TouchableOpacity activeOpacity={0.8} onPress={onStepLeft} disabled={!canGoLeft} style={styles.stepperArrowLeftContainer}>
-        <StepArrowButtonIcon direction="left" disabled={!canGoLeft} />
-      </TouchableOpacity>
+      {showArrows ? (
+        <TouchableOpacity activeOpacity={0.8} onPress={onStepLeft} disabled={!canGoLeft} style={styles.stepperArrowLeftContainer}>
+          <StepArrowButtonIcon direction="left" disabled={!canGoLeft} />
+        </TouchableOpacity>
+      ) : null}
 
-      <View style={styles.stepperCenter} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+      <View style={[styles.stepperCenter, !showArrows ? { justifyContent: 'center' } : null]} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
         <ScrollView
           ref={scrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
           bounces={false}
-          contentContainerStyle={{ alignItems: 'center', paddingLeft: SAFE_PAD, paddingRight: SAFE_PAD }}
+          contentContainerStyle={{
+            alignItems: 'center',
+            paddingLeft: SAFE_PAD,
+            paddingRight: SAFE_PAD,
+            ...(showArrows ? null : { flexGrow: 1, justifyContent: 'center' }),
+          }}
         >
           {tabs.map((step, idx) => (
             <TouchableOpacity
@@ -256,9 +265,11 @@ export const Stepper: React.FC<StepperProps> = ({
         </ScrollView>
       </View>
 
-      <TouchableOpacity activeOpacity={0.8} onPress={onStepRight} disabled={!canGoRight} style={styles.stepperArrowRightContainer}>
-        <StepArrowButtonIcon direction="right" disabled={!canGoRight} />
-      </TouchableOpacity>
+      {showArrows ? (
+        <TouchableOpacity activeOpacity={0.8} onPress={onStepRight} disabled={!canGoRight} style={styles.stepperArrowRightContainer}>
+          <StepArrowButtonIcon direction="right" disabled={!canGoRight} />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };

@@ -129,11 +129,14 @@ const CustomersHomeScreenOptions: React.FC<CustomersHomeScreenOptionsProps> = ({
   const resolvePositionStyle = () => {
     if (!anchorPosition) return null;
 
+    // Ajustes de posicionamento do modal:
+    // - Para mover para a esquerda/direita: ajuste o offset do "rawLeft"
+    // - Para subir/descer: ajuste o cálculo do "rawTop"
     const width = MODAL_WIDTH;
-    const rawLeft = anchorPosition.x - width - 16;
+    const rawLeft = anchorPosition.x - width - 20;
     const clampedLeft = Math.max(MODAL_EDGE, Math.min(rawLeft, viewport.width - width - MODAL_EDGE));
 
-    const rawTop = modalHeight > 0 ? anchorPosition.y - modalHeight * 0.5 : anchorPosition.y;
+    const rawTop = modalHeight > 0 ? anchorPosition.y - modalHeight * 0.05 : anchorPosition.y;
     const clampedTop = Math.max(MODAL_EDGE, Math.min(rawTop, viewport.height - modalHeight - MODAL_EDGE));
 
     return {
@@ -210,7 +213,7 @@ const CustomersHomeScreenOptions: React.FC<CustomersHomeScreenOptionsProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContainer: {
     position: 'absolute',
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     paddingHorizontal: 15,
     paddingVertical: 12,
-    gap: 10,
+    gap: 15,
   },
   optionItem: {
     flexDirection: 'row',
