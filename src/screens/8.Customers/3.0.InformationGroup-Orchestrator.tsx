@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import CustomersInformationGroupProfile, { type ProfileFormData } from './3.1.InformationGroup-Profile';
-import CustomersInformationGroupSalesFlowOrchestrator from './3.2.InformationGroup-SalesFlow-Orchestrator';
+import CustomersInformationGroupSalesFlowOrchestrator, { type SalesFlowTab } from './3.2.InformationGroup-SalesFlow-Orchestrator';
 
 const COLORS = {
   primary: '#1777CF',
@@ -53,6 +53,29 @@ const CustomersInformationGroupOrchestrator: React.FC<OrchestratorProps> = ({
   });
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  // ========================================
+  // ESTADO DO FLUXO DE VENDAS (persiste entre mudancas de aba)
+  // ========================================
+  const [salesFlowProductId, setSalesFlowProductId] = useState<string | null>(null);
+  const [salesFlowPhaseId, setSalesFlowPhaseId] = useState<string | null>(null);
+  const [salesFlowActiveTab, setSalesFlowActiveTab] = useState<SalesFlowTab>('produtos');
+
+  // Callback para selecao de produto (limpa fase ao mudar produto)
+  const handleSalesFlowProductSelect = useCallback((productId: string) => {
+    setSalesFlowProductId(productId);
+    setSalesFlowPhaseId(null); // Ao mudar de produto, limpa a fase selecionada
+  }, []);
+
+  // Callback para selecao de fase
+  const handleSalesFlowPhaseSelect = useCallback((phaseId: string) => {
+    setSalesFlowPhaseId(phaseId);
+  }, []);
+
+  // Callback para mudanca de aba no fluxo de vendas
+  const handleSalesFlowTabChange = useCallback((tab: SalesFlowTab) => {
+    setSalesFlowActiveTab(tab);
+  }, []);
 
   const formData = useMemo<ProfileFormData>(
     () => ({
@@ -120,7 +143,16 @@ const CustomersInformationGroupOrchestrator: React.FC<OrchestratorProps> = ({
 
       <View style={styles.content}>
         {activeTab === 'perfil' && <CustomersInformationGroupProfile formData={formData} keymanLabel="Sem indicação..." />}
-        {activeTab === 'fluxo' && <CustomersInformationGroupSalesFlowOrchestrator />}
+        {activeTab === 'fluxo' && (
+          <CustomersInformationGroupSalesFlowOrchestrator
+            selectedProductId={salesFlowProductId}
+            selectedPhaseId={salesFlowPhaseId}
+            activeTab={salesFlowActiveTab}
+            onProductSelect={handleSalesFlowProductSelect}
+            onPhaseSelect={handleSalesFlowPhaseSelect}
+            onTabChange={handleSalesFlowTabChange}
+          />
+        )}
         {activeTab === 'documentos' && <View style={styles.placeholder} />}
         {activeTab === 'rank' && <View style={styles.placeholder} />}
       </View>

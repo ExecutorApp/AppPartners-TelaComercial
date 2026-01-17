@@ -1,0 +1,2741 @@
+/**
+ * ----------------------------------------===================================
+ * 3.2.InformationGroup-SalesFlow-Activities-Chat.tsx
+ * ----------------------------------------===================================
+ * Tela de chat para atividades do fluxo de vendas.
+ * Estilo WhatsApp para comunicacao entre membros do time operacional.
+ * ----------------------------------------===================================
+ */
+
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  memo,
+} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  ScrollView,
+  TextInput,
+  Image,
+  Keyboard,
+  Dimensions,
+  useWindowDimensions,
+  Alert,
+  Platform,
+  Modal,
+  GestureResponderEvent, // Adicionado para controle de scrub na faixa de audio
+  LayoutChangeEvent, // Adicionado para calcular largura da faixa de audio
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path, Rect } from 'react-native-svg';
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import { Audio } from 'expo-av';
+
+// ----------------------------------------===================================
+// Importacao dos componentes do chat
+// ----------------------------------------===================================
+import EmojiContainer from './3.2.InformationGroup-SalesFlow-Activities-Chat-Emoji';
+import { ChatImageMessage } from './3.2.InformationGroup-SalesFlow-Activities-Chat-Image';
+import { MessageAudioPlayer, ChatAudioInput, MessageAudioPlayerRef } from './3.2.InformationGroup-SalesFlow-Activities-Chat-Audio';
+import DiscountChatCallModal from './3.2.InformationGroup-SalesFlow-Activities-Chat-Call';
+import ActivitiesChatMenu, { Activity } from './3.2.InformationGroup-SalesFlow-Activities-Chat-Menu';
+import StatusActivitiesModal, {
+  ActivityInfo,
+  ActivityStatus,
+  CollaboratorInfo,
+  InternalEvent,
+  RequiredDocument,
+  StartedStatusData,
+  CompletedStatusData,
+  ProductStatusInfo,
+  PhaseStatusInfo,
+} from './3.2.InformationGroup-SalesFlow-Activities-Chat-StatusActivities';
+
+// ----------------------------------------===================================
+// Constantes de Layout
+// ----------------------------------------===================================
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
+// Altura do header: marginTop (10px) + altura do botao (35px) + marginBottom (5px) = 50px
+const HEADER_HEIGHT = 50;
+const CONTACT_HEIGHT = 100;
+const INPUT_HEIGHT = 40;
+const BOTTOM_MARGIN = 0;
+const OPTIONS_HEIGHT = 90;
+const INPUT_BOTTOM_PADDING = 15;
+const CHAT_INPUT_GAP = 10;
+const OPTIONS_BOTTOM_PADDING = 10;
+const EMOJI_BOTTOM_PADDING = 10;
+const EMOJI_HEIGHT = 290;
+
+type BottomPanelState = 'none' | 'options' | 'emoji';
+
+// ----------------------------------------===================================
+// Interfaces
+// ----------------------------------------===================================
+
+interface ChatMessage {
+  id: string;
+  type: 'text' | 'audio' | 'sticker' | 'image';
+  content: string;
+  sender: 'user' | 'contact';
+  timestamp: string;
+  audioDuration?: string;
+  stickerEmoji?: string;
+  audioUri?: string;
+  imageUri?: string;
+  senderName?: string;
+  senderAvatar?: any;
+}
+
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  activityTitle?: string;
+  initialActivityId?: string; // ID da atividade inicial a ser selecionada
+};
+
+// ----------------------------------------===================================
+// Dados Iniciais - Conversa do Time Operacional
+// ----------------------------------------===================================
+
+const INIT_MSGS: ChatMessage[] = [
+  {
+    id: '1',
+    type: 'text',
+    content: 'Porque o cliente esta em atraso?',
+    sender: 'user',
+    timestamp: '08:15',
+    senderName: 'Voce',
+  },
+  {
+    id: '2',
+    type: 'text',
+    content: 'Ele disse que esta viajando vai enviar a nota quando retornar.',
+    sender: 'contact',
+    timestamp: '14:45',
+    senderName: 'Gabriela',
+  },
+  {
+    id: '3',
+    type: 'audio',
+    content: 'audio',
+    sender: 'contact',
+    timestamp: '08:42',
+    audioDuration: '0:16',
+    senderName: 'Gabriela',
+  },
+  {
+    id: '4',
+    type: 'audio',
+    content: 'audio',
+    sender: 'contact',
+    timestamp: '08:42',
+    audioDuration: '0:16',
+    senderName: 'Gabriela',
+  },
+  {
+    id: '5',
+    type: 'audio',
+    content: 'audio',
+    sender: 'contact',
+    timestamp: '14:45',
+    audioDuration: '0:05',
+    senderName: 'Barbara',
+  },
+  {
+    id: '6',
+    type: 'audio',
+    content: 'audio',
+    sender: 'contact',
+    timestamp: '14:45',
+    audioDuration: '0:05',
+    senderName: 'Barbara',
+  },
+];
+
+const RESPONSES = ['Entendi, vou analisar.', 'Deixa comigo.', 'Perfeito!', 'Ok, aguarde.', 'Certo!', 'Recebido!', 'Beleza!', 'Vou verificar.'];
+
+// ----------------------------------------===================================
+// Dados Mock - Atividades do Menu
+// ----------------------------------------===================================
+
+const MOCK_ACTIVITIES: Activity[] = [
+  { id: '1', number: '01', title: 'Upload lista de Keymans', status: 'completed', hasInteraction: true },
+  { id: '2', number: '02', title: 'Reuniao semanal Keymans', status: 'started', hasInteraction: false },
+  { id: '3', number: '03', title: 'Geracao de evento (Grupo)', status: 'started', hasInteraction: false },
+  { id: '4', number: '04', title: '3 Indicacoes Keymans', status: 'not_started', hasInteraction: false },
+  { id: '5', number: '05', title: '3 Clientes Keymans', status: 'not_started', hasInteraction: false },
+  { id: '6', number: '06', title: 'Audio 01', status: 'null', hasInteraction: false },
+];
+
+// Dados mock de colaboradores
+const MOCK_COLLABORATORS: Record<string, CollaboratorInfo> = {
+  'maria': { name: 'Maria Silva', whatsApp: '+55 11 99999-1111', photoUrl: 'https://randomuser.me/api/portraits/women/1.jpg' },
+  'joao': { name: 'Joao Santos', whatsApp: '+55 11 99999-2222', photoUrl: 'https://randomuser.me/api/portraits/men/1.jpg' },
+  'carlos': { name: 'Carlos Oliveira', whatsApp: '+55 11 99999-3333', photoUrl: 'https://randomuser.me/api/portraits/men/2.jpg' },
+  'ana': { name: 'Ana Costa', whatsApp: '+55 11 99999-4444', photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg' },
+};
+
+// Dados mock de documentos obrigatorios
+// Os dias representam quantos dias faltavam para o prazo quando o documento foi entregue
+// Para documentos pendentes, mostra quantos dias ainda faltam (mesmo valor do completedData.daysStatus = 14)
+// Documentos ja recebidos podem ter sido entregues antes (ex: 16 dias restantes)
+const MOCK_DOCUMENTS: RequiredDocument[] = [
+  { id: 'd1', name: 'Contrato Social', isReceived: true, receivedAt: '30/12/2025 10:30', daysStatus: 16, isOnTime: true }, // Entregue quando faltavam 16 dias
+  { id: 'd2', name: 'Comprovante de Endereco', isReceived: true, receivedAt: '31/12/2025 14:15', daysStatus: 16, isOnTime: true }, // Entregue quando faltavam 16 dias
+  { id: 'd3', name: 'RG do Socio', isReceived: false, daysStatus: 14, isOnTime: true }, // Faltam 14 dias (mesmo do completedData.daysStatus)
+  { id: 'd4', name: 'CPF do Socio', isReceived: false, daysStatus: 14, isOnTime: true }, // Faltam 14 dias (mesmo do completedData.daysStatus)
+];
+
+// Dados mock de atividades com nova estrutura
+// Status: 'null' | 'not_started' | 'started' | 'completed'
+// IMPORTANTE: A Realidade (actualDate) so aparece quando a atividade esta concluida
+// Enquanto nao concluida, mostra "-" na Realidade mas continua contando os dias no Status
+// REGRA DE DIAS (Status):
+// O Status mostra a DIFERENCA em dias entre a Previsao e a data real (Iniciou/Conclusao)
+// - Se antecipado: daysStatus = dias ANTES da previsao (isOnTime: true = azul)
+// - Se atrasado: daysStatus = dias APOS a previsao (isOnTime: false = vermelho)
+// Exemplo startedData: Previsao 15/01/2026, Iniciou 28/12/2025 = 18 dias antecipado (azul)
+// Exemplo completedData: Previsao 30/01/2026, Conclusao ainda nao definida = mostra dias restantes
+const MOCK_ACTIVITY_DATA: Record<string, ActivityInfo> = {
+  // Atividade 1: Iniciada - aguardando documentos do cliente (ainda faltam RG e CPF)
+  // Fase Keymans: 10/01/2026 → 14/02/2026 (35 dias)
+  // Atividades distribuidas sequencialmente dentro da fase
+  '1': {
+    id: '1',
+    number: '01',
+    title: 'Upload lista de Keymans',
+    status: 'started', // Ainda em andamento - faltam documentos
+    // Colunas do card principal com INICIO e CONCLUSAO
+    columns: {
+      // INICIO
+      startForecastDate: '10/01/2026',  // Previsao inicio
+      startActualDate: '12/01/2026',    // Iniciou 2 dias atrasado
+      startDaysStatus: 2,
+      startIsOnTime: false,             // Atrasou no inicio
+      // CONCLUSAO
+      forecastDate: '15/01/2026',       // Previsao conclusao
+      actualDate: undefined,            // Nao concluida = mostra "-"
+      daysStatus: 0,
+      isOnTime: true,
+    },
+    notStartedData: {
+      forecastDate: '15/01/2026', // Previsao para iniciar
+      forecastTime: '09:00',
+    },
+    startedData: {
+      columns: {
+        forecastDate: '15/01/2026', // Previsao para iniciar
+        actualDate: '28/12/2025', // Iniciou 18 dias ANTES da previsao (15/01 - 18 dias = 28/12)
+        daysStatus: 18, // 18 dias de antecipacao (azul = antecipado)
+        isOnTime: true, // true = antecipado/no prazo (azul), false = atrasado (vermelho)
+      },
+      internalEvents: [
+        {
+          id: 'e0',
+          type: 'started',
+          date: '28/12/2025', // Mesmo da actualDate acima
+          time: '09:00',
+          collaborator: MOCK_COLLABORATORS['maria'],
+          comment: 'Iniciou a atividade',
+        },
+        {
+          id: 'e1',
+          type: 'waiting_documents',
+          date: '29/12/2025', // Um dia apos o inicio
+          time: '10:00',
+          collaborator: MOCK_COLLABORATORS['joao'],
+          comment: 'Aguardando documentos do cliente para prosseguir.',
+          documents: MOCK_DOCUMENTS,
+        },
+      ],
+    },
+    completedData: {
+      columns: {
+        forecastDate: '30/01/2026', // Previsao de conclusao
+        actualDate: undefined, // Nao concluida ainda = mostra "-"
+        daysStatus: 14, // Enquanto nao concluida, mostra dias restantes. Quando concluir, mostra diferenca previsao-conclusao
+        isOnTime: true, // true = antecipado/no prazo (azul), false = atrasado (vermelho)
+      },
+    },
+  },
+  // Atividade 2: Iniciada - exibe tres colunas + eventos internos
+  '2': {
+    id: '2',
+    number: '02',
+    title: 'Reuniao semanal Keymans',
+    status: 'started',
+    // Colunas do card principal com INICIO e CONCLUSAO
+    columns: {
+      // INICIO
+      startForecastDate: '16/01/2026',  // Previsao inicio (dia seguinte ao fim da ativ. 1)
+      startActualDate: '16/01/2026',    // Iniciou no prazo
+      startDaysStatus: 0,
+      startIsOnTime: true,
+      // CONCLUSAO
+      forecastDate: '20/01/2026',       // Previsao conclusao
+      actualDate: undefined,            // Nao concluida = mostra "-"
+      daysStatus: 0,
+      isOnTime: true,
+    },
+    notStartedData: {
+      forecastDate: '20/01/2026',
+      forecastTime: '08:00',
+    },
+    startedData: {
+      columns: {
+        forecastDate: '20/01/2026',
+        actualDate: '16/01/2026', // 4 dias antes da previsao
+        daysStatus: 4,
+        isOnTime: true,
+      },
+      internalEvents: [
+        {
+          id: 'e0',
+          type: 'started',
+          date: '16/01/2026',
+          time: '08:00',
+          collaborator: MOCK_COLLABORATORS['joao'],
+          comment: 'Iniciou a atividade',
+        },
+        {
+          id: 'e1',
+          type: 'waiting_documents',
+          date: '16/01/2026',
+          time: '09:00',
+          collaborator: MOCK_COLLABORATORS['joao'],
+          comment: 'Aguardando documentos do cliente para prosseguir.',
+          documents: MOCK_DOCUMENTS,
+        },
+      ],
+    },
+  },
+  // Atividade 3: Iniciada com atraso e fluxo Pendente -> Atrasado -> Retomada
+  // REGRA: Data real nunca pode ser futura (usuario nao pode agir no futuro)
+  '3': {
+    id: '3',
+    number: '03',
+    title: 'Geracao de evento (Grupo)',
+    status: 'started',
+    // Colunas do card principal com INICIO e CONCLUSAO
+    columns: {
+      // INICIO
+      startForecastDate: '10/01/2026',  // Previsao inicio
+      startActualDate: '14/01/2026',    // Iniciou 4 dias atrasado (data passada)
+      startDaysStatus: 4,
+      startIsOnTime: false,             // Atrasou no inicio
+      // CONCLUSAO
+      forecastDate: '20/01/2026',       // Previsao conclusao
+      actualDate: undefined,            // Nao concluida = mostra "-"
+      daysStatus: 0,
+      isOnTime: true,
+    },
+    notStartedData: {
+      forecastDate: '10/01/2026',
+      forecastTime: '09:00',
+    },
+    startedData: {
+      columns: {
+        forecastDate: '10/01/2026',
+        actualDate: '14/01/2026', // 4 dias APOS a previsao (atrasado)
+        daysStatus: 4,
+        isOnTime: false, // vermelho = atrasado
+      },
+      internalEvents: [
+        {
+          id: 'e0',
+          type: 'started',
+          date: '14/01/2026', // Mesmo da actualDate
+          time: '09:00',
+          collaborator: MOCK_COLLABORATORS['ana'],
+          comment: 'Iniciou a atividade',
+        },
+        {
+          id: 'e1',
+          type: 'waiting_documents',
+          date: '14/01/2026',
+          time: '10:00',
+          collaborator: MOCK_COLLABORATORS['ana'],
+          comment: 'Cliente viajando, retorna dia 16.',
+        },
+        {
+          id: 'e2',
+          type: 'delayed',
+          date: '16/01/2026',
+          time: '18:00',
+          collaborator: MOCK_COLLABORATORS['ana'],
+          comment: 'Prazo ultrapassado aguardando retorno do cliente.',
+        },
+      ],
+    },
+  },
+  // Atividade 4: Nao iniciada - apenas titulo e status
+  '4': {
+    id: '4',
+    number: '04',
+    title: '3 Indicacoes Keymans',
+    status: 'not_started',
+    // Colunas do card principal com INICIO e CONCLUSAO
+    columns: {
+      // INICIO
+      startForecastDate: '29/01/2026',  // Previsao inicio
+      startActualDate: undefined,       // Nao iniciada
+      startDaysStatus: 0,
+      startIsOnTime: true,
+      // CONCLUSAO
+      forecastDate: '02/02/2026',       // Previsao conclusao
+      actualDate: undefined,            // Nao iniciada = mostra "-"
+      daysStatus: 0,
+      isOnTime: true,
+    },
+    notStartedData: {
+      forecastDate: '25/01/2026',
+      forecastTime: '09:00',
+    },
+  },
+  // Atividade 5: Nao iniciada
+  '5': {
+    id: '5',
+    number: '05',
+    title: '3 Clientes Keymans',
+    status: 'not_started',
+    // Colunas do card principal com INICIO e CONCLUSAO
+    columns: {
+      // INICIO
+      startForecastDate: '03/02/2026',  // Previsao inicio
+      startActualDate: undefined,       // Nao iniciada
+      startDaysStatus: 0,
+      startIsOnTime: true,
+      // CONCLUSAO
+      forecastDate: '10/02/2026',       // Previsao conclusao
+      actualDate: undefined,            // Nao iniciada = mostra "-"
+      daysStatus: 0,
+      isOnTime: true,
+    },
+    notStartedData: {
+      forecastDate: '01/02/2026',
+      forecastTime: '09:00',
+    },
+  },
+  // Atividade 6: Nula - nao precisa ser executada
+  '6': {
+    id: '6',
+    number: '06',
+    title: 'Audio 01',
+    status: 'null',
+    // Colunas do card principal com INICIO e CONCLUSAO (mesmo para nula)
+    columns: {
+      // INICIO
+      startForecastDate: '11/02/2026',  // Previsao inicio
+      startActualDate: undefined,       // Nula = nao iniciada
+      startDaysStatus: 0,
+      startIsOnTime: true,
+      // CONCLUSAO
+      forecastDate: '14/02/2026',       // Previsao conclusao (fim da fase Keymans)
+      actualDate: undefined,            // Nula = nao concluida
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+};
+
+// Lista de todas as atividades mockadas (convertida do Record para Array)
+const MOCK_ALL_ACTIVITIES: ActivityInfo[] = Object.values(MOCK_ACTIVITY_DATA);
+
+// Lista de todos os produtos mockados
+// LOGICA:
+// - Previsao inicio: sempre 5 dias apos fechamento com cliente (maximo 5 dias positivos)
+// - Previsao conclusao: 150-365 dias apos inicio
+// - Real Inicio: so quando alguma atividade foi iniciada no produto
+// - Real Conclusao: so quando TODAS atividades e fases foram concluidas
+// - Status inicio: pode ser negativo (atrasou), mas positivo max 5 dias
+const MOCK_ALL_PRODUCTS: ProductStatusInfo[] = [
+  {
+    id: '1',
+    name: 'Holding Patrimonial',
+    status: 'started', // Produto iniciado (tem atividades em andamento)
+    columns: {
+      // Dados de INICIO (previsao = 5 dias apos fechamento)
+      startForecastDate: '10/01/2026',     // Previsao inicio (fechou 05/01, +5 dias)
+      startActualDate: '12/01/2026',       // Real inicio (iniciou 2 dias depois da previsao)
+      startDaysStatus: 2,                  // 2 dias de atraso
+      startIsOnTime: false,                // Atrasou o inicio
+      // Dados de CONCLUSAO (Previsao: 180 dias apos inicio previsto)
+      forecastDate: '09/07/2026',          // Previsao conclusao (10/01 + 180 dias)
+      actualDate: undefined,               // Ainda nao concluiu
+      daysStatus: 0,                       // Calculado dinamicamente
+      isOnTime: true,
+    },
+  },
+  {
+    id: '2',
+    name: 'Ativos Fundiarios',
+    status: 'completed', // Produto concluido (todas atividades e fases finalizadas)
+    columns: {
+      // Dados de INICIO (previsao = 5 dias apos fechamento)
+      startForecastDate: '03/06/2025',     // Previsao inicio (fechou 29/05, +5 dias)
+      startActualDate: '02/06/2025',       // Real inicio (iniciou 1 dia antes - adiantou!)
+      startDaysStatus: 1,                  // 1 dia de antecipacao
+      startIsOnTime: true,                 // Adiantou o inicio
+      // Dados de CONCLUSAO (Previsao: 200 dias apos inicio previsto)
+      forecastDate: '20/12/2025',          // Previsao conclusao (03/06 + 200 dias)
+      actualDate: '12/12/2025',            // Real conclusao (concluiu 8 dias antes)
+      daysStatus: 8,                       // 8 dias de antecipacao
+      isOnTime: true,
+    },
+  },
+  {
+    id: '3',
+    name: 'Planejamento Tributario',
+    status: 'not_started', // Produto nao iniciado (hoje = 17/01/2026)
+    columns: {
+      // Dados de INICIO (previsao = 5 dias apos fechamento = hoje)
+      startForecastDate: '22/01/2026',     // Previsao inicio (fechou 17/01, +5 dias)
+      startActualDate: undefined,          // Ainda nao iniciou
+      startDaysStatus: undefined,          // Calculado dinamicamente (sera 5 dias)
+      startIsOnTime: undefined,
+      // Dados de CONCLUSAO (Previsao: 365 dias apos inicio previsto)
+      forecastDate: '22/01/2027',          // Previsao conclusao (22/01/2026 + 365 dias)
+      actualDate: undefined,               // Ainda nao concluiu
+      daysStatus: 0,                       // Calculado dinamicamente
+      isOnTime: true,
+    },
+  },
+];
+
+// Lista de todas as fases mockadas (vinculadas aos produtos por productId)
+// LOGICA: Fases sao SEQUENCIAIS - fim de uma = inicio da proxima
+// Soma dos dias das fases = dias totais do produto
+const MOCK_ALL_PHASES: PhaseStatusInfo[] = [
+  // ========================================
+  // Fases do Produto 1 (Holding Patrimonial)
+  // Produto: 180 dias (10/01/2026 → 09/07/2026)
+  // ========================================
+  {
+    id: '1',
+    name: 'Keymans',
+    status: 'started',
+    productId: '1',
+    columns: {
+      // INICIO (herda do produto)
+      startForecastDate: '10/01/2026',    // Inicio = inicio do produto
+      startActualDate: '12/01/2026',       // Iniciou 2 dias depois
+      startDaysStatus: 2,
+      startIsOnTime: false,
+      // CONCLUSAO (35 dias)
+      forecastDate: '14/02/2026',          // 10/01 + 35 dias
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '2',
+    name: 'Prospeccao',
+    status: 'not_started',
+    productId: '1',
+    columns: {
+      // INICIO (dia seguinte ao fim da fase anterior)
+      startForecastDate: '15/02/2026',     // Dia seguinte ao fim de Keymans
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (35 dias)
+      forecastDate: '22/03/2026',          // 15/02 + 35 dias
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '3',
+    name: 'Cadastro cliente',
+    status: 'not_started',
+    productId: '1',
+    columns: {
+      // INICIO
+      startForecastDate: '23/03/2026',     // Dia seguinte ao fim de Prospeccao
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (35 dias)
+      forecastDate: '27/04/2026',          // 23/03 + 35 dias
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '4',
+    name: 'Teste de maturidade',
+    status: 'not_started',
+    productId: '1',
+    columns: {
+      // INICIO
+      startForecastDate: '28/04/2026',     // Dia seguinte ao fim de Cadastro
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (35 dias)
+      forecastDate: '02/06/2026',          // 28/04 + 35 dias
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '5',
+    name: 'Reuniao gratuita',
+    status: 'not_started',
+    productId: '1',
+    columns: {
+      // INICIO
+      startForecastDate: '03/06/2026',     // Dia seguinte ao fim de Maturidade
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (37 dias - ajuste para fechar 180)
+      forecastDate: '09/07/2026',          // Fim do produto
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  // ========================================
+  // Fases do Produto 2 (Ativos Fundiarios) - CONCLUIDO
+  // Produto: 200 dias (03/06/2025 → 20/12/2025)
+  // ========================================
+  {
+    id: '6',
+    name: 'Analise inicial',
+    status: 'completed',
+    productId: '2',
+    columns: {
+      // INICIO
+      startForecastDate: '03/06/2025',
+      startActualDate: '02/06/2025',       // Adiantou 1 dia
+      startDaysStatus: 1,
+      startIsOnTime: true,
+      // CONCLUSAO (40 dias)
+      forecastDate: '13/07/2025',
+      actualDate: '10/07/2025',            // Concluiu 3 dias antes
+      daysStatus: 3,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '7',
+    name: 'Documentacao',
+    status: 'completed',
+    productId: '2',
+    columns: {
+      // INICIO
+      startForecastDate: '14/07/2025',
+      startActualDate: '11/07/2025',       // Adiantou (veio da fase anterior)
+      startDaysStatus: 3,
+      startIsOnTime: true,
+      // CONCLUSAO (40 dias)
+      forecastDate: '23/08/2025',
+      actualDate: '18/08/2025',            // Concluiu 5 dias antes
+      daysStatus: 5,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '8',
+    name: 'Avaliacao',
+    status: 'completed',
+    productId: '2',
+    columns: {
+      // INICIO
+      startForecastDate: '24/08/2025',
+      startActualDate: '19/08/2025',
+      startDaysStatus: 5,
+      startIsOnTime: true,
+      // CONCLUSAO (40 dias)
+      forecastDate: '03/10/2025',
+      actualDate: '28/09/2025',
+      daysStatus: 5,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '9',
+    name: 'Negociacao',
+    status: 'completed',
+    productId: '2',
+    columns: {
+      // INICIO
+      startForecastDate: '04/10/2025',
+      startActualDate: '29/09/2025',
+      startDaysStatus: 5,
+      startIsOnTime: true,
+      // CONCLUSAO (40 dias)
+      forecastDate: '13/11/2025',
+      actualDate: '08/11/2025',
+      daysStatus: 5,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '10',
+    name: 'Fechamento',
+    status: 'completed',
+    productId: '2',
+    columns: {
+      // INICIO
+      startForecastDate: '14/11/2025',
+      startActualDate: '09/11/2025',
+      startDaysStatus: 5,
+      startIsOnTime: true,
+      // CONCLUSAO (40 dias)
+      forecastDate: '20/12/2025',
+      actualDate: '12/12/2025',            // Concluiu 8 dias antes
+      daysStatus: 8,
+      isOnTime: true,
+    },
+  },
+  // ========================================
+  // Fases do Produto 3 (Planejamento Tributario) - NAO INICIADO
+  // Produto: 365 dias (22/01/2026 → 22/01/2027)
+  // ========================================
+  {
+    id: '11',
+    name: 'Diagnostico',
+    status: 'not_started',
+    productId: '3',
+    columns: {
+      // INICIO
+      startForecastDate: '22/01/2026',     // Inicio = inicio do produto
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (60 dias)
+      forecastDate: '22/03/2026',
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '12',
+    name: 'Planejamento',
+    status: 'not_started',
+    productId: '3',
+    columns: {
+      // INICIO
+      startForecastDate: '23/03/2026',
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (60 dias)
+      forecastDate: '22/05/2026',
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '13',
+    name: 'Implementacao',
+    status: 'not_started',
+    productId: '3',
+    columns: {
+      // INICIO
+      startForecastDate: '23/05/2026',
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (90 dias)
+      forecastDate: '21/08/2026',
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '14',
+    name: 'Acompanhamento',
+    status: 'not_started',
+    productId: '3',
+    columns: {
+      // INICIO
+      startForecastDate: '22/08/2026',
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (90 dias)
+      forecastDate: '20/11/2026',
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+  {
+    id: '15',
+    name: 'Revisao Final',
+    status: 'not_started',
+    productId: '3',
+    columns: {
+      // INICIO
+      startForecastDate: '21/11/2026',
+      startActualDate: undefined,
+      startDaysStatus: undefined,
+      startIsOnTime: undefined,
+      // CONCLUSAO (63 dias - ajuste para fechar 365)
+      forecastDate: '22/01/2027',          // Fim do produto
+      actualDate: undefined,
+      daysStatus: 0,
+      isOnTime: true,
+    },
+  },
+];
+
+// Nota: Os dados de produto e fase sao agora gerenciados por estado no componente
+// usando os indices currentProductIndex e currentPhaseIndex
+
+// ----------------------------------------===================================
+// Icones SVG
+// ----------------------------------------===================================
+
+const BackArrowIcon = memo(() => (
+  <Svg width={20} height={20} viewBox="0 0 20 20" fill="none">
+    <Path d="M10 19L1 10M1 10L10 1M1 10L19 10" stroke="#1777CF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+));
+
+const MenuIcon = memo(() => (
+  <Svg width={35} height={35} viewBox="0 0 35 35" fill="none">
+    <Rect x={0.4} y={0.4} width={34.2} height={34.2} rx={5.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={34.2} height={34.2} rx={5.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path d="M8.75 11.25C8.75 10.5586 9.30859 10 10 10H25C25.6914 10 26.25 10.5586 26.25 11.25C26.25 11.9414 25.6914 12.5 25 12.5H10C9.30859 12.5 8.75 11.9414 8.75 11.25ZM8.75 17.5C8.75 16.8086 9.30859 16.25 10 16.25H25C25.6914 16.25 26.25 16.8086 26.25 17.5C26.25 18.1914 25.6914 18.75 25 18.75H10C9.30859 18.75 8.75 18.1914 8.75 17.5ZM26.25 23.75C26.25 24.4414 25.6914 25 25 25H10C9.30859 25 8.75 24.4414 8.75 23.75C8.75 23.0586 9.30859 22.5 10 22.5H25C25.6914 22.5 26.25 23.0586 26.25 23.75Z" fill="#FCFCFC" />
+  </Svg>
+));
+
+const CloseIcon = memo(() => (
+  <Svg width={35} height={35} viewBox="0 0 35 35" fill="none">
+    <Rect width={35} height={35} rx={8} fill="#F4F4F4" />
+    <Rect width={35} height={35} rx={8} stroke="#EDF2F6" />
+    <Path d="M23.655 11.7479C23.2959 11.4179 22.7339 11.4173 22.374 11.7466L17.5 16.2065L12.626 11.7466C12.2661 11.4173 11.7041 11.4179 11.345 11.7479L11.2916 11.797C10.9022 12.1549 10.9029 12.757 11.2931 13.114L16.0863 17.5L11.2931 21.886C10.9029 22.243 10.9022 22.8451 11.2916 23.203L11.345 23.2521C11.7041 23.5821 12.2661 23.5827 12.626 23.2534L17.5 18.7935L22.374 23.2534C22.7339 23.5827 23.2959 23.5821 23.655 23.2521L23.7084 23.203C24.0978 22.8451 24.0971 22.243 23.7069 21.886L18.9137 17.5L23.7069 13.114C24.0971 12.757 24.0978 12.1549 23.7084 11.797L23.655 11.7479Z" fill="#3A3F51" />
+  </Svg>
+));
+
+const MicIcon = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect width={40} height={40} rx={6} fill="#1777CF" />
+    <Path d="M26.5 18V20C26.5 21.7 25.8 23.3 24.6 24.5C23.4 25.7 21.7 26.4 20 26.4M20 26.4C18.3 26.4 16.6 25.7 15.4 24.5C14.2 23.3 13.5 21.7 13.5 20V18M20 26.4V30M16.3 30H23.7M20 10C18.9 10 17.9 10.4 17.1 11.2C16.3 12 15.9 13 15.9 14V20C15.9 21 16.3 22 17.1 22.8C17.9 23.6 18.9 24 20 24C21.1 24 22.1 23.6 22.9 22.8C23.7 22 24.1 21 24.1 20V14C24.1 13 23.7 12 22.9 11.2C22.1 10.4 21.1 10 20 10Z" stroke="white" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+));
+
+const SendBtnIcon = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect width={40} height={40} rx={6} fill="#1777CF" />
+    <Path d="M10 28L30 20L10 12V18L24 20L10 22V28Z" fill="white" />
+  </Svg>
+));
+
+const PlusBtn = memo(() => (
+  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 5V19M5 12H19" stroke="#7D8592" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+));
+
+const PhotosIconFigma = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path
+      d="M15.4467 25.3182C14.8267 25.317 14.2227 25.115 13.7197 24.7406C13.2167 24.3662 12.8399 23.8382 12.6423 23.231L12.6146 23.1369C12.5259 22.8501 12.4797 22.5511 12.4776 22.25V16.6716L10.5569 23.2973C10.4393 23.7687 10.5055 24.269 10.7412 24.6906C10.977 25.1121 11.3634 25.4212 11.8173 25.5514L24.06 28.9395C24.2128 28.9804 24.3656 29 24.516 29C25.3046 29 26.0251 28.4592 26.227 27.6623L26.9403 25.3182H15.4467ZM17.6239 16.7273C18.4972 16.7273 19.2074 15.9934 19.2074 15.0909C19.2074 14.1885 18.4972 13.4545 17.6239 13.4545C16.7506 13.4545 16.0405 14.1885 16.0405 15.0909C16.0405 15.9934 16.7506 16.7273 17.6239 16.7273Z"
+      fill="#FCFCFC"
+    />
+    <Path
+      d="M27.5207 11H15.6446C15.1198 11.0006 14.6167 11.2164 14.2457 11.5998C13.8746 11.9833 13.6659 12.5032 13.6652 13.0455V22.0455C13.6652 23.1729 14.5536 24.0909 15.6446 24.0909H27.5207C28.6117 24.0909 29.5 23.1729 29.5 22.0455V13.0455C29.5 11.918 28.6117 11 27.5207 11ZM15.6446 12.6364H27.5207C27.6256 12.6364 27.7263 12.6795 27.8006 12.7562C27.8748 12.8329 27.9165 12.937 27.9165 13.0455V18.8537L25.4154 15.8379C25.2832 15.6809 25.1201 15.5549 24.937 15.4681C24.754 15.3813 24.5551 15.3359 24.3537 15.3347C24.1516 15.3358 23.9522 15.3826 23.7695 15.4718C23.5867 15.561 23.4251 15.6904 23.2959 15.851L20.3554 19.4985L19.3974 18.5109C19.1369 18.2421 18.7838 18.0911 18.4157 18.0911C18.0475 18.0911 17.6944 18.2421 17.4339 18.5109L15.2487 20.7683V13.0455C15.2487 12.937 15.2904 12.8329 15.3647 12.7562C15.4389 12.6795 15.5396 12.6364 15.6446 12.6364Z"
+      fill="#FCFCFC"
+    />
+  </Svg>
+));
+
+const CameraIconFigma = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path
+      d="M29 14.7429H25.535C25.3704 14.7428 25.2083 14.7056 25.0631 14.6346C24.918 14.5635 24.7943 14.4608 24.703 14.3355L23.5935 12.8142C23.4109 12.5637 23.1634 12.3584 22.8731 12.2163C22.5829 12.0743 22.2587 12 21.9295 12H18.0705C17.7413 12 17.4171 12.0743 17.1269 12.2163C16.8366 12.3584 16.5891 12.5637 16.4065 12.8142L15.297 14.3355C15.2057 14.4608 15.082 14.5635 14.9369 14.6346C14.7917 14.7056 14.6296 14.7428 14.465 14.7429H14V14.2857C14 14.1645 13.9473 14.0482 13.8536 13.9625C13.7598 13.8767 13.6326 13.8286 13.5 13.8286H12C11.8674 13.8286 11.7402 13.8767 11.6464 13.9625C11.5527 14.0482 11.5 14.1645 11.5 14.2857V14.7429H11C10.4696 14.7429 9.96086 14.9355 9.58579 15.2784C9.21071 15.6214 9 16.0865 9 16.5714V26.1714C9 26.6564 9.21071 27.1215 9.58579 27.4644C9.96086 27.8073 10.4696 28 11 28H29C29.5304 28 30.0391 27.8073 30.4142 27.4644C30.7893 27.1215 31 26.6564 31 26.1714V16.5714C31 16.0865 30.7893 15.6214 30.4142 15.2784C30.0391 14.9355 29.5304 14.7429 29 14.7429ZM20 26.1714C18.8628 26.1714 17.7511 25.8631 16.8055 25.2854C15.8599 24.7078 15.1229 23.8867 14.6877 22.9261C14.2525 21.9655 14.1386 20.9085 14.3605 19.8887C14.5823 18.8689 15.13 17.9321 15.9341 17.1969C16.7383 16.4617 17.7628 15.961 18.8782 15.7582C19.9936 15.5553 21.1498 15.6594 22.2004 16.0573C23.2511 16.4552 24.1491 17.129 24.781 17.9936C25.4128 18.8581 25.75 19.8745 25.75 20.9143C25.75 22.3086 25.1442 23.6457 24.0659 24.6316C22.9875 25.6176 21.525 26.1714 20 26.1714Z"
+      fill="#FCFCFC"
+    />
+    <Path
+      d="M20 17.4857C19.2583 17.4857 18.5333 17.6868 17.9166 18.0635C17.2999 18.4403 16.8193 18.9757 16.5355 19.6022C16.2516 20.2287 16.1774 20.9181 16.3221 21.5832C16.4667 22.2482 16.8239 22.8592 17.3483 23.3387C17.8728 23.8181 18.541 24.1447 19.2684 24.277C19.9958 24.4093 20.7498 24.3414 21.4351 24.0819C22.1203 23.8224 22.706 23.3829 23.118 22.8191C23.5301 22.2553 23.75 21.5924 23.75 20.9143C23.75 20.005 23.3549 19.1329 22.6517 18.4899C21.9484 17.8469 20.9946 17.4857 20 17.4857ZM20 22.9714C19.4035 22.9708 18.8316 22.7539 18.4097 22.3682C17.9879 21.9826 17.7507 21.4597 17.75 20.9143C17.75 20.793 17.8027 20.6768 17.8964 20.591C17.9902 20.5053 18.1174 20.4571 18.25 20.4571C18.3826 20.4571 18.5098 20.5053 18.6036 20.591C18.6973 20.6768 18.75 20.793 18.75 20.9143C18.75 21.2174 18.8817 21.5081 19.1161 21.7224C19.3505 21.9367 19.6685 22.0571 20 22.0571C20.1326 22.0571 20.2598 22.1053 20.3536 22.191C20.4473 22.2768 20.5 22.393 20.5 22.5143C20.5 22.6355 20.4473 22.7518 20.3536 22.8375C20.2598 22.9233 20.1326 22.9714 20 22.9714Z"
+      fill="#FCFCFC"
+    />
+  </Svg>
+));
+
+const DocumentIconFigma = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M22.7115 11.9091L26.0984 15.3252H22.7115V11.9091ZM26.2339 29C26.6562 29 27 28.6535 27 28.2276V16.611H22.0742C21.722 16.611 21.4368 16.3232 21.4368 15.9682V11H13.7657C13.3433 11 13 11.3465 13 11.7724V28.2276C13 28.6535 13.3434 29 13.7657 29H26.2339Z"
+      fill="#FCFCFC"
+    />
+  </Svg>
+));
+
+const EmojiIconFigma = memo(() => (
+  <Svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={39.2} height={39.2} rx={9.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M20 10C14.486 10 10 14.4869 10 20C10 25.515 14.486 30 20 30C25.514 30 30 25.515 30 20C30 14.4869 25.514 10 20 10ZM25.0669 23.6172C24.5228 24.4674 23.7735 25.167 22.8881 25.6516C22.0026 26.1362 21.0094 26.3902 20 26.3902C18.9906 26.3902 17.9974 26.1362 17.112 25.6516C16.2265 25.167 15.4772 24.4674 14.9331 23.6172C14.8477 23.4777 14.8203 23.3103 14.8569 23.1509C14.8935 22.9915 14.9911 22.8528 15.1288 22.7645C15.2665 22.6763 15.4333 22.6455 15.5934 22.6788C15.7535 22.7121 15.8942 22.8069 15.9853 22.9428C16.4165 23.6162 17.0103 24.1704 17.7119 24.5542C18.4134 24.938 19.2003 25.1392 20 25.1392C20.7997 25.1392 21.5866 24.938 22.2881 24.5542C22.9897 24.1704 23.5835 23.6162 24.0147 22.9428C24.1057 22.8067 24.2464 22.7117 24.4066 22.6782C24.5669 22.6447 24.7338 22.6755 24.8717 22.7638C25.0095 22.8522 25.1071 22.991 25.1437 23.1506C25.1802 23.3102 25.1526 23.4777 25.0669 23.6172ZM15.0375 17.1863C15.0375 16.7978 15.1918 16.4252 15.4665 16.1505C15.7413 15.8758 16.1138 15.7215 16.5023 15.7215H16.5026C16.7923 15.7215 17.0755 15.8074 17.3164 15.9684C17.5573 16.1293 17.745 16.3581 17.8559 16.6258C17.9668 16.8934 17.9958 17.188 17.9393 17.4721C17.8828 17.7563 17.7432 18.0173 17.5384 18.2221C17.3335 18.427 17.0725 18.5665 16.7884 18.623C16.5042 18.6795 16.2097 18.6505 15.942 18.5397C15.6743 18.4288 15.4456 18.241 15.2846 18.0002C15.1236 17.7593 15.0377 17.476 15.0377 17.1863H15.0375ZM22.0328 17.1863C22.0328 16.7978 22.1871 16.4252 22.4619 16.1505C22.7366 15.8758 23.1092 15.7215 23.4977 15.7215H23.4979C23.7876 15.7215 24.0709 15.8074 24.3118 15.9684C24.5526 16.1293 24.7404 16.3581 24.8513 16.6258C24.9621 16.8934 24.9911 17.188 24.9346 17.4721C24.8781 17.7563 24.7386 18.0173 24.5337 18.2221C24.3289 18.427 24.0679 18.5665 23.7837 18.623C23.4996 18.6795 23.205 18.6505 22.9374 18.5397C22.6697 18.4288 22.4409 18.241 22.28 18.0002C22.119 17.7593 22.0331 17.476 22.0331 17.1863H22.0328Z"
+      fill="#FCFCFC"
+    />
+  </Svg>
+));
+
+// ----------------------------------------===================================
+// Componente Principal
+// ----------------------------------------===================================
+
+const ActivitiesChatModal: React.FC<Props> = ({ visible, onClose, activityTitle, initialActivityId }) => {
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
+
+  // Estados
+  const [txt, setTxt] = useState('');
+  const [bottomPanel, setBottomPanel] = useState<BottomPanelState>('none');
+  const [callModalVisible, setCallModalVisible] = useState(false);
+  const [callAnchor, setCallAnchor] = useState<{ x: number; y: number; width: number; height: number } | undefined>(undefined);
+  const moreBtnRef = useRef<View>(null);
+
+  // Estados do Menu de Atividades
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedActivityId, setSelectedActivityId] = useState('1');
+  const [activities, setActivities] = useState<Activity[]>(MOCK_ACTIVITIES);
+
+  // Estado do Modal de Historico de Status
+  const [statusHistoryVisible, setStatusHistoryVisible] = useState(false);
+
+  // Estados para navegacao entre produtos, fases e atividades no modal de historico
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
+
+  // Dados derivados: produto, fase e atividade atuais baseados nos indices
+  const currentProduct = MOCK_ALL_PRODUCTS[currentProductIndex];
+  const phasesForCurrentProduct = MOCK_ALL_PHASES.filter(
+    (phase) => phase.productId === currentProduct.id
+  );
+  const currentPhase = phasesForCurrentProduct[currentPhaseIndex] || MOCK_ALL_PHASES[0];
+  const currentActivity = MOCK_ALL_ACTIVITIES[currentActivityIndex];
+
+  // Callbacks para navegacao de produto, fase e atividade
+  const handleProductSelect = (index: number) => {
+    setCurrentProductIndex(index);
+    setCurrentPhaseIndex(0); // Reset fase quando muda produto
+  };
+
+  const handlePhaseSelect = (index: number) => {
+    setCurrentPhaseIndex(index);
+  };
+
+  const handleActivitySelect = (index: number) => {
+    setCurrentActivityIndex(index);
+    // Atualiza tambem o selectedActivityId para manter sincronizado com o menu
+    const activityId = MOCK_ALL_ACTIVITIES[index]?.id;
+    if (activityId) {
+      setSelectedActivityId(activityId);
+    }
+  };
+
+  // Atualiza a atividade selecionada quando o modal abre com um ID especifico
+  useEffect(() => {
+    if (visible && initialActivityId) {
+      setSelectedActivityId(initialActivityId);
+    }
+  }, [visible, initialActivityId]);
+
+  // Estado para armazenar mensagens por atividade
+  // Apenas atividade '1' inicia com mensagens (tem hasInteraction: true)
+  const [messagesByActivity, setMessagesByActivity] = useState<Record<string, ChatMessage[]>>({
+    '1': INIT_MSGS,
+  });
+
+  // Mensagens da atividade atual
+  const msgs = messagesByActivity[selectedActivityId] || [];
+  const setMsgs = (updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
+    setMessagesByActivity(prev => {
+      const currentMsgs = prev[selectedActivityId] || [];
+      const newMsgs = typeof updater === 'function' ? updater(currentMsgs) : updater;
+      return { ...prev, [selectedActivityId]: newMsgs };
+    });
+    // Marca a atividade como tendo interacao quando receber mensagens
+    if (msgs.length === 0 || (typeof updater === 'function' && updater(msgs).length > msgs.length)) {
+      setActivities(prev => prev.map(a =>
+        a.id === selectedActivityId ? { ...a, hasInteraction: true } : a
+      ));
+    }
+  };
+
+  // ----------------------------------------
+  // CONTAINER: Estados de Audio
+  // Controle de reproducao, progresso e velocidade dos cards de audio
+  // ----------------------------------------
+  const [audioStates, setAudioStates] = useState<Record<string, {
+    isPlaying: boolean; // indica se o audio esta tocando
+    progress: number; // progresso de 0 a 1
+    currentTime: number; // tempo atual em ms
+    duration: number; // duracao total em ms
+    speed: 1 | 1.5 | 2; // velocidade de reproducao
+    showSpeed: boolean; // exibe controle de velocidade no lugar da foto
+    speedShowTimestamp: number; // timestamp de quando showSpeed foi ativado (para timeout de 3s)
+    waveWidth: number; // largura da faixa de audio para calculo de scrub
+  }>>({});
+
+  // Refs para timers de timeout do controle de velocidade
+  const speedTimeoutRefs = useRef<Record<string, NodeJS.Timeout>>({});
+
+  // Refs
+  const scrollRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
+  const audioPlayerRefs = useRef<Map<string, MessageAudioPlayerRef>>(new Map());
+  const audioSoundRefs = useRef<Record<string, Audio.Sound>>({}); // Refs para objetos Audio.Sound de cada mensagem
+
+  // Calculo de Altura
+  const getPanelHeight = () => {
+    if (bottomPanel === 'options') return OPTIONS_HEIGHT;
+    if (bottomPanel === 'emoji') return EMOJI_HEIGHT;
+    return 0;
+  };
+
+  const messagesAreaHeight = windowHeight
+    - insets.top
+    - insets.bottom
+    - HEADER_HEIGHT
+    - CONTACT_HEIGHT
+    - INPUT_HEIGHT
+    - INPUT_BOTTOM_PADDING
+    - CHAT_INPUT_GAP
+    - getPanelHeight()
+    - (bottomPanel === 'options' ? OPTIONS_BOTTOM_PADDING : 0)
+    - (bottomPanel === 'emoji' ? EMOJI_BOTTOM_PADDING : 0)
+    + 32;
+
+  useEffect(() => {
+    const t = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+    return () => clearTimeout(t);
+  }, [msgs.length]);
+
+  // Cleanup: descarregar todos os audios quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      Object.values(audioSoundRefs.current).forEach(sound => {
+        if (sound) {
+          sound.unloadAsync().catch(() => {});
+        }
+      });
+      audioSoundRefs.current = {};
+    };
+  }, []);
+
+  // ----------------------------------------
+  // CONTAINER: Funcoes de Controle de Audio
+  // Play/pause, velocidade, scrub e progresso
+  // ----------------------------------------
+
+  // Inicializa estado do audio se nao existir
+  const getAudioState = useCallback((msgId: string, audioDuration?: string) => {
+    if (audioStates[msgId]) {
+      return audioStates[msgId];
+    }
+    // Parsear duracao do audio (formato "0:16" ou "00:16")
+    let durationMs = 16000; // Default 16 segundos
+    if (audioDuration) {
+      const parts = audioDuration.split(':');
+      if (parts.length === 2) {
+        const mins = parseInt(parts[0], 10) || 0; // minutos
+        const secs = parseInt(parts[1], 10) || 0; // segundos
+        durationMs = (mins * 60 + secs) * 1000; // converte para milissegundos
+      }
+    }
+    return {
+      isPlaying: false, // audio parado inicialmente
+      progress: 0, // progresso zerado
+      currentTime: 0, // tempo atual zerado
+      duration: durationMs, // duracao total
+      speed: 1 as const, // velocidade 1x
+      showSpeed: false, // controle de velocidade oculto
+      speedShowTimestamp: 0, // sem timestamp
+      waveWidth: 0, // largura da faixa zerada
+    };
+  }, [audioStates]);
+
+  // ----------------------------------------
+  // Funcao: Toggle Play/Pause
+  // Alterna entre reproducao e pausa do audio
+  // ----------------------------------------
+  const toggleAudioPlay = useCallback(async (msgId: string, audioDuration?: string, audioUri?: string) => {
+    // Limpar timeout anterior se existir
+    if (speedTimeoutRefs.current[msgId]) {
+      clearTimeout(speedTimeoutRefs.current[msgId]);
+    }
+
+    const currentState = audioStates[msgId] || getAudioState(msgId, audioDuration);
+    const newIsPlaying = !currentState.isPlaying; // inverte o estado de reproducao
+
+    if (newIsPlaying) {
+      // PLAY: Carregar e reproduzir áudio real
+      try {
+        // Parar qualquer áudio que esteja tocando
+        for (const [id, sound] of Object.entries(audioSoundRefs.current)) {
+          if (id !== msgId && sound) {
+            await sound.pauseAsync();
+            setAudioStates(prev => ({
+              ...prev,
+              [id]: { ...prev[id], isPlaying: false }
+            }));
+          }
+        }
+
+        // Carregar áudio se ainda não foi carregado
+        if (!audioSoundRefs.current[msgId] && audioUri) {
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: audioUri },
+            { shouldPlay: false, isLooping: false }
+          );
+          audioSoundRefs.current[msgId] = sound;
+
+          // Listener para detectar quando o áudio termina
+          sound.setOnPlaybackStatusUpdate((status) => {
+            if (!status.isLoaded) return;
+            if (status.didJustFinish) {
+              setAudioStates(prev => ({
+                ...prev,
+                [msgId]: { ...prev[msgId], isPlaying: false, progress: 0, currentTime: 0 }
+              }));
+            }
+          });
+        }
+
+        // Reproduzir áudio
+        const sound = audioSoundRefs.current[msgId];
+        if (sound) {
+          const speed = currentState.speed || 1;
+          await sound.setRateAsync(speed, true);
+          await sound.playAsync();
+        }
+
+        // Timeout para esconder controle de velocidade
+        speedTimeoutRefs.current[msgId] = setTimeout(() => {
+          setAudioStates(prevState => {
+            const state = prevState[msgId];
+            if (state) {
+              return {
+                ...prevState,
+                [msgId]: { ...state, showSpeed: false }
+              };
+            }
+            return prevState;
+          });
+        }, 5000);
+
+        setAudioStates(prev => ({
+          ...prev,
+          [msgId]: {
+            ...currentState,
+            isPlaying: true,
+            showSpeed: true,
+            speedShowTimestamp: Date.now(),
+          }
+        }));
+      } catch (error) {
+        console.warn('Erro ao reproduzir áudio:', error);
+      }
+    } else {
+      // PAUSE: Pausar áudio real
+      try {
+        const sound = audioSoundRefs.current[msgId];
+        if (sound) {
+          await sound.pauseAsync();
+        }
+      } catch (error) {
+        console.warn('Erro ao pausar áudio:', error);
+      }
+
+      setAudioStates(prev => ({
+        ...prev,
+        [msgId]: {
+          ...currentState,
+          isPlaying: false,
+        }
+      }));
+    }
+  }, [audioStates, getAudioState]);
+
+  // ----------------------------------------
+  // Funcao: Toggle Controle de Velocidade
+  // Exibe controle e cicla entre 1x, 1.5x, 2x
+  // ----------------------------------------
+  const toggleSpeedControl = useCallback(async (msgId: string, audioDuration?: string) => {
+    // Limpar timeout anterior se existir
+    if (speedTimeoutRefs.current[msgId]) {
+      clearTimeout(speedTimeoutRefs.current[msgId]);
+    }
+
+    const currentState = audioStates[msgId] || getAudioState(msgId, audioDuration);
+
+    // Timeout para esconder controle de velocidade
+    speedTimeoutRefs.current[msgId] = setTimeout(() => {
+      setAudioStates(prevState => {
+        const state = prevState[msgId];
+        if (state) {
+          return {
+            ...prevState,
+            [msgId]: { ...state, showSpeed: false }
+          };
+        }
+        return prevState;
+      });
+    }, 5000);
+
+    if (!currentState.showSpeed) {
+      // Primeira vez tocando - mostrar velocidade
+      setAudioStates(prev => ({
+        ...prev,
+        [msgId]: {
+          ...currentState,
+          showSpeed: true,
+          speedShowTimestamp: Date.now(),
+        }
+      }));
+      return;
+    }
+
+    // Ja esta mostrando - ciclar velocidade: 1x -> 1.5x -> 2x -> 1x
+    let newSpeed: 1 | 1.5 | 2;
+    if (currentState.speed === 1) newSpeed = 1.5;
+    else if (currentState.speed === 1.5) newSpeed = 2;
+    else newSpeed = 1;
+
+    // Aplicar velocidade ao audio real se existir
+    const sound = audioSoundRefs.current[msgId];
+    if (sound) {
+      try {
+        await sound.setRateAsync(newSpeed, true);
+      } catch (error) {
+        console.warn('Erro ao alterar velocidade do áudio:', error);
+      }
+    }
+
+    setAudioStates(prev => ({
+      ...prev,
+      [msgId]: {
+        ...currentState,
+        speed: newSpeed,
+        speedShowTimestamp: Date.now(),
+      }
+    }));
+  }, [audioStates, getAudioState]);
+
+  // ----------------------------------------
+  // Funcao: Scrub na Faixa de Audio
+  // Permite arrastar/tocar para alterar posicao
+  // ----------------------------------------
+  const handleAudioScrub = useCallback(async (msgId: string, audioDuration: string | undefined, locationX: number, waveWidth: number) => {
+    if (waveWidth <= 0) return; // largura invalida
+
+    const currentState = audioStates[msgId] || getAudioState(msgId, audioDuration);
+    const newProgress = Math.max(0, Math.min(1, locationX / waveWidth)); // calcula progresso (0 a 1)
+    const newCurrentTime = newProgress * currentState.duration; // calcula tempo atual
+
+    // Seek no audio real se existir
+    const sound = audioSoundRefs.current[msgId];
+    if (sound) {
+      try {
+        await sound.setPositionAsync(newCurrentTime);
+      } catch (error) {
+        console.warn('Erro ao fazer seek no áudio:', error);
+      }
+    }
+
+    setAudioStates(prev => ({
+      ...prev,
+      [msgId]: {
+        ...currentState,
+        progress: newProgress, // atualiza progresso
+        currentTime: newCurrentTime, // atualiza tempo atual
+      }
+    }));
+  }, [audioStates, getAudioState]);
+
+  // ----------------------------------------
+  // Funcao: Atualizar Largura da Faixa
+  // Armazena largura para calculo de scrub
+  // ----------------------------------------
+  const updateWaveWidth = useCallback((msgId: string, audioDuration: string | undefined, width: number) => {
+    setAudioStates(prev => {
+      const currentState = prev[msgId] || getAudioState(msgId, audioDuration);
+      return {
+        ...prev,
+        [msgId]: {
+          ...currentState,
+          waveWidth: width, // armazena largura da faixa
+        }
+      };
+    });
+  }, [getAudioState]);
+
+  // Timer para atualizar progresso dos audios em reproducao (usa posicao real do audio)
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const updates: Record<string, { progress: number; currentTime: number; isPlaying?: boolean }> = {};
+
+      for (const msgId of Object.keys(audioStates)) {
+        const state = audioStates[msgId];
+        if (state && state.isPlaying) {
+          const sound = audioSoundRefs.current[msgId];
+          if (sound) {
+            try {
+              const status = await sound.getStatusAsync();
+              if (status.isLoaded) {
+                const currentTime = status.positionMillis || 0;
+                const duration = status.durationMillis || state.duration;
+                const newProgress = duration > 0 ? currentTime / duration : 0;
+
+                if (status.didJustFinish || newProgress >= 1) {
+                  updates[msgId] = { progress: 0, currentTime: 0, isPlaying: false };
+                } else {
+                  updates[msgId] = { progress: newProgress, currentTime };
+                }
+              }
+            } catch {
+              // Fallback para simulacao se nao conseguir obter status
+              const increment = (50 * state.speed) / state.duration;
+              const newProgress = state.progress + increment;
+              if (newProgress >= 1) {
+                updates[msgId] = { progress: 0, currentTime: 0, isPlaying: false };
+              } else {
+                updates[msgId] = { progress: newProgress, currentTime: newProgress * state.duration };
+              }
+            }
+          } else {
+            // Fallback para simulacao se nao houver sound (audio sem URI)
+            const increment = (50 * state.speed) / state.duration;
+            const newProgress = state.progress + increment;
+            if (newProgress >= 1) {
+              updates[msgId] = { progress: 0, currentTime: 0, isPlaying: false };
+            } else {
+              updates[msgId] = { progress: newProgress, currentTime: newProgress * state.duration };
+            }
+          }
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        setAudioStates(prev => {
+          const updated = { ...prev };
+          for (const [msgId, update] of Object.entries(updates)) {
+            updated[msgId] = { ...updated[msgId], ...update };
+          }
+          return updated;
+        });
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [audioStates]);
+
+  // Formata tempo em mm:ss
+  const formatAudioTime = useCallback((ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }, []);
+
+  // Funcoes Utilitarias
+  const id = useCallback(() => `m${Date.now()}${Math.random().toString(36).slice(2, 8)}`, []);
+  const time = useCallback(() => `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`, []);
+  const fmt = useCallback((s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`, []);
+
+  // Array de emojis Unicode
+  const EMOJI_UNICODE_MAP = [
+    '\u{1F600}', '\u{1F61F}', '\u{1F622}', '\u{1F603}', '\u{1F632}', '\u{1F62F}',
+    '\u{1F62E}', '\u{1F627}', '\u{1F60A}', '\u{1F618}', '\u{1F60D}', '\u{1F970}',
+    '\u{1F60E}', '\u{1F635}', '\u{1F641}', '\u{1F621}', '\u{1F642}', '\u{1F929}',
+    '\u{1F607}', '\u{1F61B}', '\u{1F643}', '\u{1F92A}', '\u{1F976}', '\u{1F922}',
+    '\u{1F914}', '\u{1F605}', '\u{1F44D}', '\u{2764}\u{FE0F}', '\u{1F608}', '\u{1F47F}',
+  ];
+
+  const send = useCallback(() => {
+    const t = txt.trim();
+    if (!t) return;
+
+    const emojiRegex = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1FFFF}]+$/u;
+    const isOnlyEmoji = emojiRegex.test(t);
+
+    if (isOnlyEmoji) {
+      const emojiIndex = EMOJI_UNICODE_MAP.findIndex(e => t.includes(e));
+      const stickerEmojiId = emojiIndex >= 0 ? `emoji_${emojiIndex + 1}` : 'emoji_1';
+
+      setMsgs(p => [...p, {
+        id: id(),
+        type: 'sticker',
+        content: 'sticker',
+        sender: 'user',
+        timestamp: time(),
+        stickerEmoji: stickerEmojiId
+      }]);
+    } else {
+      setMsgs(p => [...p, { id: id(), type: 'text', content: t, sender: 'user', timestamp: time() }]);
+    }
+
+    setTxt('');
+    setBottomPanel('none');
+
+    setTimeout(() => {
+      setMsgs(p => [...p, { id: id(), type: 'text', content: RESPONSES[Math.floor(Math.random() * RESPONSES.length)], sender: 'contact', timestamp: time() }]);
+    }, 1500);
+  }, [txt, id, time, EMOJI_UNICODE_MAP]);
+
+  const insertEmoji = useCallback((index: number) => {
+    const emoji = EMOJI_UNICODE_MAP[index] || '\u{1F600}';
+    setTxt(prev => prev + emoji);
+    inputRef.current?.focus();
+  }, [EMOJI_UNICODE_MAP]);
+
+  const handleSendAudio = useCallback((durationSec: number, uri?: string | null) => {
+    setMsgs(p => [...p, {
+      id: id(),
+      type: 'audio',
+      content: 'audio',
+      sender: 'user',
+      timestamp: time(),
+      audioDuration: fmt(durationSec),
+      audioUri: uri || undefined,
+    }]);
+    setBottomPanel('none');
+  }, [id, time, fmt]);
+
+  // Funcoes de Midia
+  const pickPhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissao Necessaria', 'Para selecionar fotos, precisamos de acesso a sua galeria.', [{ text: 'OK' }]);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        setMsgs(p => [...p, { id: id(), type: 'image', content: '', imageUri, sender: 'user', timestamp: time() }]);
+        setBottomPanel('none');
+
+        setTimeout(() => {
+          setMsgs(p => [...p, { id: id(), type: 'text', content: 'Recebi sua foto!', sender: 'contact', timestamp: time() }]);
+        }, 1500);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel selecionar a foto.');
+    }
+  };
+
+  const openCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissao Necessaria', 'Para usar a camera, precisamos de acesso a sua camera.', [{ text: 'OK' }]);
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        setMsgs(p => [...p, { id: id(), type: 'image', content: '', imageUri, sender: 'user', timestamp: time() }]);
+        setBottomPanel('none');
+
+        setTimeout(() => {
+          setMsgs(p => [...p, { id: id(), type: 'text', content: 'Recebi sua foto da camera!', sender: 'contact', timestamp: time() }]);
+        }, 1500);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel abrir a camera.');
+    }
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const doc = result.assets[0];
+        const fileName = doc.name || 'Documento';
+
+        setMsgs(p => [...p, { id: id(), type: 'text', content: `📄 ${fileName}`, sender: 'user', timestamp: time() }]);
+        setBottomPanel('none');
+
+        setTimeout(() => {
+          setMsgs(p => [...p, { id: id(), type: 'text', content: 'Recebi seu documento!', sender: 'contact', timestamp: time() }]);
+        }, 1500);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel selecionar o documento.');
+    }
+  };
+
+  const closePanel = useCallback(() => {
+    if (bottomPanel !== 'none') {
+      setBottomPanel('none');
+    }
+  }, [bottomPanel]);
+
+  const toggleOptions = () => {
+    Keyboard.dismiss();
+    setBottomPanel(prev => prev === 'options' ? 'none' : 'options');
+  };
+
+  const openEmoji = () => {
+    setBottomPanel('emoji');
+  };
+
+  // Render Mensagem
+  const renderMsg = useCallback((m: ChatMessage, isLast: boolean = false, msgIndex: number = 0) => {
+    const u = m.sender === 'user';
+    const rowStyle = isLast
+      ? [styles.msgRow, u ? styles.msgR : styles.msgL, { marginBottom: 0 }]
+      : [styles.msgRow, u ? styles.msgR : styles.msgL];
+
+    if (m.type === 'text') {
+      // Mensagem do usuario (lado direito)
+      if (u) {
+        return (
+          <View key={m.id} style={rowStyle}>
+            <View style={[styles.bubble, styles.bubbleU]}>
+              <Text style={[styles.bubbleTxt, styles.txtW]}>{m.content}</Text>
+              <Text style={[styles.timeT, styles.timeW]}>{m.timestamp}</Text>
+            </View>
+          </View>
+        );
+      }
+
+      // Mensagem do contato (lado esquerdo) - novo layout com avatar dentro do card
+      return (
+        <View key={m.id} style={rowStyle}>
+          <View style={styles.contactMessageCard}>
+            <View style={styles.contactMessageRow}>
+              <View style={styles.contactAvatarContainer}>
+                <Image source={require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
+              </View>
+              <View style={styles.contactMessageContent}>
+                <View style={styles.contactMessageHeader}>
+                  <View style={styles.contactNameContainer}>
+                    <Text style={styles.contactName}>{m.senderName || 'Contato'}</Text>
+                  </View>
+                  <View style={styles.contactTimeContainer}>
+                    <Text style={styles.contactTime}>{m.timestamp}</Text>
+                  </View>
+                </View>
+                <View style={styles.contactMessageTextContainer}>
+                  <Text style={styles.contactMessageText}>{m.content}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    if (m.type === 'image' && m.imageUri) {
+      return (
+        <View key={m.id} style={rowStyle}>
+          <ChatImageMessage uri={m.imageUri} timestamp={m.timestamp} isUser={u} />
+        </View>
+      );
+    }
+
+    if (m.type === 'audio') {
+      const nextMsg = msgs[msgIndex + 1];
+      const hasNextAudio = nextMsg?.type === 'audio';
+
+      const handleAudioFinished = () => {
+        if (!hasNextAudio) return;
+        const nextPlayerRef = audioPlayerRefs.current.get(msgs[msgIndex + 1]?.id);
+        if (nextPlayerRef) {
+          nextPlayerRef.play();
+        }
+      };
+
+      // ----------------------------------------
+      // CONTAINER: Card de Audio do Usuario (Direita)
+      // Layout azul com avatar, controle de velocidade e faixa de audio
+      // ----------------------------------------
+      // Mensagem de audio do usuario (lado direito) - layout azul com avatar na direita
+      if (u) {
+        const userAudioState = getAudioState(m.id, m.audioDuration); // obtem estado do audio
+        // ----------------------------------------
+        // AJUSTES MANUAIS: Configuracao dos Risquinhos (Barras de Audio - Usuario)
+        // ----------------------------------------
+        const USER_AUDIO_TOTAL_BARS = 46; // quantidade total de barras na faixa
+        const USER_AUDIO_BAR_PLAYED_COLOR = '#FCFCFC'; // cor da parte ja executada (branco)
+        const USER_AUDIO_BAR_UNPLAYED_COLOR = 'rgba(252,252,252,0.4)'; // cor da parte nao executada (branco transparente)
+        const userPlayedBars = Math.floor(userAudioState.progress * USER_AUDIO_TOTAL_BARS); // barras ja executadas
+
+        // ----------------------------------------
+        // Funcao: Renderiza Faixa de Audio do Usuario
+        // Barras de onda com progresso dinamico e scrub
+        // ----------------------------------------
+        const renderUserAudioWaveform = () => {
+          // AJUSTE MANUAL: Alturas das barras de onda (valores de 3 a 18)
+          const waveHeights = [3, 4, 4, 3, 10, 8, 9, 18, 18, 14, 11, 8, 18, 14, 10, 7, 11, 15, 18, 14, 11, 14, 18, 14, 10, 7, 6, 4, 4, 4, 11, 14, 18, 14, 10, 7, 11, 15, 18, 14, 11, 14, 18, 14, 10, 7];
+
+          // Handler para scrub na faixa de audio
+          const handleUserWaveTouch = (event: GestureResponderEvent) => {
+            const { locationX } = event.nativeEvent; // posicao X do toque
+            const waveWidth = userAudioState.waveWidth || 160; // largura da faixa (fallback 160)
+            handleAudioScrub(m.id, m.audioDuration, locationX, waveWidth); // atualiza progresso
+          };
+
+          return (
+            <View
+              style={styles.userAudioWaveRow}
+              onLayout={(event: LayoutChangeEvent) => {
+                const { width } = event.nativeEvent.layout; // obtem largura da faixa
+                updateWaveWidth(m.id, m.audioDuration, width); // armazena largura
+              }}
+              onStartShouldSetResponder={() => true} // habilita responder a toques
+              onMoveShouldSetResponder={() => true} // habilita responder a arrastar
+              onResponderGrant={handleUserWaveTouch} // toque inicial
+              onResponderMove={handleUserWaveTouch} // arrastar
+            >
+              {waveHeights.slice(0, USER_AUDIO_TOTAL_BARS).map((height, i) => {
+                const isPlayed = i < userPlayedBars; // verifica se barra ja foi executada
+                const color = isPlayed ? USER_AUDIO_BAR_PLAYED_COLOR : USER_AUDIO_BAR_UNPLAYED_COLOR;
+                return (
+                  <View key={i} style={[styles.userAudioBar, { height: Math.max(3, height), backgroundColor: color }]} />
+                );
+              })}
+              {/* Marcador circular branco - posicao dinamica baseada no progresso */}
+              <View style={[styles.userAudioMarker, { left: `${userAudioState.progress * 100}%` }]} />
+            </View>
+          );
+        };
+
+        // Tempo a exibir: tempo atual se tocando/com progresso, duracao original se parado
+        const userDisplayTime = userAudioState.isPlaying || userAudioState.currentTime > 0
+          ? formatAudioTime(userAudioState.currentTime) // tempo atual formatado
+          : m.audioDuration || '00:16'; // duracao original
+
+        return (
+          <View key={m.id} style={rowStyle}>
+            <View style={styles.userAudioCard}>
+              {/* Coluna esquerda: Play + Ondas + Tempo */}
+              <View style={styles.userAudioLeftCol}>
+                {/* Botao Play/Pause */}
+                <TouchableOpacity
+                  style={styles.userAudioPlayButton}
+                  onPress={() => toggleAudioPlay(m.id, m.audioDuration, m.audioUri)}
+                  activeOpacity={0.7}
+                >
+                  {userAudioState.isPlaying ? (
+                    // Icone de Pause (branco)
+                    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+                      <Rect x={3} y={2} width={4} height={14} rx={1} fill="#FCFCFC" />
+                      <Rect x={11} y={2} width={4} height={14} rx={1} fill="#FCFCFC" />
+                    </Svg>
+                  ) : (
+                    // Icone de Play (branco)
+                    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+                      <Path d="M16.3409 7.86187L2.97916 0.176171C2.77851 0.0607592 2.55091 0 2.31922 0C2.08753 0 1.85993 0.0607592 1.65928 0.176171C1.4588 0.291678 1.29235 0.457692 1.17663 0.657549C1.06091 0.857406 0.999994 1.08407 1 1.3148V16.6859C0.999935 16.8585 1.03401 17.0294 1.10029 17.1889C1.16657 17.3484 1.26374 17.4933 1.38625 17.6153C1.50877 17.7373 1.65423 17.8341 1.81431 17.9001C1.97439 17.9662 2.14597 18.0001 2.31922 18C2.55075 18.0002 2.77822 17.9394 2.97866 17.824L16.3404 10.1385C16.541 10.0232 16.7075 9.85727 16.8233 9.65747C16.9391 9.45768 17 9.23104 17 9.00033C17.0002 8.76961 16.9394 8.54289 16.8237 8.34303C16.708 8.14316 16.5415 7.9772 16.3409 7.86187Z" fill="#FCFCFC" />
+                    </Svg>
+                  )}
+                </TouchableOpacity>
+                {/* Ondas e tempos */}
+                <View style={styles.userAudioWaveContainer}>
+                  {renderUserAudioWaveform()}
+                  {/* Linha de tempo */}
+                  <View style={styles.userAudioTimeRow}>
+                    <Text style={styles.userAudioTime}>{userDisplayTime}</Text>
+                    <Text style={styles.userAudioTime}>{m.timestamp}</Text>
+                  </View>
+                </View>
+              </View>
+              {/* Coluna direita: Avatar ou Controle de Velocidade */}
+              <TouchableOpacity
+                style={styles.userAudioAvatarContainer}
+                onPress={() => toggleSpeedControl(m.id, m.audioDuration)}
+                activeOpacity={0.7}
+              >
+                {userAudioState.showSpeed ? (
+                  // Container de velocidade (substitui avatar)
+                  <View style={styles.userSpeedContainer}>
+                    <Text style={styles.userSpeedText}>
+                      {userAudioState.speed === 1 ? '1x' : userAudioState.speed === 1.5 ? '1,5x' : '2x'}
+                    </Text>
+                  </View>
+                ) : (
+                  // Avatar do usuario
+                  <Image source={require('../../../assets/02-Foto.png')} style={styles.userAudioAvatar} />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      }
+
+      // ----------------------------------------
+      // CONTAINER: Card de Audio do Contato
+      // Layout com avatar, controle de velocidade e faixa de audio
+      // ----------------------------------------
+      const audioState = getAudioState(m.id, m.audioDuration); // obtem estado do audio
+
+      // AJUSTES MANUAIS: Configuracao dos Risquinhos (Barras de Audio)
+      const CONTACT_AUDIO_BAR_WIDTH = 1.5; // largura de cada barra
+      const CONTACT_AUDIO_BAR_GAP = 2; // espaco entre barras
+      const CONTACT_AUDIO_MARGIN_RIGHT = 0; // AJUSTE MANUAL: margem direita (linha 998)
+      const CONTACT_AUDIO_BAR_PLAYED_COLOR = '#7D8592'; // cor da parte ja executada (cinza escuro)
+      const CONTACT_AUDIO_BAR_UNPLAYED_COLOR = '#C5CAD1'; // cor da parte nao executada (cinza claro solido)
+
+      // Calcula numero de barras baseado na largura do container (responsivo)
+      const containerWidth = audioState.waveWidth || 200; // largura do container
+      const barSpace = CONTACT_AUDIO_BAR_WIDTH + CONTACT_AUDIO_BAR_GAP; // espaco por barra (3.5px)
+      const availableWidth = containerWidth - CONTACT_AUDIO_MARGIN_RIGHT; // largura disponivel
+      const CONTACT_AUDIO_TOTAL_BARS = Math.max(1, Math.floor(availableWidth / barSpace)); // numero de barras
+      const playedBars = Math.floor(audioState.progress * CONTACT_AUDIO_TOTAL_BARS); // barras ja executadas
+
+      // Funcao: Renderiza Faixa de Audio do Contato
+      // Barras de onda com progresso dinamico e scrub
+      const renderContactAudioWaveform = () => {
+
+        // Padrao base de alturas das barras (valores de 3 a 18) - repete para preencher
+        const wavePattern = [3, 4, 4, 3, 10, 8, 9, 18, 18, 14, 11, 8, 18, 14, 10, 7, 11, 15, 18, 14, 11, 14, 18, 14, 10, 7, 6, 4, 4, 4, 11, 14, 18, 14, 10, 7, 11, 15, 18, 14, 11, 14, 18, 14, 10, 7];
+
+        // Gera array de alturas repetindo o padrao ate atingir o numero necessario de barras
+        const waveHeights = Array.from({ length: CONTACT_AUDIO_TOTAL_BARS }, (_, i) => wavePattern[i % wavePattern.length]);
+
+        // Handler para scrub na faixa de audio
+        const handleWaveTouch = (event: GestureResponderEvent) => {
+          const { locationX } = event.nativeEvent; // posicao X do toque
+          const waveWidth = audioState.waveWidth || 200; // largura da faixa (fallback 200)
+          handleAudioScrub(m.id, m.audioDuration, locationX, waveWidth); // atualiza progresso
+        };
+
+        return (
+          <View
+            style={styles.contactAudioWaveRow}
+            onLayout={(event: LayoutChangeEvent) => {
+              const { width } = event.nativeEvent.layout; // obtem largura da faixa
+              updateWaveWidth(m.id, m.audioDuration, width); // armazena largura
+            }}
+            onStartShouldSetResponder={() => true} // habilita responder a toques
+            onMoveShouldSetResponder={() => true} // habilita responder a arrastar
+            onResponderGrant={handleWaveTouch} // toque inicial
+            onResponderMove={handleWaveTouch} // arrastar
+          >
+            {waveHeights.map((height, i) => {
+              const isPlayed = i < playedBars; // verifica se barra ja foi executada
+              const color = isPlayed ? CONTACT_AUDIO_BAR_PLAYED_COLOR : CONTACT_AUDIO_BAR_UNPLAYED_COLOR;
+              return (
+                <View key={i} style={[styles.contactAudioBar, { height: Math.max(3, height), backgroundColor: color }]} />
+              );
+            })}
+            {/* Marcador circular azul - posicao dinamica baseada no progresso */}
+            <View style={[styles.contactAudioMarker, { left: `${audioState.progress * 100}%` }]} />
+          </View>
+        );
+      };
+
+      // Tempo a exibir: tempo atual se tocando/com progresso, duracao original se parado
+      const displayTime = audioState.isPlaying || audioState.currentTime > 0
+        ? formatAudioTime(audioState.currentTime) // tempo atual formatado
+        : m.audioDuration || '0:05'; // duracao original
+
+      return (
+        <View key={m.id} style={[rowStyle, styles.msgLAudio]}>
+          <View style={styles.contactMessageCard}>
+            <View style={styles.contactMessageRow}>
+              {/* Avatar ou Controle de Velocidade - toque para alternar */}
+              <TouchableOpacity
+                style={styles.contactAvatarContainer}
+                onPress={() => toggleSpeedControl(m.id, m.audioDuration)}
+                activeOpacity={0.7}
+              >
+                {audioState.showSpeed ? (
+                  // Container de velocidade (substitui avatar)
+                  <View style={styles.contactSpeedContainer}>
+                    <Text style={styles.contactSpeedText}>
+                      {audioState.speed === 1 ? '1x' : audioState.speed === 1.5 ? '1,5x' : '2x'}
+                    </Text>
+                  </View>
+                ) : (
+                  // Avatar do contato
+                  <Image source={require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
+                )}
+              </TouchableOpacity>
+              <View style={styles.contactMessageContent}>
+                <View style={styles.contactMessageHeader}>
+                  <View style={styles.contactNameContainer}>
+                    <Text style={styles.contactName}>{m.senderName || 'Contato'}</Text>
+                  </View>
+                  <View style={styles.contactTimeContainer}>
+                    <Text style={styles.contactTime}>{m.timestamp}</Text>
+                  </View>
+                </View>
+                {/* Player de audio inline */}
+                <View style={styles.contactAudioPlayerContainer}>
+                  {/* Botao Play/Pause */}
+                  <TouchableOpacity
+                    style={styles.contactAudioPlayButton}
+                    onPress={() => toggleAudioPlay(m.id, m.audioDuration, m.audioUri)}
+                    activeOpacity={0.7}
+                  >
+                    {audioState.isPlaying ? (
+                      // Icone de Pause
+                      <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+                        <Rect x={3} y={2} width={4} height={14} rx={1} fill="#7D8592" />
+                        <Rect x={11} y={2} width={4} height={14} rx={1} fill="#7D8592" />
+                      </Svg>
+                    ) : (
+                      // Icone de Play
+                      <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+                        <Path d="M13.6133 8.99902L3.3457 14.9053V3.09277L13.6133 8.99902Z" fill="#7D8592" stroke="#7D8592" strokeWidth={4.69} />
+                      </Svg>
+                    )}
+                  </TouchableOpacity>
+                  {/* Ondas e tempo */}
+                  <View style={styles.contactAudioWaveContainer}>
+                    {renderContactAudioWaveform()}
+                    {/* Linha de tempo */}
+                    <View style={styles.contactAudioTimeRow}>
+                      <Text style={styles.contactAudioTime}>{displayTime}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    if (m.type === 'sticker') {
+      const STICKER_EMOJIS = [
+        '\u{1F600}', '\u{1F61F}', '\u{1F622}', '\u{1F603}', '\u{1F632}', '\u{1F62F}',
+        '\u{1F62E}', '\u{1F627}', '\u{1F60A}', '\u{1F618}', '\u{1F60D}', '\u{1F970}',
+        '\u{1F60E}', '\u{1F635}', '\u{1F641}', '\u{1F621}', '\u{1F642}', '\u{1F929}',
+        '\u{1F607}', '\u{1F61B}', '\u{1F643}', '\u{1F92A}', '\u{1F976}', '\u{1F922}',
+        '\u{1F914}', '\u{1F605}', '\u{1F44D}', '\u{2764}\u{FE0F}', '\u{1F608}', '\u{1F47F}',
+      ];
+      const emojiIndex = parseInt(m.stickerEmoji?.replace('emoji_', '') || '1', 10);
+      const emojiChar = STICKER_EMOJIS[emojiIndex - 1] || '\u{1F600}';
+
+      return (
+        <View key={m.id} style={rowStyle}>
+          <View style={styles.stickerBox}>
+            <Text style={styles.stickerEmoji}>{emojiChar}</Text>
+            <Text style={styles.stickerT}>{m.timestamp}</Text>
+          </View>
+        </View>
+      );
+    }
+
+    return null;
+  }, [msgs, audioStates, getAudioState, toggleAudioPlay, toggleSpeedControl, handleAudioScrub, updateWaveWidth, formatAudioTime]);
+
+  // Render Input Area
+  const renderInputArea = () => {
+    return (
+      <ChatAudioInput
+        txt={txt}
+        setTxt={setTxt}
+        onSendText={send}
+        toggleOptions={toggleOptions}
+        inputRef={inputRef}
+        onSendAudio={handleSendAudio}
+      />
+    );
+  };
+
+  // Render Painel de Opcoes
+  const renderOptionsPanel = () => {
+    if (bottomPanel !== 'options') return null;
+
+    return (
+      <View style={[styles.optionsPanel, { marginBottom: OPTIONS_BOTTOM_PADDING }]}>
+        <View style={styles.optionsRow}>
+          <TouchableOpacity style={styles.optionItem} onPress={pickPhoto} activeOpacity={0.7}>
+            <PhotosIconFigma />
+            <Text style={styles.optionLabel}>Fotos</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionItem} onPress={openCamera} activeOpacity={0.7}>
+            <CameraIconFigma />
+            <Text style={styles.optionLabel}>Camera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionItem} onPress={pickDocument} activeOpacity={0.7}>
+            <DocumentIconFigma />
+            <Text style={styles.optionLabel}>Documento</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionItem} onPress={openEmoji} activeOpacity={0.7}>
+            <EmojiIconFigma />
+            <Text style={styles.optionLabel}>Emoji</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  // Render Painel de Emojis
+  const renderEmojiPanel = () => {
+    if (bottomPanel !== 'emoji') return null;
+
+    return (
+      <View style={[styles.emojiPanel, { marginBottom: EMOJI_BOTTOM_PADDING }]}>
+        <EmojiContainer onSelectEmoji={insertEmoji} />
+      </View>
+    );
+  };
+
+  // Obtem a atividade selecionada
+  const selectedActivity = activities.find(a => a.id === selectedActivityId);
+
+  // Funcao para obter o label de status
+  const getStatusLabel = (status: ActivityStatus): string => {
+    switch (status) {
+      case 'completed':
+        return 'Atividade concluida';
+      case 'started':
+        return 'Atividade iniciada';
+      case 'not_started':
+        return 'Atividade nao iniciada';
+      case 'null':
+        return 'Nulo';
+      default:
+        return '';
+    }
+  };
+
+  // Icone de status para o card de contexto
+  const renderStatusIcon = (status: ActivityStatus) => {
+    switch (status) {
+      case 'completed':
+        return (
+          <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+            <Path
+              d="M8 1.5C9.72391 1.5 11.3772 2.18482 12.5962 3.40381C13.8152 4.62279 14.5 6.27609 14.5 8C14.5 9.72391 13.8152 11.3772 12.5962 12.5962C11.3772 13.8152 9.72391 14.5 8 14.5C6.27609 14.5 4.62279 13.8152 3.40381 12.5962C2.18482 11.3772 1.5 9.72391 1.5 8C1.5 6.27609 2.18482 4.62279 3.40381 3.40381C4.62279 2.18482 6.27609 1.5 8 1.5ZM8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM11.5312 6.53125C11.825 6.2375 11.825 5.7625 11.5312 5.47188C11.2375 5.18125 10.7625 5.17813 10.4719 5.47188L7.00313 8.94063L5.53438 7.47188C5.24063 7.17813 4.76562 7.17813 4.475 7.47188C4.18437 7.76563 4.18125 8.24063 4.475 8.53125L6.475 10.5312C6.76875 10.825 7.24375 10.825 7.53438 10.5312L11.5312 6.53125Z"
+              fill="#1777CF"
+            />
+          </Svg>
+        );
+      case 'started':
+        return (
+          <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+            <Path
+              d="M8 1.5C9.72391 1.5 11.3772 2.18482 12.5962 3.40381C13.8152 4.62279 14.5 6.27609 14.5 8C14.5 9.72391 13.8152 11.3772 12.5962 12.5962C11.3772 13.8152 9.72391 14.5 8 14.5C6.27609 14.5 4.62279 13.8152 3.40381 12.5962C2.18482 11.3772 1.5 9.72391 1.5 8C1.5 6.27609 2.18482 4.62279 3.40381 3.40381C4.62279 2.18482 6.27609 1.5 8 1.5ZM8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM11.5312 6.53125C11.825 6.2375 11.825 5.7625 11.5312 5.47188C11.2375 5.18125 10.7625 5.17813 10.4719 5.47188L7.00313 8.94063L5.53438 7.47188C5.24063 7.17813 4.76562 7.17813 4.475 7.47188C4.18437 7.76563 4.18125 8.24063 4.475 8.53125L6.475 10.5312C6.76875 10.825 7.24375 10.825 7.53438 10.5312L11.5312 6.53125Z"
+              fill="#7D8592"
+            />
+          </Svg>
+        );
+      case 'not_started':
+        return (
+          <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+            <Path
+              d="M8 15.25C12.0041 15.25 15.25 12.0041 15.25 8C15.25 3.99594 12.0041 0.75 8 0.75C3.99594 0.75 0.75 3.99594 0.75 8C0.75 12.0041 3.99594 15.25 8 15.25Z"
+              stroke="#6F7DA0"
+              strokeWidth={1.5}
+              fill="none"
+            />
+          </Svg>
+        );
+      case 'null':
+        // Icone de X no circulo para atividade nula
+        return (
+          <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+            <Path
+              d="M8 15.25C12.0041 15.25 15.25 12.0041 15.25 8C15.25 3.99594 12.0041 0.75 8 0.75C3.99594 0.75 0.75 3.99594 0.75 8C0.75 12.0041 3.99594 15.25 8 15.25Z"
+              stroke="#6F7DA0"
+              strokeWidth={1.5}
+              fill="none"
+            />
+            <Path
+              d="M5 5L11 11M11 5L5 11"
+              stroke="#6F7DA0"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+            />
+          </Svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <View style={[styles.root, { paddingTop: insets.top }]}>
+        {/* HEADER com titulo centralizado */}
+        <View style={styles.header}>
+          {/* Seta de voltar */}
+          <TouchableOpacity style={styles.backBtn} onPress={onClose} activeOpacity={0.7}>
+            <BackArrowIcon />
+          </TouchableOpacity>
+          {/* Titulo centralizado */}
+          <Text style={styles.headerTitle}>Time Operacional</Text>
+          {/* Botao do menu */}
+          <TouchableOpacity style={styles.menuBtn} onPress={() => setMenuVisible(true)} activeOpacity={0.7}>
+            <MenuIcon />
+          </TouchableOpacity>
+        </View>
+
+        {/* AREA AZUL - Card de contexto da atividade */}
+        <View style={styles.contactCard}>
+          {selectedActivity && (
+            <TouchableOpacity
+              style={styles.activityContextCard}
+              onPress={() => {
+                // Sincroniza o indice da atividade baseado no selectedActivityId antes de abrir o modal
+                const activityIndex = MOCK_ALL_ACTIVITIES.findIndex(a => a.id === selectedActivityId);
+                if (activityIndex !== -1) {
+                  setCurrentActivityIndex(activityIndex);
+                }
+                setStatusHistoryVisible(true);
+              }}
+              activeOpacity={0.7}
+            >
+              {/* Coluna esquerda: Numero + Icone de status */}
+              <View style={styles.activityContextNumberCol}>
+                <View style={styles.activityContextNumberContainer}>
+                  <Text style={styles.activityContextNumber}>{selectedActivity.number}</Text>
+                </View>
+                <View style={styles.activityContextDivider} />
+                <View style={styles.activityContextIconContainer}>
+                  {renderStatusIcon(selectedActivity.status)}
+                </View>
+              </View>
+              {/* Coluna direita: Titulo + Status */}
+              <View style={styles.activityContextContentCol}>
+                <View style={styles.activityContextTitleContainer}>
+                  <Text style={styles.activityContextTitle} numberOfLines={1} ellipsizeMode="tail">
+                    {selectedActivity.title}
+                  </Text>
+                </View>
+                <View style={styles.activityContextStatusDivider} />
+                <View style={styles.activityContextStatusContainer}>
+                  <Text style={styles.activityContextStatusText}>
+                    {getStatusLabel(selectedActivity.status)}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* MESSAGES AREA */}
+        <TouchableWithoutFeedback onPress={closePanel}>
+          <View style={[styles.msgsArea, { height: messagesAreaHeight }]}>
+            {msgs.length === 0 ? (
+              // Estado vazio - sem mensagens
+              <View style={styles.emptyStateContainer}>
+                <View style={styles.emptyStateContent}>
+                  {/* Icone de chat vazio */}
+                  <View style={styles.emptyStateIconContainer}>
+                    <Svg width={64} height={64} viewBox="0 0 64 64" fill="none">
+                      <Path
+                        d="M32 6C17.64 6 6 16.536 6 29.5C6 35.736 8.736 41.352 13.248 45.456C12.528 49.656 10.176 53.4 10.128 53.472C10 53.664 9.96 53.904 10.032 54.12C10.104 54.336 10.272 54.504 10.488 54.576C10.56 54.6 10.632 54.6 10.704 54.6C10.872 54.6 11.04 54.528 11.16 54.408C11.232 54.336 17.4 48.312 20.112 46.2C23.76 48.072 27.792 49 32 49C46.36 49 58 38.464 58 25.5C58 16.536 46.36 6 32 6ZM20 33C18.344 33 17 31.656 17 30C17 28.344 18.344 27 20 27C21.656 27 23 28.344 23 30C23 31.656 21.656 33 20 33ZM32 33C30.344 33 29 31.656 29 30C29 28.344 30.344 27 32 27C33.656 27 35 28.344 35 30C35 31.656 33.656 33 32 33ZM44 33C42.344 33 41 31.656 41 30C41 28.344 42.344 27 44 27C45.656 27 47 28.344 47 30C47 31.656 45.656 33 44 33Z"
+                        fill="#D8E0F0"
+                      />
+                    </Svg>
+                  </View>
+                  {/* Titulo */}
+                  <Text style={styles.emptyStateTitle}>Nenhuma mensagem ainda</Text>
+                  {/* Descricao */}
+                  <Text style={styles.emptyStateDescription}>
+                    Inicie a conversa digitando sua mensagem{'\n'}no campo abaixo e pressione enviar.
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              // Lista de mensagens
+              <ScrollView
+                ref={scrollRef}
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+                overScrollMode="never"
+              >
+                {msgs.map((m, index) => renderMsg(m, index === msgs.length - 1, index))}
+                <View style={{ height: CHAT_INPUT_GAP }} />
+              </ScrollView>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+
+        {/* BOTTOM CONTAINER */}
+        <View style={[styles.bottomContainer, { height: INPUT_HEIGHT + INPUT_BOTTOM_PADDING + getPanelHeight() + (bottomPanel === 'options' ? OPTIONS_BOTTOM_PADDING : 0) + (bottomPanel === 'emoji' ? EMOJI_BOTTOM_PADDING : 0) + (Platform.OS === 'ios' ? insets.bottom : 0), paddingBottom: INPUT_BOTTOM_PADDING }]}>
+          <View style={styles.inputArea}>
+            {renderInputArea()}
+          </View>
+          {renderOptionsPanel()}
+          {renderEmojiPanel()}
+          <DiscountChatCallModal visible={callModalVisible} onClose={() => setCallModalVisible(false)} anchor={callAnchor} />
+        </View>
+
+        {/* Menu de Atividades */}
+        <ActivitiesChatMenu
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          productName="Holding Patrimonial"
+          phaseName="Keymans"
+          activities={activities}
+          selectedActivityId={selectedActivityId}
+          onSelectActivity={(id) => {
+            setSelectedActivityId(id);
+            // Apenas troca a atividade selecionada
+            // hasInteraction sera marcado quando o usuario enviar mensagem
+          }}
+        />
+
+        {/* Modal de Historico de Status */}
+        <StatusActivitiesModal
+          visible={statusHistoryVisible}
+          onClose={() => setStatusHistoryVisible(false)}
+          activity={currentActivity || null}
+          productInfo={currentProduct}
+          phaseInfo={currentPhase}
+          currentActivityPosition={currentActivityIndex + 1}
+          totalActivities={MOCK_ALL_ACTIVITIES.length}
+          currentProductPosition={currentProductIndex + 1}
+          totalProducts={MOCK_ALL_PRODUCTS.length}
+          currentPhasePosition={currentPhaseIndex + 1}
+          totalPhases={phasesForCurrentProduct.length}
+          allProducts={MOCK_ALL_PRODUCTS}
+          allPhases={MOCK_ALL_PHASES}
+          onProductSelect={handleProductSelect}
+          onPhaseSelect={handlePhaseSelect}
+          onActivitySelect={handleActivitySelect}
+        />
+      </View>
+    </Modal>
+  );
+};
+
+// ----------------------------------------===================================
+// Estilos
+// ----------------------------------------===================================
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#FCFCFC',
+  },
+  header: {
+    backgroundColor: '#FCFCFC',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // Espaco no topo do header (15px)
+    paddingTop: 15,
+    // Margem esquerda da seta de voltar (15px)
+    paddingLeft: 15,
+    // Margem direita do container do menu (15px)
+    paddingRight: 15,
+  },
+  backBtn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuBtn: {
+    width: 35,
+    height: 35,
+    // Espaçamento superior do container do menu (10px)
+    marginTop: 10,
+    // Espaçamento inferior do container do menu (5px)
+    marginBottom: 5,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#1777CF',
+    flex: 1,
+    textAlign: 'center',
+  },
+  contactCard: {
+    backgroundColor: '#1777CF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // AJUSTE MANUAL: Espacamento vertical do card na area azul
+    // paddingTop = espacamento visivel acima do card
+    // paddingBottom = espacamento visivel abaixo + 32px (compensacao do msgsArea)
+    paddingTop: 20,       // LINHA 1459 - espacamento acima (altere este valor)
+    paddingBottom: 52,    // LINHA 1460 - espacamento abaixo (valor visivel + 32)
+    paddingHorizontal: 15,
+  },
+  // ----------------------------------------
+  // Card de Contexto da Atividade (area azul)
+  // ----------------------------------------
+  activityContextCard: {
+    flexDirection: 'row',
+    borderRadius: 6,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    alignSelf: 'stretch',
+  },
+  activityContextNumberCol: {
+    width: 38,
+    height: 66,
+    backgroundColor: '#F4F4F4',
+    borderRightWidth: 0.5,
+    borderRightColor: '#D8E0F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activityContextNumberContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 3,
+  },
+  activityContextNumber: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: '#3A3F51',
+  },
+  activityContextDivider: {
+    alignSelf: 'stretch',
+    height: 0.5,
+    backgroundColor: '#D8E0F0',
+  },
+  activityContextIconContainer: {
+    height: 33,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activityContextContentCol: {
+    flex: 1,
+    padding: 10,
+    borderLeftWidth: 0.5,
+    borderLeftColor: '#D8E0F0',
+    justifyContent: 'center',
+    gap: 5,
+    backgroundColor: '#FCFCFC',
+  },
+  activityContextTitleContainer: {
+    alignSelf: 'stretch',
+  },
+  activityContextTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: '#3A3F51',
+  },
+  activityContextStatusDivider: {
+    alignSelf: 'stretch',
+    height: 0.5,
+    backgroundColor: '#D8E0F0',
+  },
+  activityContextStatusContainer: {
+    alignSelf: 'stretch',
+  },
+  activityContextStatusText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: '#7D8592',
+  },
+  msgsArea: {
+    backgroundColor: '#FCFCFC',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    marginTop: -32,
+    overflow: 'hidden',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 15,
+    paddingTop: 20,
+    paddingBottom: 0,
+  },
+  // ----------------------------------------
+  // Estado Vazio do Chat
+  // ----------------------------------------
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyStateContent: {
+    alignItems: 'center',
+    gap: 16,
+  },
+  emptyStateIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F4F7FA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#3A3F51',
+    textAlign: 'center',
+  },
+  emptyStateDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: '#7D8592',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  inputArea: {
+    height: INPUT_HEIGHT,
+    backgroundColor: '#FCFCFC',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    paddingBottom: 0,
+    marginBottom: 0,
+  },
+  optionsPanel: {
+    height: OPTIONS_HEIGHT,
+    backgroundColor: '#F4F4F4',
+    borderRadius: 8,
+    marginHorizontal: 15,
+    marginTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  optionsRow: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  optionItem: {
+    width: 60,
+    alignItems: 'center',
+    gap: 5,
+  },
+  optionLabel: {
+    fontSize: 12,
+    color: '#3A3F51',
+  },
+  emojiPanel: {
+    height: EMOJI_HEIGHT,
+    backgroundColor: '#F4F4F4',
+    borderRadius: 8,
+    marginHorizontal: 15,
+    marginTop: 10,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  msgRow: {
+    marginBottom: 15,
+  },
+  msgR: {
+    alignItems: 'flex-end',
+  },
+  msgL: {
+    alignItems: 'flex-start',
+  },
+  msgLAudio: {
+    alignItems: 'stretch',
+    alignSelf: 'stretch',
+  },
+  senderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 5,
+  },
+  senderAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+  },
+  senderName: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: '#3A3F51',
+  },
+  msgTimestamp: {
+    fontSize: 12,
+    color: '#91929E',
+  },
+  bubble: {
+    maxWidth: '80%',
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  bubbleU: {
+    backgroundColor: '#1777CF',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 0,
+  },
+  bubbleC: {
+    backgroundColor: '#F4F4F4',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 16,
+  },
+  bubbleTxt: {
+    fontSize: 14,
+    flex: 1,
+  },
+  txtW: {
+    color: '#FCFCFC',
+  },
+  txtD: {
+    color: '#3A3F51',
+  },
+  timeT: {
+    fontSize: 12,
+  },
+  timeW: {
+    color: 'rgba(255,255,255,0.7)',
+  },
+  timeG: {
+    color: '#91929E',
+  },
+  stickerBox: {
+    alignItems: 'center',
+  },
+  stickerEmoji: {
+    fontSize: 60,
+  },
+  stickerT: {
+    fontSize: 12,
+    color: '#91929E',
+    marginTop: 4,
+  },
+  bottomContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FCFCFC',
+    paddingBottom: 0,
+  },
+  // ----------------------------------------===================================
+  // Estilos do Card de Mensagem do Contato (lado esquerdo)
+  // ----------------------------------------===================================
+  contactMessageCard: {
+    alignSelf: 'stretch',
+    paddingTop: 2,
+    paddingBottom: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    backgroundColor: '#F4F4F4',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 16,
+  },
+  contactMessageRow: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  contactAvatarContainer: {
+    alignSelf: 'stretch',
+    paddingTop: 6,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  // Container de velocidade (substitui avatar ao tocar)
+  contactSpeedContainer: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contactSpeedText: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    color: '#7D8592',
+  },
+  contactAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+  },
+  contactMessageContent: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 2,
+    // AJUSTE MANUAL: overflow visible permite que a faixa de audio se estenda alem do limite
+    overflow: 'visible',
+  },
+  contactMessageHeader: {
+    alignSelf: 'stretch',
+    height: 24,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  contactNameContainer: {
+    flex: 1,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+  },
+  contactName: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: '#3A3F51',
+  },
+  contactTimeContainer: {
+    alignSelf: 'stretch',
+    paddingTop: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contactTime: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    color: '#7D8592',
+  },
+  contactMessageTextContainer: {
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+  },
+  contactMessageText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    color: '#3A3F51',
+  },
+  contactAudioContainer: {
+    alignSelf: 'stretch',
+    marginTop: 5,
+  },
+
+  // Container: Player de Audio do Contato
+  // Container principal do player inline
+  contactAudioPlayerContainer: {
+    alignSelf: 'stretch', //.......Ocupa largura total
+    paddingTop: 12, //.............Espaco acima do player
+    flexDirection: 'row', //.......Layout horizontal
+    alignItems: 'flex-start', //...Alinha no topo
+    gap: 10, //....................Espaco entre play e faixa
+    overflow: 'visible', //........Permite overflow do marcador
+  },
+
+  // Botao Play/Pause do Contato
+  contactAudioPlayButton: {
+    width: 18, //..................Largura do botao
+    height: 18, //.................Altura do botao
+    justifyContent: 'center', //...Centraliza icone
+    alignItems: 'center', //.......Centraliza icone
+  },
+
+  // Container das Ondas de Audio do Contato
+  contactAudioWaveContainer: {
+    flex: 1, //...................Ocupa espaco restante
+    flexDirection: 'column', //...Layout vertical
+    gap: 5, //....................Espaco entre faixa e tempo
+    overflow: 'visible', //.......Permite overflow do marcador
+    marginRight: 0, //...........AJUSTE MANUAL: margem direita (linha 1572)
+  },
+
+  // Container: Faixa de Audio (Risquinhos) do Contato
+  // Container das barras de onda sonora
+  contactAudioWaveRow: {
+    alignSelf: 'stretch', //...Ocupa largura total
+    flexDirection: 'row', //...Layout horizontal das barras
+    alignItems: 'center', //...Centraliza barras verticalmente
+    gap: 2, //.................Espaco entre barras
+    height: 18, //.............Altura da area das barras
+    position: 'relative', //...Para posicionar marcador absoluto
+    overflow: 'visible', //....Permite overflow do marcador
+  },
+
+  // Conteiner: Barra Individual de Audio (Risquinho)
+  // Estilo de cada barra de onda sonora
+  contactAudioBar: {
+    width: 1.5, //...........Largura fixa da barra
+    borderRadius: 0.5, //...Arredondamento das pontas
+  },
+
+  // Marcador de Progresso (Bolinha) do Contato
+  contactAudioMarker: {
+    position: 'absolute', //...........Posicao absoluta para mover
+    width: 9, //.......................Largura do marcador
+    height: 9, //......................Altura do marcador
+    borderRadius: 4.5, //..............Arredondamento (circulo)
+    backgroundColor: '#1777CF', //....Cor azul do marcador
+    top: 4.5, //.......................Posicao vertical (centralizado)
+    marginLeft: -4.5, //...............Centraliza bolinha (metade da largura)
+  },
+
+  // Linha de Tempo do Audio do Contato
+  contactAudioTimeRow: {
+    alignSelf: 'stretch', //...Ocupa largura total
+    flexDirection: 'row', //...Layout horizontal
+    alignItems: 'center', //...Centraliza verticalmente
+    gap: 15, //................Espaco entre elementos
+  },
+
+  // Texto de Tempo do Audio do Contato
+  contactAudioTime: {
+    fontSize: 12, //.....................Tamanho da fonte
+    fontFamily: 'Inter_400Regular', //...Familia da fonte
+    color: '#7D8592', //...............Cor cinza do texto
+  },
+
+  // Conteiner: Card de Audio do Usuario
+  // Card azul do lado direito com player de audio
+  userAudioCard: {
+    paddingTop: 8, //..................Espaco superior interno
+    paddingBottom: 2, //...............Espaco inferior interno
+    paddingLeft: 20, //................Espaco esquerdo interno
+    paddingRight: 10, //...............Espaco direito interno
+    backgroundColor: '#1777CF', //...Cor azul do card
+    borderTopLeftRadius: 16, //........Arredondamento superior esquerdo
+    borderTopRightRadius: 16, //.......Arredondamento superior direito
+    borderBottomLeftRadius: 16, //.....Arredondamento inferior esquerdo
+    borderBottomRightRadius: 0, //.....Arredondamento inferior direito
+    flexDirection: 'row', //...........Layout horizontal
+    alignItems: 'flex-start', //.......Alinha no topo
+    gap: 10, //........................Espaco entre colunas
+  },
+
+  // Coluna Esquerda do Card de Audio do Usuario
+  userAudioLeftCol: {
+    paddingTop: 12, //.............Espaco superior
+    flexDirection: 'row', //.......Layout horizontal
+    alignItems: 'flex-start', //...Linha no topo
+    gap: 10, //....................Espaco entre play e faixa
+  },
+
+  // Botao Play/Pause do Usuario
+  userAudioPlayButton: {
+    width: 18, //..................Largura do botao
+    height: 18, //.................Altura do botao
+    justifyContent: 'center', //...Centraliza icone
+    alignItems: 'center', //.......Centraliza icone
+  },
+  
+  // Container: Ondas de Audio do Usuario
+  userAudioWaveContainer: {
+    flexDirection: 'column', //...Layout vertical
+    gap: 5, //....................Espaco entre faixa e tempo
+  },
+
+  // Conteiner: Faixa de Audio (Risquinhos) do Usuario
+  // Container das barras de onda sonora
+  userAudioWaveRow: {
+    alignSelf: 'stretch', //...Ocupa largura total
+    flexDirection: 'row', //...Layout horizontal das barras
+    alignItems: 'center', //...Centraliza barras verticalmente
+
+    // Espacamento entre Risquinhos (Usuario)
+    // Valores menores = barras mais juntas
+    // Valores maiores = barras mais espacadas
+    gap: 2, //.................Espacamento entre barras
+    height: 18, //.............Altura da area das barras
+    position: 'relative', //...Para posicionar marcador absoluto
+    overflow: 'visible', //....Permite overflow do marcador
+  },
+
+  // Conteiner: Barra Individual de Audio (Risquinho) do Usuario
+  // Estilo de cada barra de onda sonora
+  userAudioBar: {
+
+    // Largura dos Risquinhos (Usuario)
+    // width: largura fixa de cada barra
+    width: 1.5, //..........Largura da barra
+    borderRadius: 0.5, //...Arredondamento das pontas
+  },
+
+  // Marcador de Progresso (Bolinha) do Usuario
+  userAudioMarker: {
+    position: 'absolute', //...........Posicao absoluta para mover
+    width: 9, //.......................Largura do marcador
+    height: 9, //......................Altura do marcador
+    borderRadius: 4.5, //..............Arredondamento (circulo)
+    backgroundColor: '#FCFCFC', //...Cor branca do marcador
+    top: 4.5, //.......................Posicao vertical (centralizado)
+  },
+
+  // Linha de Tempo do Audio do Usuario
+  userAudioTimeRow: {
+    alignSelf: 'stretch', //..............Ocupa largura total
+    flexDirection: 'row', //..............Layout horizontal
+    justifyContent: 'space-between', //...Espaca tempo e horario
+    alignItems: 'center', //..............Centraliza verticalmente
+    gap: 15, //...........................Espaco entre elementos
+  },
+
+  // Texto de Tempo do Audio do Usuario
+  userAudioTime: {
+    fontSize: 12, //..........................Tamanho da fonte
+    fontFamily: 'Inter_400Regular', //........Familia da fonte
+    color: 'rgba(252, 252, 252, 0.9)', //...Cor branca semi-transparente
+  },
+
+  // Conteiner: Avatar do Usuario
+  userAudioAvatarContainer: {
+    alignSelf: 'stretch', //.........Ocupa altura total
+    paddingBottom: 8, //.............Espaco inferior
+    justifyContent: 'flex-end', //...Alinha no final
+    alignItems: 'center', //.........Centraliza horizontalmente
+  },
+  userAudioAvatar: {
+    width: 42, //..........Largura do avatar
+    height: 42, //.........Altura do avatar
+    borderRadius: 10, //...Arredondamento do avatar
+  },
+
+  // Conteiner: Controle de Velocidade do Usuario
+  // Container que substitui avatar ao tocar (cards da direita)
+  userSpeedContainer: {
+    width: 42, //.......................................Mesma largura do avatar
+    height: 42, //......................................Mesma altura do avatar
+    borderRadius: 10, //................................Mesmo arredondamento do avatar
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', //...Fundo branco transparente
+    justifyContent: 'center', //........................Centraliza texto verticalmente
+    alignItems: 'center', // ...........................Centraliza texto horizontalmente
+  },
+  userSpeedText: {
+    fontSize: 12, //.....................Tamanho da fonte
+    fontFamily: 'Inter_400Regular', //...Familia da fonte
+    color: '#FCFCFC', //...............Cor da fonte
+  },
+});
+
+export default ActivitiesChatModal;
