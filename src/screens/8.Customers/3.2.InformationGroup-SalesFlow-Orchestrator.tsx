@@ -5,6 +5,7 @@ import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '
 import CustomersInformationGroupSalesFlowProducts from './3.2.InformationGroup-SalesFlow-Product';
 import CustomersInformationGroupSalesFlowPhases from './3.2.InformationGroup-SalesFlow-Phases';
 import CustomersInformationGroupSalesFlowActivities from './3.2.InformationGroup-SalesFlow-Activities';
+import { CustomerInfoProps } from './3.2.InformationGroup-SalesFlow-Activities-Commercial-Execution';
 
 const COLORS = {
   primary: '#1777CF',
@@ -144,19 +145,29 @@ export type SalesFlowTab = 'produtos' | 'fases' | 'atividades';
 type Props = {
   selectedProductId: string | null;
   selectedPhaseId: string | null;
+  selectedActivityId: string | null;
   activeTab: SalesFlowTab;
   onProductSelect: (productId: string) => void;
   onPhaseSelect: (phaseId: string) => void;
+  onActivitySelect: (activityId: string) => void;
   onTabChange: (tab: SalesFlowTab) => void;
+  contextCardVisible: boolean;
+  customerName?: string; //...............Nome do cliente
+  customerPhoto?: any; //................Foto do cliente
 };
 
 const CustomersInformationGroupSalesFlowOrchestrator: React.FC<Props> = ({
   selectedProductId,
   selectedPhaseId,
+  selectedActivityId,
   activeTab,
   onProductSelect,
   onPhaseSelect,
+  onActivitySelect,
   onTabChange,
+  contextCardVisible,
+  customerName,
+  customerPhoto,
 }) => {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -218,6 +229,30 @@ const CustomersInformationGroupSalesFlowOrchestrator: React.FC<Props> = ({
     const idx = phasesForProduct.findIndex(p => p.id === selectedPhaseId);
     return idx >= 0 ? idx + 1 : 0;
   }, [selectedPhaseId, selectedProductId, phasesForProduct]);
+
+  // Obter dados da atividade selecionada
+  const selectedActivity = useMemo(() => {
+    return ACTIVITIES_DATA.find(a => a.id === selectedActivityId) || null;
+  }, [selectedActivityId]);
+
+  // Obter indice da atividade selecionada (dentro da fase)
+  const selectedActivityIndex = useMemo(() => {
+    if (!selectedActivityId || !selectedPhaseId) return 0;
+    const idx = activitiesForPhase.findIndex(a => a.id === selectedActivityId);
+    return idx >= 0 ? idx + 1 : 0;
+  }, [selectedActivityId, selectedPhaseId, activitiesForPhase]);
+
+  // Construir objeto customerInfo com dados do sistema
+  const customerInfo: CustomerInfoProps = useMemo(() => ({
+    name: customerName, //.................Nome do cliente (vindo do pai)
+    photo: customerPhoto, //...............Foto do cliente (vindo do pai)
+    productName: selectedProduct?.title, //..Nome do produto selecionado
+    phaseName: selectedPhase?.title, //.....Nome da fase selecionada
+    productIndex: selectedProductIndex, //...Indice do produto
+    totalProducts: PRODUCTS_DATA.length, //..Total de produtos
+    phaseIndex: selectedPhaseIndex, //.......Indice da fase
+    totalPhases: phasesForProduct.length, //..Total de fases
+  }), [customerName, customerPhoto, selectedProduct, selectedPhase, selectedProductIndex, selectedPhaseIndex, phasesForProduct.length]);
 
   const tabs = useMemo(
     () =>
@@ -284,6 +319,16 @@ const CustomersInformationGroupSalesFlowOrchestrator: React.FC<Props> = ({
             products={PRODUCTS_DATA}
             selectedProductId={selectedProductId}
             onProductSelect={onProductSelect}
+            contextCardVisible={contextCardVisible}
+            selectedProduct={selectedProduct}
+            selectedProductIndex={selectedProductIndex}
+            totalProducts={PRODUCTS_DATA.length}
+            selectedPhase={selectedPhase}
+            selectedPhaseIndex={selectedPhaseIndex}
+            totalPhases={phasesForProduct.length}
+            selectedActivity={selectedActivity}
+            selectedActivityIndex={selectedActivityIndex}
+            totalActivities={activitiesForPhase.length}
           />
         )}
         {activeTab === 'fases' && (
@@ -294,17 +339,25 @@ const CustomersInformationGroupSalesFlowOrchestrator: React.FC<Props> = ({
             selectedProduct={selectedProduct}
             selectedProductIndex={selectedProductIndex}
             totalProducts={PRODUCTS_DATA.length}
+            contextCardVisible={contextCardVisible}
+            selectedActivity={selectedActivity}
+            selectedActivityIndex={selectedActivityIndex}
+            totalActivities={activitiesForPhase.length}
           />
         )}
         {activeTab === 'atividades' && (
           <CustomersInformationGroupSalesFlowActivities
             activities={activitiesForPhase}
+            selectedActivityId={selectedActivityId}
+            onActivitySelect={onActivitySelect}
             selectedProduct={selectedProduct}
             selectedPhase={selectedPhase}
             selectedProductIndex={selectedProductIndex}
             selectedPhaseIndex={selectedPhaseIndex}
             totalProducts={PRODUCTS_DATA.length}
             totalPhases={phasesForProduct.length}
+            contextCardVisible={contextCardVisible}
+            customerInfo={customerInfo}
           />
         )}
       </View>
@@ -319,8 +372,8 @@ const styles = StyleSheet.create({
   },
   tabsWrap: {
     paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 10,
+    paddingTop: 15,
+    paddingBottom: 0,
     backgroundColor: COLORS.white,
   },
   tabsBase: {

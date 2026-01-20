@@ -11,6 +11,7 @@ import InformationGroupContactsContent, { type Contact } from './02.02.Informati
 import InformationGroupContactsNewContact from './02.02.InformationGroup-Contacts-NewContact01';
 import type { ProfileFormData as ContactFormData } from './02.02.InformationGroup-Contacts-NewContact03';
 import InformationGroupRankContent from './02.03.InformationGroup-Rank';
+import { useKeyman } from '../../context/KeymanContext';
 
 const COLORS = {
   primary: '#1777CF',
@@ -145,6 +146,7 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
   onViewContact,
   onDeleteContact,
 }) => {
+  // Hook de fontes
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -152,24 +154,34 @@ const InformationGroup: React.FC<InformationGroupProps> = ({
     Inter_700Bold,
   });
 
+  // Hook do contexto global de Keymans
+  const { keymans } = useKeyman();
+
+  // Busca o keyman pelo ID no contexto global
+  const currentKeyman = useMemo(() => {
+    if (!keymanId) return null; //...........Retorna nulo se nao ha ID
+    return keymans.find(k => k.id === keymanId) || null; //...Busca pelo ID
+  }, [keymans, keymanId]);
+
+  // Dados iniciais do formulario (usa dados reais do contexto)
   const initialFormData = useMemo<ProfileFormData>(
     () => ({
-      nome: mode === 'criar' ? '' : (keymanName || 'Perola Marina Diniz'),
-      cpfCnpj: mode === 'criar' ? '' : '385.474.956-25',
-      responsavelNome: '',
-      responsavelCpf: '',
-      email: mode === 'criar' ? '' : 'PerolaDiniz@hotmail.com',
-      whatsapp: mode === 'criar' ? '' : '17 99246-0025',
-      estado: mode === 'criar' ? '' : 'São Paulo',
-      cep: mode === 'criar' ? '' : '15200-000',
-      cidade: mode === 'criar' ? '' : 'São José do Rio Preto',
-      bairro: mode === 'criar' ? '' : 'Centro',
-      endereco: mode === 'criar' ? '' : 'Piratininga',
-      numero: mode === 'criar' ? '' : '650',
-      complemento: mode === 'criar' ? '' : 'Sala 207',
-      keymanPhoto: mode === 'criar' ? undefined : keymanPhoto,
+      nome: mode === 'criar' ? '' : (currentKeyman?.name || keymanName || ''), //.........Nome do keyman
+      cpfCnpj: mode === 'criar' ? '' : (currentKeyman?.cpfCnpj || ''), //..................CPF ou CNPJ
+      responsavelNome: currentKeyman?.nomeResponsavel || '', //...........................Nome do responsavel
+      responsavelCpf: currentKeyman?.cpfResponsavel || '', //............................CPF do responsavel
+      email: mode === 'criar' ? '' : (currentKeyman?.email || ''), //.....................Email
+      whatsapp: mode === 'criar' ? '' : (currentKeyman?.whatsapp || ''), //...............WhatsApp
+      estado: mode === 'criar' ? '' : (currentKeyman?.estado || ''), //..................Estado
+      cep: mode === 'criar' ? '' : (currentKeyman?.cep || ''), //........................CEP
+      cidade: mode === 'criar' ? '' : (currentKeyman?.cidade || ''), //..................Cidade
+      bairro: mode === 'criar' ? '' : (currentKeyman?.bairro || ''), //..................Bairro
+      endereco: mode === 'criar' ? '' : (currentKeyman?.endereco || ''), //..............Endereco
+      numero: mode === 'criar' ? '' : (currentKeyman?.numero || ''), //..................Numero
+      complemento: mode === 'criar' ? '' : (currentKeyman?.complemento || ''), //........Complemento
+      keymanPhoto: mode === 'criar' ? undefined : (currentKeyman?.photo ? { uri: currentKeyman.photo } : keymanPhoto), //...Foto
     }),
-    [keymanName, keymanPhoto, mode]
+    [keymanName, keymanPhoto, mode, currentKeyman]
   );
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);

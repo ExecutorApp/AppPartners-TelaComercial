@@ -20,6 +20,7 @@ import ModalSortBy from './01.01.KeymansHomeScreen-Modal-SortBy';
 import KeymansOptionsModal from './01.02.KeymansHomeScreen-Modal-Options';
 import InformationGroup from './02.00.InformationGroup';
 import EmptyContentState from '../../components/content/EmptyContentState';
+import { useKeyman, Keyman } from '../../context/KeymanContext';
 
 // Altura do BottomMenu (igual ao Layout.bottomMenuHeight do projeto)
 const BOTTOM_MENU_HEIGHT = 103;
@@ -110,17 +111,9 @@ const MoreIcon = () => (
   </Svg>
 );
 
-type Keyman = {
-  id: number;
-  name: string;
-  photo: any;
-  contacts: number;
-  conversions: number;
-  rank: number;
-};
-
 const KeymansScreen: React.FC = () => {
-  const [keymans, setKeymans] = useState<Keyman[]>([]);
+  // Consome lista de keymans do contexto global
+  const { keymans, deleteKeyman: removeKeyman } = useKeyman();
   const [searchText, setSearchText] = useState('');
   const [sideMenuVisible, setSideMenuVisible] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
@@ -305,7 +298,7 @@ const KeymansScreen: React.FC = () => {
     const keymanId = selectedKeyman?.id ?? null;
     if (!keymanId) return;
 
-    setKeymans(prev => prev.filter(k => k.id !== keymanId));
+    removeKeyman(keymanId);
     setSelectedCardId(prev => (prev === keymanId ? null : prev));
     setOptionsModalVisible(false);
     setSelectedKeyman(null);
@@ -340,7 +333,10 @@ const KeymansScreen: React.FC = () => {
         isSelected && styles.keymanCardHighlighted
       ]}
     >
-      <Image source={keyman.photo} style={styles.keymanPhoto} />
+      <Image
+        source={keyman.photo ? { uri: keyman.photo } : require('../../../assets/AvatarPlaceholder02.png')}
+        style={styles.keymanPhoto}
+      />
       <View style={styles.keymanInfo}>
         <View style={styles.keymanHeader}>
           <Text style={styles.keymanName}>{keyman.name}</Text>
@@ -361,7 +357,7 @@ const KeymansScreen: React.FC = () => {
           <ContactsIcon />
           <View style={styles.statContent}>
             <Text style={styles.statLabel}>Base de contatos</Text>
-            <Text style={styles.statValue}>{keyman.contacts}</Text>
+            <Text style={styles.statValue}>{keyman.contacts.toString().padStart(2, '0')}</Text>
           </View>
         </View>
         

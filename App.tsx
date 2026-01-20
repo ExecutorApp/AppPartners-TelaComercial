@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { ModalProvider } from './src/context/ModalContext';
+import { KeymanProvider } from './src/context/KeymanContext';
 import ModalRoot from './src/components/ModalRoot';
 import {
   useFonts,
@@ -41,16 +42,18 @@ export default function App() {
     );
   }
   return (
-    <ModalProvider>
-      <View style={[
-        styles.container,
-        Platform.OS === 'web' ? ({ height: '100vh', minHeight: 0 } as any) : undefined,
-      ]}>
-        <StatusBar style="dark" backgroundColor="#FCFCFC" />
-        <AppNavigator />
-        <ModalRoot />
-      </View>
-    </ModalProvider>
+    <KeymanProvider>
+      <ModalProvider>
+        <View style={[
+          styles.container,
+          Platform.OS === 'web' ? ({ height: '100vh', minHeight: 0 } as any) : undefined,
+        ]}>
+          <StatusBar style="dark" backgroundColor="#FCFCFC" />
+          <AppNavigator />
+          <ModalRoot />
+        </View>
+      </ModalProvider>
+    </KeymanProvider>
   );
 }
 

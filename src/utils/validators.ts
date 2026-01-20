@@ -78,8 +78,11 @@ export function isValidCEP(cep: string): boolean {
 
 export function validateWhatsApp(phone: string): { valid: boolean; normalized: string } {
   const digits = onlyDigits(phone);
-  // Aceita 10 (fixo) ou 11 (celular) dígitos sem DDI
-  const valid = digits.length === 10 || digits.length === 11;
+  // Aceita 10 (fixo) ou 11 (celular) digitos sem DDI
+  const hasValidLength = digits.length === 10 || digits.length === 11;
+  // Rejeita numeros repetidos (ex: 00000000000, 11111111111)
+  const isRepeated = /^(\d)\1+$/.test(digits);
+  const valid = hasValidLength && !isRepeated;
   return { valid, normalized: digits };
 }
 

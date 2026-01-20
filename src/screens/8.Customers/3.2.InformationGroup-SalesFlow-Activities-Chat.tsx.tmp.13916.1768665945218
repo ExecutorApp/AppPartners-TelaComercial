@@ -123,7 +123,6 @@ const INIT_MSGS: ChatMessage[] = [
     sender: 'contact',
     timestamp: '14:45',
     senderName: 'Gabriela',
-    senderAvatar: { uri: 'https://randomuser.me/api/portraits/women/3.jpg' },
   },
   {
     id: '3',
@@ -133,7 +132,6 @@ const INIT_MSGS: ChatMessage[] = [
     timestamp: '08:42',
     audioDuration: '0:16',
     senderName: 'Gabriela',
-    senderAvatar: { uri: 'https://randomuser.me/api/portraits/women/3.jpg' },
   },
   {
     id: '4',
@@ -143,7 +141,6 @@ const INIT_MSGS: ChatMessage[] = [
     timestamp: '08:42',
     audioDuration: '0:16',
     senderName: 'Gabriela',
-    senderAvatar: { uri: 'https://randomuser.me/api/portraits/women/3.jpg' },
   },
   {
     id: '5',
@@ -153,7 +150,6 @@ const INIT_MSGS: ChatMessage[] = [
     timestamp: '14:45',
     audioDuration: '0:05',
     senderName: 'Barbara',
-    senderAvatar: { uri: 'https://randomuser.me/api/portraits/women/4.jpg' },
   },
   {
     id: '6',
@@ -163,7 +159,6 @@ const INIT_MSGS: ChatMessage[] = [
     timestamp: '14:45',
     audioDuration: '0:05',
     senderName: 'Barbara',
-    senderAvatar: { uri: 'https://randomuser.me/api/portraits/women/4.jpg' },
   },
 ];
 
@@ -188,8 +183,6 @@ const MOCK_COLLABORATORS: Record<string, CollaboratorInfo> = {
   'joao': { name: 'Joao Santos', whatsApp: '+55 11 99999-2222', photoUrl: 'https://randomuser.me/api/portraits/men/1.jpg' },
   'carlos': { name: 'Carlos Oliveira', whatsApp: '+55 11 99999-3333', photoUrl: 'https://randomuser.me/api/portraits/men/2.jpg' },
   'ana': { name: 'Ana Costa', whatsApp: '+55 11 99999-4444', photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  'gabriela': { name: 'Gabriela', whatsApp: '+55 11 99999-5555', photoUrl: 'https://randomuser.me/api/portraits/women/3.jpg' },
-  'barbara': { name: 'Barbara', whatsApp: '+55 11 99999-6666', photoUrl: 'https://randomuser.me/api/portraits/women/4.jpg' },
 };
 
 // Dados mock de documentos obrigatorios
@@ -263,14 +256,6 @@ const MOCK_ACTIVITY_DATA: Record<string, ActivityInfo> = {
           collaborator: MOCK_COLLABORATORS['joao'],
           comment: 'Aguardando documentos do cliente para prosseguir.',
           documents: MOCK_DOCUMENTS,
-        },
-        {
-          id: 'e2',
-          type: 'custom',
-          date: '30/12/2025',
-          time: '14:30',
-          collaborator: MOCK_COLLABORATORS['barbara'],
-          comment: 'Acompanhando o cliente.',
         },
       ],
     },
@@ -830,9 +815,9 @@ const BackArrowIcon = memo(() => (
 
 const MenuIcon = memo(() => (
   <Svg width={35} height={35} viewBox="0 0 35 35" fill="none">
-    <Rect x={0.25} y={0.25} width={34.5} height={34.5} rx={5.75} fill="#FCFCFC" />
-    <Rect x={0.25} y={0.25} width={34.5} height={34.5} rx={5.75} stroke="#D8E0F0" strokeWidth={0.5} />
-    <Path d="M8.75 11.25C8.75 10.5586 9.30859 10 10 10H25C25.6914 10 26.25 10.5586 26.25 11.25C26.25 11.9414 25.6914 12.5 25 12.5H10C9.30859 12.5 8.75 11.9414 8.75 11.25ZM8.75 17.5C8.75 16.8086 9.30859 16.25 10 16.25H25C25.6914 16.25 26.25 16.8086 26.25 17.5C26.25 18.1914 25.6914 18.75 25 18.75H10C9.30859 18.75 8.75 18.1914 8.75 17.5ZM26.25 23.75C26.25 24.4414 25.6914 25 25 25H10C9.30859 25 8.75 24.4414 8.75 23.75C8.75 23.0586 9.30859 22.5 10 22.5H25C25.6914 22.5 26.25 23.0586 26.25 23.75Z" fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={34.2} height={34.2} rx={5.6} fill="#1777CF" />
+    <Rect x={0.4} y={0.4} width={34.2} height={34.2} rx={5.6} stroke="#FCFCFC" strokeWidth={0.8} />
+    <Path d="M8.75 11.25C8.75 10.5586 9.30859 10 10 10H25C25.6914 10 26.25 10.5586 26.25 11.25C26.25 11.9414 25.6914 12.5 25 12.5H10C9.30859 12.5 8.75 11.9414 8.75 11.25ZM8.75 17.5C8.75 16.8086 9.30859 16.25 10 16.25H25C25.6914 16.25 26.25 16.8086 26.25 17.5C26.25 18.1914 25.6914 18.75 25 18.75H10C9.30859 18.75 8.75 18.1914 8.75 17.5ZM26.25 23.75C26.25 24.4414 25.6914 25 25 25H10C9.30859 25 8.75 24.4414 8.75 23.75C8.75 23.0586 9.30859 22.5 10 22.5H25C25.6914 22.5 26.25 23.0586 26.25 23.75Z" fill="#FCFCFC" />
   </Svg>
 ));
 
@@ -1563,7 +1548,7 @@ const ActivitiesChatModal: React.FC<Props> = ({ visible, onClose, activityTitle,
           <View style={styles.contactMessageCard}>
             <View style={styles.contactMessageRow}>
               <View style={styles.contactAvatarContainer}>
-                <Image source={m.senderAvatar || require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
+                <Image source={require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
               </View>
               <View style={styles.contactMessageContent}>
                 <View style={styles.contactMessageHeader}>
@@ -1806,8 +1791,8 @@ const ActivitiesChatModal: React.FC<Props> = ({ visible, onClose, activityTitle,
                     </Text>
                   </View>
                 ) : (
-                  // Avatar do contato - usa senderAvatar se disponivel
-                  <Image source={m.senderAvatar || require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
+                  // Avatar do contato
+                  <Image source={require('../../../assets/01-Foto.png')} style={styles.contactAvatar} />
                 )}
               </TouchableOpacity>
               <View style={styles.contactMessageContent}>
@@ -2245,7 +2230,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 66,
     borderRadius: 6,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#FFFFFF',
     overflow: 'hidden',
     backgroundColor: '#E8E8E8',
@@ -2340,9 +2325,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 15, //.....Espaco horizontal interno
-    paddingTop: 20, //............Espaco superior interno
-    paddingBottom: 60, //.........Espaco inferior para ultima mensagem ficar visivel acima do input
+    paddingHorizontal: 15,
+    paddingTop: 20,
+    paddingBottom: 10, // Espaco entre ultima mensagem e campo de input
   },
   // ----------------------------------------
   // Estado Vazio do Chat

@@ -52,10 +52,11 @@ const CustomersInformationGroupProfile: React.FC<ProfileViewProps> = ({ formData
   const activeTabRef = useRef<number>(1);
   const isScrollingProgrammaticallyRef = useRef<boolean>(false);
   const scrollViewRef = useRef<ScrollView | null>(null);
-  const sectionPositionsRef = useRef<{ dadosPessoais: number; localizacao: number; operacao: number }>({
-    dadosPessoais: 0,
-    localizacao: 0,
-    operacao: 0,
+  const sectionPositionsRef = useRef<{ keyman: number; dadosPessoais: number; localizacao: number; operacao: number }>({
+    keyman: 0, //...........Posicao do container Keyman
+    dadosPessoais: 0, //....Posicao do container Dados pessoais
+    localizacao: 0, //......Posicao do container Localizacao
+    operacao: 0, //........Posicao do container Operacao
   });
 
   const scrollToSectionY = useCallback((y: number) => {
@@ -72,7 +73,7 @@ const CustomersInformationGroupProfile: React.FC<ProfileViewProps> = ({ formData
     (tab: number) => {
       setActiveTab(tab);
       activeTabRef.current = tab;
-      if (tab === 1) scrollToSectionY(sectionPositionsRef.current.dadosPessoais);
+      if (tab === 1) scrollToSectionY(sectionPositionsRef.current.keyman);
       if (tab === 2) scrollToSectionY(sectionPositionsRef.current.localizacao);
       if (tab === 3) scrollToSectionY(sectionPositionsRef.current.operacao);
     },
@@ -153,7 +154,12 @@ const CustomersInformationGroupProfile: React.FC<ProfileViewProps> = ({ formData
         onScroll={handleScroll}
         scrollEventThrottle={32}
       >
-        <View style={styles.card}>
+        <View
+          style={styles.card}
+          onLayout={(e) => {
+            sectionPositionsRef.current.keyman = Math.max(0, e.nativeEvent.layout.y - 10);
+          }}
+        >
           <View style={styles.photoContainer}>
             <View style={styles.photoWrapper}>
               <Image source={getPhotoSource()} style={styles.customerPhoto} resizeMode={hasCustomPhoto ? 'cover' : 'contain'} />

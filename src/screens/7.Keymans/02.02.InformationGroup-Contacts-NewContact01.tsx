@@ -56,6 +56,7 @@ interface NewContactModalProps {
   onSave?: (data: ProfileFormData) => void;
   onSaveMany?: (data: ProfileFormData[]) => void;
   onImportExcel?: () => void;
+  initialContacts?: ProfileFormData[]; //..Contatos pre-carregados (upload externo)
 }
 
 const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
@@ -66,6 +67,7 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
   onImportExcel,
   onSave,
   onSaveMany,
+  initialContacts,
 }) => {
   const [tabs, setTabs] = useState<number[]>([1]);
   const [activeTab, setActiveTab] = useState(1);
@@ -333,11 +335,34 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
   useEffect(() => {
     if (!visible) return;
 
+    setTabErrors({});
+    setFieldErrorsByTab({});
+
+    // Se ha contatos iniciais (upload externo), popula as abas
+    if (initialContacts && initialContacts.length > 0) {
+      const tabIndexes = initialContacts.map((_, idx) => idx + 1);
+      const formMap: Record<number, ProfileFormData> = {};
+      const personMap: Record<number, PersonType> = {};
+
+      initialContacts.forEach((contact, idx) => {
+        const tab = idx + 1;
+        formMap[tab] = contact;
+        // Detecta tipo de pessoa pelo CPF/CNPJ
+        const docDigits = digitsOnly(String(contact.cpfCnpj ?? ''));
+        personMap[tab] = docDigits.length > 11 ? 'juridica' : 'fisica';
+      });
+
+      setTabs(tabIndexes);
+      setFormDataByTab(formMap);
+      setPersonTypeByTab(personMap);
+      setActiveTab(1);
+      return;
+    }
+
+    // Comportamento padrao
     setTabs([1]);
     setActiveTab(1);
     setPersonTypeByTab({ 1: 'fisica' });
-    setTabErrors({});
-    setFieldErrorsByTab({});
 
     if (mode === 'criar') {
       setFormDataByTab({ 1: createEmptyFormData() });
@@ -347,7 +372,7 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
     setFormDataByTab({
       1: createFormDataFromContactData(contactData),
     });
-  }, [visible, mode, contactData]);
+  }, [visible, mode, contactData, initialContacts]);
 
   const activeTabIndex = useMemo(() => tabs.findIndex((t) => t === activeTab), [tabs, activeTab]);
   const canGoLeft = tabs.length > 1 && activeTabIndex > 0;
@@ -537,22 +562,27 @@ const InformationGroupContactsNewContact: React.FC<NewContactModalProps> = ({
 
             {mode === 'criar' && (
               <>
-                <TouchableOpacity style={styles.downloadModelContainer} activeOpacity={0.8} onPress={readOnly ? undefined : handleDownloadModel}>
-                  <DownloadModelIcon />
-                  <Text style={styles.downloadModelText}>Baixar modelo - Planilha do Excel</Text>
-                </TouchableOpacity>
-                <HeaderActions
-                  onImportExcel={readOnly ? () => {} : handleImportExcel}
-                  onDeleteTab={
-                    readOnly
-                      ? () => {}
-                      : () => {
-                          setDeleteConfirmVisible(true);
-                        }
-                  }
-                  onAddTab={readOnly ? () => {} : handleAddTab}
-                />
-                <View style={styles.headerDivider} />
+                {/* Botoes de importacao - ocultar se veio de upload externo */}
+                {(!initialContacts || initialContacts.length === 0) && (
+                  <>
+                    <TouchableOpacity style={styles.downloadModelContainer} activeOpacity={0.8} onPress={readOnly ? undefined : handleDownloadModel}>
+                      <DownloadModelIcon />
+                      <Text style={styles.downloadModelText}>Baixar modelo - Planilha do Excel</Text>
+                    </TouchableOpacity>
+                    <HeaderActions
+                      onImportExcel={readOnly ? () => {} : handleImportExcel}
+                      onDeleteTab={
+                        readOnly
+                          ? () => {}
+                          : () => {
+                              setDeleteConfirmVisible(true);
+                            }
+                      }
+                      onAddTab={readOnly ? () => {} : handleAddTab}
+                    />
+                    <View style={styles.headerDivider} />
+                  </>
+                )}
                 <Stepper
                   tabs={tabs}
                   activeTab={activeTab}

@@ -420,7 +420,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
     <>
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
-          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'Nome*' : 'Razão social*'}</Text>
+          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'Nome *' : 'Razão social *'}</Text>
         </View>
         <View style={[styles.inputContainer, focusedField === 'nome' ? styles.inputFocused : null]}>
           <TextInput
@@ -442,7 +442,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
-          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'CPF*' : 'CNPJ*'}</Text>
+          <Text style={styles.inputLabel}>{personType === 'fisica' ? 'CPF *' : 'CNPJ *'}</Text>
         </View>
         <View style={[styles.inputContainer, focusedField === 'cpfCnpj' ? styles.inputFocused : null]}>
           <TextInput
@@ -468,7 +468,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
         <>
           <View style={styles.inputGroup}>
             <View style={styles.labelContainer}>
-              <Text style={styles.inputLabel}>Nome do responsável*</Text>
+              <Text style={styles.inputLabel}>Nome do responsável *</Text>
             </View>
             <View style={[styles.inputContainer, focusedField === 'responsavelNome' ? styles.inputFocused : null]}>
               <TextInput
@@ -494,7 +494,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
           <View style={styles.inputGroup}>
             <View style={styles.labelContainer}>
-              <Text style={styles.inputLabel}>CPF do responsável*</Text>
+              <Text style={styles.inputLabel}>CPF do responsável *</Text>
             </View>
             <View style={[styles.inputContainer, focusedField === 'responsavelCpf' ? styles.inputFocused : null]}>
               <TextInput
@@ -524,7 +524,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
-          <Text style={styles.inputLabel}>Email*</Text>
+          <Text style={styles.inputLabel}>Email *</Text>
         </View>
         <View style={[styles.inputContainer, focusedField === 'email' ? styles.inputFocused : null]}>
           <TextInput
@@ -548,7 +548,7 @@ const InformationGroupProfile: React.FC<InformationGroupProfileProps> = ({
 
       <View style={styles.inputGroup}>
         <View style={styles.labelContainer}>
-          <Text style={styles.inputLabel}>WhatsApp</Text>
+          <Text style={styles.inputLabel}>WhatsApp *</Text>
         </View>
         <View style={[styles.inputContainer, focusedField === 'whatsapp' ? styles.inputFocused : null]}>
           <TextInput
@@ -1003,6 +1003,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.labelText,
   },
+  // Asterisco de campo obrigatorio
+  requiredAsterisk: {
+    color: '#D94F4F', //...............Cor vermelha
+    fontFamily: 'Inter_600SemiBold', //.Fonte semi-bold
+    fontSize: 12, //...................Tamanho da fonte
+  },
   inputContainer: {
     height: 36,
     borderRadius: 8,
@@ -1030,7 +1036,7 @@ const styles = StyleSheet.create({
   },
   inputClearButton: {
     position: 'absolute',
-    right: 6,
+    right: 0,
     top: 0,
     bottom: 0,
     width: 28,
