@@ -92,6 +92,15 @@ const ConfiguracoesIcon: React.FC<{ color?: string }> = ({ color = INACTIVE_COLO
   </Svg>
 );
 
+const CompromissosIcon: React.FC<{ color?: string }> = ({ color = INACTIVE_COLOR }) => (
+  <Svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <Path
+      d="M18 2.06255C18 0.924785 17.0752 0 15.9375 0H2.06255C0.924785 0 0 0.924785 0 2.06255V15.9375C0 17.0752 0.924785 18 2.06255 18H15.9375C17.0752 18 18 17.0752 18 15.9375V2.06255ZM13.5615 6.03232C13.8547 6.32552 13.8547 6.79943 13.5615 7.09277L8.68648 11.9677C8.54023 12.1139 8.34824 12.1875 8.15625 12.1875C7.96426 12.1875 7.77227 12.1139 7.62602 11.9677L5.18857 9.53023C4.89523 9.23702 4.89523 8.76298 5.18857 8.46977C5.48177 8.17643 5.95568 8.17643 6.24902 8.46977L8.15625 10.377L12.5011 6.03232C12.7943 5.73898 13.2682 5.73898 13.5615 6.03232Z"
+      fill={color}
+    />
+  </Svg>
+);
+
 const SairIcon = () => (
   <Svg width="19" height="15" viewBox="0 0 19 15" fill="none">
     <Path d="M18.4434 7.75665L12.209 13.991C11.6523 14.5477 10.6875 14.158 10.6875 13.3602V9.79766H5.64062C5.14707 9.79766 4.75 9.40059 4.75 8.90704V5.34454C4.75 4.85098 5.14707 4.45391 5.64062 4.45391H10.6875V0.891414C10.6875 0.0972737 11.6486 -0.296086 12.209 0.260555L18.4434 6.49493C18.7885 6.84376 18.7885 7.40782 18.4434 7.75665ZM7.125 13.8055V12.3211C7.125 12.0762 6.92461 11.8758 6.67969 11.8758H3.5625C2.90566 11.8758 2.375 11.3451 2.375 10.6883V3.56329C2.375 2.90645 2.90566 2.37579 3.5625 2.37579H6.67969C6.92461 2.37579 7.125 2.1754 7.125 1.93048V0.446102C7.125 0.20118 6.92461 0.000789264 6.67969 0.000789264H3.5625C1.5957 0.000789264 0 1.59649 0 3.56329V10.6883C0 12.6551 1.5957 14.2508 3.5625 14.2508H6.67969C6.92461 14.2508 7.125 14.0504 7.125 13.8055Z" fill="#1777CF"/>
@@ -164,6 +173,7 @@ const SideMenuScreen: React.FC<SideMenuScreenProps> = ({ isVisible, onClose }) =
   }
   const menuItems = [
     { icon: <DashboardIcon />, title: 'Dashboard', color: '#91929E' },
+    { icon: <CompromissosIcon />, title: 'Compromissos', color: '#91929E' },
     { icon: <ProdutosIcon />, title: 'Produtos', color: '#91929E' },
     { icon: <KeymansIcon />, title: 'Keymans', color: '#7D8592' },
     { icon: <ClientesIcon />, title: 'Clientes', color: '#1777CF' },
@@ -227,6 +237,10 @@ const SideMenuScreen: React.FC<SideMenuScreenProps> = ({ isVisible, onClose }) =
                 style={styles.menuItem}
                 onPress={() => {
                   setActiveItem(item.title);
+                  if (item.title === 'Compromissos') {
+                    navigation.navigate(ScreenNames.DailyCommitmentHome);
+                    onClose();
+                  }
                   if (item.title === 'Clientes') {
                     navigation.navigate(ScreenNames.CustomersHome);
                     onClose();

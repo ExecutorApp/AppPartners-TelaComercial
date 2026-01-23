@@ -26,6 +26,7 @@ import CalendarHomeScreen from '../screens/9.Agenda/1.CalendarHomeScreen';
 import SalesHomeScreen from '../screens/10.Vendas/01.01.SalesHomeScreen';
 import CommissionsHomeScreen from '../screens/11.Comissões/01.CommissionsHomeScreen';
 import HomeScreenPaymentFlow from '../screens/12.FluxoDePagamento/1.HomeScreen-PaymentFlow';
+import DailyCommitmentHomeScreen from '../screens/13.Commitments/01.DailyCommitment-HomeScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -297,6 +298,15 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <CommissionsHomeScreen />}
+        </Stack.Screen>
+        {/* Rota Compromissos */}
+        <Stack.Screen
+          name={ScreenNames.DailyCommitmentHome}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <DailyCommitmentHomeScreen />}
         </Stack.Screen>
         {/* Rota Desconto Vendas */}
         <Stack.Screen

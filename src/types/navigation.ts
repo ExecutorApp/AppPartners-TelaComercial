@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Keymans: undefined;
   CustomersHome: undefined;
   Schedule: undefined;
+  DailyCommitmentHome: undefined;
   SalesHome: { autoOpenDiscount?: boolean } | undefined;
   PaymentFlowHome: { appointmentId?: string } | undefined;
   PaymentFlowPix: undefined;
@@ -93,6 +94,7 @@ export const ScreenNames = {
   Keymans: 'Keymans' as const,
   CustomersHome: 'CustomersHome' as const,
   Schedule: 'Schedule' as const,
+  DailyCommitmentHome: 'DailyCommitmentHome' as const,
   SalesHome: 'SalesHome' as const,
   PaymentFlowHome: 'PaymentFlowHome' as const,
   PaymentFlowPix: 'PaymentFlowPix' as const,
