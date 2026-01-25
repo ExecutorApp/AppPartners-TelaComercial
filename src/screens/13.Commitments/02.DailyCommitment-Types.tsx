@@ -29,6 +29,25 @@ export type CommitmentCategory =
   | 'pendencias'; //..Intencoes sem horario
 
 // ========================================
+// SUBCATEGORIAS DE COMPROMISSO
+// ========================================
+
+export type CommitmentSubcategory =
+  | 'prospeccao' //......Comercial sem lead
+  | 'negociacao' //......Comercial com lead
+  | 'relacionamento' //..Comercial pos-venda
+  | 'atividade' //.......Cliente com produto
+  | 'reuniao' //..........Cliente com produto
+  | 'treinamento' //......Rotina simples
+  | 'outros'; //...........Generico
+
+// ========================================
+// MODELO DE CARD (1, 2 OU 3)
+// ========================================
+
+export type CardModel = 1 | 2 | 3;
+
+// ========================================
 // STATUS DE COMPROMISSO (REUTILIZAR EXISTENTES)
 // ========================================
 
@@ -54,6 +73,7 @@ export interface CommitmentItem {
   number: string; //..................Numero "01", "02"...
   title: string; //...................Nome da acao
   category: CommitmentCategory; //....Categoria
+  subcategory?: CommitmentSubcategory; //..Subcategoria
   status: CommitmentStatus; //........Status atual
   subStatus?: StartedSubStatus; //....Subestado (se iniciada)
   startTime: string; //...............Horario inicio "08:00"
@@ -61,8 +81,10 @@ export interface CommitmentItem {
   estimatedMinutes: number; //........Duracao em minutos
   isFixed: boolean; //................Agenda = true
   timeBalance?: number; //............Tempo restante/atraso em min
+  isAfterHours?: boolean; //..........Fora do expediente (apos 18h)
   clientPhoto?: string; //............URL/URI da foto do cliente
   clientName?: string; //.............Nome do cliente
+  whatsapp?: string; //...............Telefone para WhatsApp
   productName?: string; //.............Nome do produto
   phaseName?: string; //..............Nome da fase
   activityName?: string; //...........Nome da atividade
@@ -103,6 +125,36 @@ export const PERIOD_LABELS: Record<PeriodFilter, string> = {
   week: 'Semana',
   fortnight: '15 dias',
   month: 'Mes',
+};
+
+// ========================================
+// LABELS DAS SUBCATEGORIAS
+// ========================================
+
+export const SUBCATEGORY_LABELS: Record<CommitmentSubcategory, string> = {
+  prospeccao: 'Prospecção',
+  negociacao: 'Negociação',
+  relacionamento: 'Relacionamento',
+  atividade: 'Atividade',
+  reuniao: 'Reunião',
+  treinamento: 'Treinamento',
+  outros: 'Outros',
+};
+
+// ========================================
+// FUNCAO PARA DETERMINAR MODELO DO CARD
+// ========================================
+
+export const getCardModel = (item: CommitmentItem): CardModel => {
+  // Modelo 03: Clientes (com produto + fase)
+  if (item.category === 'clientes') return 3;
+  // Modelo 02: Comercial com lead (negociacao, relacionamento)
+  if (item.category === 'comercial') {
+    if (item.subcategory === 'prospeccao') return 1;
+    return 2;
+  }
+  // Modelo 01: Rotina, pendencias, outros
+  return 1;
 };
 
 // ========================================
@@ -219,93 +271,231 @@ export const NotificationIcon = ({ count = 0 }: { count?: number }) => (
 // ========================================
 
 export const MOCK_COMMITMENTS: CommitmentItem[] = [
+  // ========================================
+  // MANHA (08:00 - 12:00)
+  // ========================================
+
+  // 08:00 - 08:30 | Prospecção
   {
     id: '1',
     number: '01',
-    title: 'Prospecao de leads',
+    title: 'Prospecção de novos leads',
     category: 'comercial',
-    status: 'not_started',
+    subcategory: 'prospeccao',
+    status: 'completed',
     startTime: '08:00',
     endTime: '08:30',
     estimatedMinutes: 30,
     isFixed: false,
-    timeBalance: 15,
-    clientName: 'Diversos',
-    productName: 'Consorcio',
+    timeBalance: 0,
   },
+  // 08:30 - 09:00 | Follow-up lead
   {
     id: '2',
     number: '02',
-    title: 'Follow-up Joao Silva',
+    title: 'Follow-up João Silva',
     category: 'comercial',
-    status: 'not_started',
+    subcategory: 'negociacao',
+    status: 'completed',
     startTime: '08:30',
     endTime: '09:00',
     estimatedMinutes: 30,
     isFixed: false,
-    timeBalance: 10,
-    clientName: 'Joao Silva',
-    productName: 'Consorcio',
-    phaseName: 'Negociacao',
+    timeBalance: 0,
+    clientName: 'João Silva',
+    whatsapp: '11999887766',
   },
+  // 09:00 - 10:00 | Reunião fixa
   {
     id: '3',
     number: '03',
-    title: 'Reuniao cliente ABC',
-    category: 'agenda',
-    status: 'not_started',
+    title: 'Apresentação Consórcio Premium',
+    category: 'clientes',
+    subcategory: 'reuniao',
+    status: 'started',
     startTime: '09:00',
     endTime: '10:00',
     estimatedMinutes: 60,
     isFixed: true,
-    timeBalance: 0,
-    clientName: 'Empresa ABC',
-    productName: 'Consorcio Premium',
-    activityName: 'Apresentacao',
+    timeBalance: -10,
+    clientName: 'Roberto Almeida',
+    productName: 'Consórcio Premium',
+    phaseName: 'Apresentação',
   },
+  // 10:00 - 10:30 | Treinamento diário
   {
     id: '4',
     number: '04',
-    title: 'Cadastrar keymans',
-    category: 'clientes',
-    status: 'started',
-    subStatus: 'pending',
+    title: 'Treinamento técnicas de venda',
+    category: 'rotina',
+    subcategory: 'treinamento',
+    status: 'not_started',
     startTime: '10:00',
     endTime: '10:30',
     estimatedMinutes: 30,
     isFixed: false,
-    timeBalance: -5,
-    clientName: 'Maria Santos',
-    productName: 'Consorcio',
-    phaseName: 'Documentacao',
-    activityName: 'Cadastro de Keymans',
+    timeBalance: 25,
   },
+  // 10:30 - 11:00 | Pós-venda
   {
     id: '5',
     number: '05',
-    title: 'Upload documentos',
-    category: 'clientes',
-    status: 'completed',
+    title: 'Ligação pós-venda Maria Santos',
+    category: 'comercial',
+    subcategory: 'relacionamento',
+    status: 'not_started',
     startTime: '10:30',
     endTime: '11:00',
     estimatedMinutes: 30,
     isFixed: false,
-    timeBalance: 0,
-    clientName: 'Carlos Oliveira',
-    productName: 'Consorcio',
-    phaseName: 'Documentacao',
-    activityName: 'Upload de Docs',
+    timeBalance: 20,
+    clientName: 'Maria Santos',
+    whatsapp: '11988776655',
   },
+  // 11:00 - 12:00 | Atividade cliente
   {
     id: '6',
     number: '06',
-    title: 'Treinamento diario',
-    category: 'rotina',
+    title: 'Cadastrar keymans no sistema',
+    category: 'clientes',
+    subcategory: 'atividade',
     status: 'not_started',
     startTime: '11:00',
-    endTime: '11:30',
+    endTime: '12:00',
+    estimatedMinutes: 60,
+    isFixed: false,
+    timeBalance: 15,
+    clientName: 'Carlos Oliveira',
+    productName: 'Consórcio Flex',
+    phaseName: 'Documentação',
+  },
+
+  // ========================================
+  // ALMOCO (12:00 - 14:00) - SEM COMPROMISSOS
+  // ========================================
+
+  // ========================================
+  // TARDE (14:00 - 18:00)
+  // ========================================
+
+  // 14:00 - 14:40 | Prospecção
+  {
+    id: '7',
+    number: '07',
+    title: 'Prospecção redes sociais',
+    category: 'comercial',
+    subcategory: 'prospeccao',
+    status: 'not_started',
+    startTime: '14:00',
+    endTime: '14:40',
+    estimatedMinutes: 40,
+    isFixed: false,
+    timeBalance: 35,
+  },
+  // 14:40 - 15:30 | Reunião cliente
+  {
+    id: '8',
+    number: '08',
+    title: 'Fechamento proposta Empresa XYZ',
+    category: 'clientes',
+    subcategory: 'reuniao',
+    status: 'not_started',
+    startTime: '14:40',
+    endTime: '15:30',
+    estimatedMinutes: 50,
+    isFixed: true,
+    timeBalance: 45,
+    clientName: 'Empresa XYZ Ltda',
+    productName: 'Consórcio Empresarial',
+    phaseName: 'Fechamento',
+  },
+  // 15:30 - 16:00 | Follow-up
+  {
+    id: '9',
+    number: '09',
+    title: 'Follow-up Ana Paula',
+    category: 'comercial',
+    subcategory: 'negociacao',
+    status: 'not_started',
+    startTime: '15:30',
+    endTime: '16:00',
     estimatedMinutes: 30,
     isFixed: false,
-    timeBalance: 20,
+    timeBalance: 25,
+    clientName: 'Ana Paula Costa',
+    whatsapp: '11977665544',
+  },
+  // 16:00 - 17:00 | Atividade
+  {
+    id: '10',
+    number: '10',
+    title: 'Envio de documentos cliente',
+    category: 'clientes',
+    subcategory: 'atividade',
+    status: 'not_started',
+    startTime: '16:00',
+    endTime: '17:00',
+    estimatedMinutes: 60,
+    isFixed: false,
+    timeBalance: 55,
+    clientName: 'Pedro Henrique',
+    productName: 'Consórcio Auto',
+    phaseName: 'Documentação',
+  },
+  // 17:00 - 18:00 | Relacionamento
+  {
+    id: '11',
+    number: '11',
+    title: 'Visita cliente VIP',
+    category: 'comercial',
+    subcategory: 'relacionamento',
+    status: 'not_started',
+    startTime: '17:00',
+    endTime: '18:00',
+    estimatedMinutes: 60,
+    isFixed: false,
+    timeBalance: 55,
+    clientName: 'Fernanda Lima',
+    whatsapp: '11966554433',
+  },
+
+  // ========================================
+  // FORA DO EXPEDIENTE (Apos 18:00)
+  // ========================================
+
+  // 19:00 - 19:30 | Compromisso pessoal
+  {
+    id: '12',
+    number: '12',
+    title: 'Ligação cliente urgente',
+    category: 'comercial',
+    subcategory: 'negociacao',
+    status: 'not_started',
+    startTime: '19:00',
+    endTime: '19:30',
+    estimatedMinutes: 30,
+    isFixed: false,
+    timeBalance: 25,
+    isAfterHours: true,
+    clientName: 'Marcelo Souza',
+    whatsapp: '11955443322',
+  },
+  // 19:30 - 20:00 | Compromisso pessoal
+  {
+    id: '13',
+    number: '13',
+    title: 'Reunião online especial',
+    category: 'clientes',
+    subcategory: 'reuniao',
+    status: 'not_started',
+    startTime: '19:30',
+    endTime: '20:00',
+    estimatedMinutes: 30,
+    isFixed: true,
+    timeBalance: 25,
+    isAfterHours: true,
+    clientName: 'Juliana Martins',
+    productName: 'Consórcio Premium Plus',
+    phaseName: 'Negociação',
   },
 ];

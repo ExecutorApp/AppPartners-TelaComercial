@@ -261,6 +261,10 @@ const SideMenuScreen: React.FC<SideMenuScreenProps> = ({ isVisible, onClose }) =
                     navigation.navigate(ScreenNames.CommissionsHome);
                     onClose();
                   }
+                  if (item.title === 'Treinamentos') {
+                    navigation.navigate(ScreenNames.TrainingHome);
+                    onClose();
+                  }
                 }}
               >
                 <View style={styles.menuIconWrapper}>{coloredIcon}</View>

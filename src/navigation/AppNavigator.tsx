@@ -27,6 +27,9 @@ import SalesHomeScreen from '../screens/10.Vendas/01.01.SalesHomeScreen';
 import CommissionsHomeScreen from '../screens/11.Comissões/01.CommissionsHomeScreen';
 import HomeScreenPaymentFlow from '../screens/12.FluxoDePagamento/1.HomeScreen-PaymentFlow';
 import DailyCommitmentHomeScreen from '../screens/13.Commitments/01.DailyCommitment-HomeScreen';
+import CardSandbox from '../screens/13.Commitments/99.CardSandbox'; // TEMPORARIO - Apagar depois dos testes
+import TrainingHomeScreen from '../screens/14.Training/01.Training-HomeScreen';
+import TrainingDetailScreen from '../screens/14.Training/05.Training-DetailScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -44,6 +47,7 @@ export const AppNavigator: React.FC = () => {
         config: {
           screens: {
             [ScreenNames.PaymentFlowHome]: 'pagamento/:appointmentId?',
+            [ScreenNames.CardSandbox]: 'sandbox', // TEMPORARIO - Apagar depois
           },
         },
         getStateFromPath: (path, options) => {
@@ -308,6 +312,14 @@ export const AppNavigator: React.FC = () => {
         >
           {() => <DailyCommitmentHomeScreen />}
         </Stack.Screen>
+        {/* TEMPORARIO - Sandbox para testes visuais de cards - Apagar depois */}
+        <Stack.Screen
+          name={ScreenNames.CardSandbox}
+          component={CardSandbox}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        />
         {/* Rota Desconto Vendas */}
         <Stack.Screen
           name={ScreenNames.DiscountSales}
@@ -386,6 +398,24 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <VerificationMethodScreen />}
+        </Stack.Screen>
+        {/* Rota Treinamentos */}
+        <Stack.Screen
+          name={ScreenNames.TrainingHome}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <TrainingHomeScreen />}
+        </Stack.Screen>
+        {/* Rota Detalhes do Treinamento */}
+        <Stack.Screen
+          name={ScreenNames.TrainingDetail}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <TrainingDetailScreen />}
         </Stack.Screen>
         <Stack.Screen
           name={ScreenNames.CompanySelection}

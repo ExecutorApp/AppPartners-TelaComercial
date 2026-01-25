@@ -1,12 +1,63 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { COLORS, CommitmentItem, CATEGORY_LABELS } from './02.DailyCommitment-Types';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from 'react-native';
+import { Svg, Path, Circle } from 'react-native-svg';
+import {
+  COLORS,
+  CommitmentItem,
+  CATEGORY_LABELS,
+  SUBCATEGORY_LABELS,
+  getCardModel,
+} from './02.DailyCommitment-Types';
 
 // ========================================
 // PLACEHOLDER PADRAO DO SISTEMA
 // ========================================
 
 const DEFAULT_AVATAR = require('../../../assets/AvatarPlaceholder02.png');
+
+// ========================================
+// ICONE TEMPO (RELOGIO)
+// ========================================
+
+const TimeIcon = ({ color = COLORS.textSecondary }: { color?: string }) => (
+  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+    <Circle
+      cx={12}
+      cy={12}
+      r={9}
+      stroke={color}
+      strokeWidth={2}
+    />
+    <Path
+      d="M12 7V12L15 15"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// ========================================
+// FUNCAO PARA FORMATAR TELEFONE
+// ========================================
+
+const formatPhone = (phone: string): string => {
+  const clean = phone.replace(/\D/g, '');
+  if (clean.length === 11) {
+    return `(${clean.slice(0, 2)}) ${clean.slice(2, 7)}-${clean.slice(7)}`;
+  }
+  if (clean.length === 10) {
+    return `(${clean.slice(0, 2)}) ${clean.slice(2, 6)}-${clean.slice(6)}`;
+  }
+  return phone;
+};
 
 // ========================================
 // PROPS DO COMPONENTE
@@ -16,7 +67,8 @@ interface TimelineCardProps {
   item: CommitmentItem; //..............Item do compromisso
   isLast: boolean; //....................Se e o ultimo item
   isExpanded: boolean; //................Se esta expandido (olhinho)
-  onPress: () => void; //................Callback ao clicar
+  onPress: () => void; //................Callback ao clicar no card
+  onConfirmPress: () => void; //.........Callback ao confirmar conclusao
 }
 
 // ========================================
@@ -28,7 +80,11 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
   isLast,
   isExpanded,
   onPress,
+  onConfirmPress,
 }) => {
+  // Modelo do card (1, 2 ou 3)
+  const cardModel = getCardModel(item);
+
   // Status concluido
   const isCompleted = item.status === 'completed';
 
@@ -40,6 +96,16 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
     if (minutes === undefined || minutes === 0) return '--';
     const absMinutes = Math.abs(minutes);
     return absMinutes < 10 ? `0${absMinutes}` : `${absMinutes}`;
+  };
+
+  // Formata duracao em minutos para texto legivel
+  const formatDuration = (minutes: number): string => {
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins > 0 ? `${hours}h${mins}` : `${hours}h`;
+    }
+    return `${minutes}min`;
   };
 
   // Cor do tempo baseada no status
@@ -62,67 +128,131 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      {/* Coluna Esquerda: Circulo + Linha */}
-      <View style={styles.leftColumn}>
-        {/* Circulo com numero */}
-        <View style={getCircleStyle()}>
-          <Text style={[
-            styles.numberText,
-            (item.isFixed || isCompleted) && styles.numberTextFixed,
-          ]}>
-            {item.number}
-          </Text>
-        </View>
-        {/* Linha conectora */}
-        {!isLast && <View style={styles.connectorLine} />}
-      </View>
+    <View style={styles.container}>
+      {/* Linha Conectora (posicao absoluta) */}
+      {!isLast && <View style={styles.connectorLine} />}
 
-      {/* Coluna Direita: Conteudo */}
-      <View style={styles.rightColumn}>
-        {/* Card Principal */}
-        <View style={[
-          styles.card,
-          isCompleted && styles.cardCompleted,
-          isDelayed && styles.cardDelayed,
+      {/* Circulo com Numero - Clique abre modal de confirmacao */}
+      <TouchableOpacity
+        style={getCircleStyle()}
+        onPress={onConfirmPress}
+        activeOpacity={0.7}
+      >
+        <Text style={[
+          styles.numberText,
+          (item.isFixed || isCompleted) && styles.numberTextFixed,
         ]}>
-          {/* Linha Superior: Titulo + Tempo */}
-          <View style={styles.cardHeader}>
-            <Text
-              style={[
-                styles.title,
-                isCompleted && styles.titleCompleted,
-              ]}
-              numberOfLines={1}
-            >
-              {item.title}
-            </Text>
-            <View style={styles.timeBalanceContainer}>
-              <Text style={[styles.timeBalance, { color: getTimeBalanceColor() }]}>
+          {item.number}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Card Principal */}
+      <View style={styles.cardContainer}>
+        <TouchableOpacity
+          style={[
+            styles.card,
+            isCompleted && styles.cardCompleted,
+            isDelayed && styles.cardDelayed,
+          ]}
+          onPress={onPress}
+          activeOpacity={0.9}
+        >
+          {/* Conteudo do Card (Layout Horizontal) */}
+          <View style={styles.cardContent}>
+            {/* Bloco Esquerdo: Tempo + Horarios */}
+            <View style={styles.leftBlock}>
+              <Text style={[
+                styles.timeBalanceText,
+                { color: getTimeBalanceColor() },
+              ]}>
                 {formatTimeBalance(item.timeBalance)}
+              </Text>
+              <View style={styles.leftDivider} />
+              <Text style={styles.timeText}>{item.startTime}</Text>
+              <View style={styles.leftDivider} />
+              <Text style={styles.timeText}>{item.endTime}</Text>
+            </View>
+
+            {/* Divisoria Vertical */}
+            <View style={styles.verticalDivider} />
+
+            {/* Bloco Direito: Categoria + Subcategoria + Titulo */}
+            <View style={styles.rightBlock}>
+              {/* Linha Categoria + Duracao */}
+              <View style={styles.categoryRow}>
+                <Text style={styles.categoryText}>{CATEGORY_LABELS[item.category]}</Text>
+                <View style={styles.durationContainer}>
+                  <TimeIcon color={COLORS.textSecondary} />
+                  <Text style={styles.durationText}>{formatDuration(item.estimatedMinutes)}</Text>
+                </View>
+              </View>
+              <View style={styles.rightDivider} />
+              {/* Subcategoria */}
+              <Text style={styles.subcategoryText}>
+                {item.subcategory ? SUBCATEGORY_LABELS[item.subcategory] : '--'}
+              </Text>
+              <View style={styles.rightDivider} />
+              {/* Titulo */}
+              <Text style={[
+                styles.titleText,
+                isCompleted && styles.titleCompleted,
+              ]} numberOfLines={1}>
+                {item.title}
               </Text>
             </View>
           </View>
 
-          {/* Divisoria entre linhas */}
-          <View style={styles.cardDivider} />
+          {/* Conteudo Expandido - Modelo 02 (Lead + WhatsApp) */}
+          {isExpanded && cardModel === 2 && (
+            <View style={styles.expandedContent}>
+              <View style={styles.divider} />
 
-          {/* Linha Inferior: Categoria + Horario */}
-          <View style={styles.cardFooter}>
-            <Text style={styles.categoryLabel}>
-              {CATEGORY_LABELS[item.category]}
-            </Text>
-            <Text style={styles.timeRange}>
-              {item.startTime} - {item.endTime}
-            </Text>
-          </View>
+              {/* Linha com Foto e Informacoes */}
+              <View style={styles.expandedRow}>
+                {/* Foto do Lead */}
+                <View style={styles.clientPhotoContainer}>
+                  <Image
+                    source={item.clientPhoto ? { uri: item.clientPhoto } : DEFAULT_AVATAR}
+                    style={styles.clientPhoto}
+                    resizeMode="cover"
+                  />
+                </View>
 
-          {/* Conteudo Expandido (olhinho ativo) */}
-          {isExpanded && (
+                {/* Informacoes do Lead ou Time Operacional */}
+                <View style={styles.expandedInfoContainer}>
+                  {/* Nome da Pessoa */}
+                  {item.clientName && (
+                    <Text style={styles.clientName}>{item.clientName}</Text>
+                  )}
+
+                  {/* Campo WhatsApp (se for lead) */}
+                  {item.whatsapp && (
+                    <>
+                      <View style={styles.fieldDivider} />
+                      <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>WhatsApp</Text>
+                        <Text style={styles.fieldValue}>{formatPhone(item.whatsapp)}</Text>
+                      </View>
+                    </>
+                  )}
+
+                  {/* Campo Departamento (se for time operacional) */}
+                  {!item.whatsapp && (
+                    <>
+                      <View style={styles.fieldDivider} />
+                      <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Departamento</Text>
+                        <Text style={styles.fieldValue}>Time operacional</Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Conteudo Expandido - Modelo 03 (Cliente + Produto + Fase) */}
+          {isExpanded && cardModel === 3 && (
             <View style={styles.expandedContent}>
               <View style={styles.divider} />
 
@@ -137,7 +267,7 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
                   />
                 </View>
 
-                {/* Informacoes em Colunas (Label em cima, Valor embaixo) */}
+                {/* Informacoes do Cliente */}
                 <View style={styles.expandedInfoContainer}>
                   {/* Nome do Cliente */}
                   {item.clientName && (
@@ -165,24 +295,13 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
                       </View>
                     </>
                   )}
-
-                  {/* Atividade */}
-                  {item.activityName && (
-                    <>
-                      <View style={styles.fieldDivider} />
-                      <View style={styles.fieldContainer}>
-                        <Text style={styles.fieldLabel}>Atividade</Text>
-                        <Text style={styles.fieldValue}>{item.activityName}</Text>
-                      </View>
-                    </>
-                  )}
                 </View>
               </View>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -191,31 +310,38 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
 // ========================================
 
 const styles = StyleSheet.create({
-  // Container Principal
+  // Container Principal (posicao relativa para linha absoluta)
   container: {
     flexDirection: 'row', //............Layout horizontal
-    paddingLeft: 0, //..................Sem margem esquerda
+    alignItems: 'flex-start', //........Alinha ao topo
+    marginBottom: 12, //................Espaco entre cards
+    paddingLeft: 8, //..................Margem esquerda
     paddingRight: 16, //................Margem direita
+    position: 'relative' as const, //...Para linha absoluta
   },
 
-  // Coluna Esquerda (Circulo + Linha)
-  leftColumn: {
-    width: 48, //.......................Largura fixa
-    alignItems: 'center', //.............Centraliza horizontalmente
-    marginRight: 0, //..................Margem direita
-    marginLeft: 8, //..................Margem direita
+  // Linha Conectora (posicao absoluta)
+  connectorLine: {
+    position: 'absolute' as const, //...Posicao absoluta
+    left: 23, //........................Centro do numero (8 + 32/2 - 1)
+    top: 38, //.........................Abaixo do numero com espaco
+    width: 2, //.........................Largura da linha
+    height: 'calc(100% - 32px)' as any, //..Altura com espacos
+    backgroundColor: COLORS.border, //...Cor da linha
   },
 
   // Circulo com Numero
   numberCircle: {
-    width: 36, //........................Largura do circulo
-    height: 36, //.......................Altura do circulo
-    borderRadius: 8, //..................Bordas arredondadas (quadrado)
+    width: 32, //........................Largura do circulo
+    height: 32, //.......................Altura do circulo
+    borderRadius: 8, //..................Bordas arredondadas
     backgroundColor: COLORS.white, //....Fundo branco
     borderWidth: 1.5, //.................Largura da borda
     borderColor: COLORS.border, //.......Cor da borda
     justifyContent: 'center', //.........Centraliza verticalmente
     alignItems: 'center', //.............Centraliza horizontalmente
+    zIndex: 2, //........................Acima da linha
+    marginRight: 8, //...................Espaco entre numero e card
   },
 
   // Circulo Concluido
@@ -233,7 +359,7 @@ const styles = StyleSheet.create({
   // Texto do Numero
   numberText: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 14, //.....................Tamanho da fonte
+    fontSize: 12, //.....................Tamanho da fonte
     color: COLORS.textPrimary, //........Cor do texto
   },
 
@@ -242,19 +368,9 @@ const styles = StyleSheet.create({
     color: COLORS.white, //..............Cor branca
   },
 
-  // Linha Conectora
-  connectorLine: {
-    width: 2, //.........................Largura da linha
+  // Container do Card
+  cardContainer: {
     flex: 1, //..........................Ocupa espaco restante
-    backgroundColor: COLORS.border, //...Cor da linha
-    marginVertical: 4, //................Margem vertical
-  },
-
-  // Coluna Direita (Conteudo)
-  rightColumn: {
-    flex: 1, //..........................Ocupa espaco restante
-    paddingLeft: 12, //..................Margem esquerda
-    paddingBottom: 12, //................Margem inferior
   },
 
   // Card Principal
@@ -269,77 +385,115 @@ const styles = StyleSheet.create({
   // Card Concluido
   cardCompleted: {
     backgroundColor: 'rgba(222, 251, 230, 0.5)', //..Fundo verde claro 50%
-    borderColor: 'rgba(27, 136, 60, 0.5)', //.......Borda verde com 50% opacidade
+    borderColor: 'rgba(27, 136, 60, 0.5)', //.......Borda verde
     borderWidth: StyleSheet.hairlineWidth, //.......Borda mais fina
   },
 
   // Card em Atraso
   cardDelayed: {
-    borderColor: 'rgba(220, 53, 69, 0.5)', //..Borda vermelha com 50% opacidade
+    borderColor: 'rgba(220, 53, 69, 0.5)', //..Borda vermelha
     borderWidth: StyleSheet.hairlineWidth, //..Borda mais fina
   },
 
-  // Header do Card
-  cardHeader: {
+  // Conteudo do Card (layout horizontal)
+  cardContent: {
     flexDirection: 'row', //............Layout horizontal
+    alignItems: 'stretch', //.............Estica verticalmente
+  },
+
+  // Bloco Esquerdo (tempo + horarios)
+  leftBlock: {
+    alignItems: 'center', //.............Centraliza horizontalmente
+    justifyContent: 'center', //........Centraliza verticalmente
+  },
+
+  // Texto do Tempo Restante
+  timeBalanceText: {
+    fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
+    fontSize: 13, //.....................Tamanho da fonte
+  },
+
+  // Divisoria Esquerda
+  leftDivider: {
+    width: '100%' as any, //.............Largura maxima
+    height: 1, //........................Altura
+    backgroundColor: COLORS.border, //...Cor da borda
+    marginVertical: 6, //................Margem vertical
+  },
+
+  // Texto Horario
+  timeText: {
+    fontFamily: 'Inter_500Medium', //....Fonte media
+    fontSize: 12, //.....................Tamanho da fonte
+    color: COLORS.textSecondary, //......Cor cinza
+  },
+
+  // Divisoria Vertical
+  verticalDivider: {
+    width: 1, //.........................Largura
+    backgroundColor: COLORS.border, //...Cor da borda
+    marginHorizontal: 12, //.............Margem horizontal
+  },
+
+  // Bloco Direito (categoria + subcategoria + titulo)
+  rightBlock: {
+    flex: 1, //..........................Ocupa espaco restante
+    justifyContent: 'center', //........Centraliza verticalmente
+  },
+
+  // Linha Categoria + Duracao
+  categoryRow: {
+    flexDirection: 'row', //.............Layout horizontal
     justifyContent: 'space-between', //..Espaco entre elementos
     alignItems: 'center', //.............Centraliza verticalmente
   },
 
-  // Divisoria do Card
-  cardDivider: {
-    height: StyleSheet.hairlineWidth, //..Altura fina
-    backgroundColor: COLORS.border, //....Cor da borda
-    marginVertical: 8, //.................Margem vertical
-  },
-
-  // Titulo
-  title: {
+  // Texto Categoria
+  categoryText: {
     fontFamily: 'Inter_500Medium', //....Fonte media
     fontSize: 14, //.....................Tamanho da fonte
-    color: COLORS.textPrimary, //........Cor do texto
-    flex: 1, //..........................Ocupa espaco disponivel
-    marginRight: 8, //...................Margem direita
+    color: COLORS.primary, //.............Cor azul
+  },
+
+  // Container Duracao
+  durationContainer: {
+    flexDirection: 'row', //.............Layout horizontal
+    alignItems: 'center', //.............Centraliza verticalmente
+    gap: 4, //...........................Espaco entre icone e texto
+  },
+
+  // Texto Duracao
+  durationText: {
+    fontFamily: 'Inter_500Medium', //....Fonte media
+    fontSize: 12, //.....................Tamanho da fonte
+    color: COLORS.textSecondary, //......Cor cinza
+  },
+
+  // Divisoria Direita
+  rightDivider: {
+    width: '100%' as any, //.............Largura maxima
+    height: 1, //........................Altura
+    backgroundColor: COLORS.border, //...Cor da borda
+    marginVertical: 6, //................Margem vertical
+  },
+
+  // Texto Subcategoria
+  subcategoryText: {
+    fontFamily: 'Inter_500Medium', //....Fonte media
+    fontSize: 14, //.....................Tamanho da fonte
+    color: COLORS.primary, //.............Cor azul
+  },
+
+  // Texto Titulo
+  titleText: {
+    fontFamily: 'Inter_500Medium', //....Fonte media
+    fontSize: 14, //.....................Tamanho da fonte
+    color: COLORS.textPrimary, //........Cor preta
   },
 
   // Titulo Concluido
   titleCompleted: {
-    color: COLORS.textPrimary, //..........Cor primaria (sem risco)
-  },
-
-  // Container do Tempo
-  timeBalanceContainer: {
-    paddingHorizontal: 8, //.............Padding horizontal
-    paddingVertical: 2, //...............Padding vertical
-    borderRadius: 4, //..................Bordas arredondadas
-    backgroundColor: COLORS.background, //..Fundo cinza
-  },
-
-  // Texto do Tempo
-  timeBalance: {
-    fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 12, //.....................Tamanho da fonte
-  },
-
-  // Footer do Card
-  cardFooter: {
-    flexDirection: 'row', //............Layout horizontal
-    justifyContent: 'space-between', //..Espaco entre elementos
-    alignItems: 'center', //.............Centraliza verticalmente
-  },
-
-  // Horario
-  timeRange: {
-    fontFamily: 'Inter_400Regular', //...Fonte regular
-    fontSize: 12, //.....................Tamanho da fonte
-    color: COLORS.textSecondary, //......Cor secundaria
-  },
-
-  // Categoria do Card
-  categoryLabel: {
-    fontFamily: 'Inter_500Medium', //....Fonte media
-    fontSize: 14, //.....................Tamanho da fonte
-    color: COLORS.primary, //.............Cor azul
+    color: COLORS.textPrimary, //..........Cor primaria
   },
 
   // Conteudo Expandido
@@ -361,10 +515,10 @@ const styles = StyleSheet.create({
     gap: 12, //..........................Espaco entre foto e info
   },
 
-  // Container Foto do Cliente - Quadrado com cantos arredondados
+  // Container Foto do Cliente - Ocupa altura maxima do container
   clientPhotoContainer: {
-    width: 70, //........................Largura fixa
-    minHeight: 88, //...................Altura minima
+    width: 56, //.........................Largura fixa
+    alignSelf: 'stretch', //..............Estica para altura maxima
     borderRadius: 8, //..................Bordas arredondadas
     backgroundColor: COLORS.border, //...Fundo placeholder
     overflow: 'hidden', //...............Esconde overflow
@@ -379,7 +533,7 @@ const styles = StyleSheet.create({
   // Container Info Expandida
   expandedInfoContainer: {
     flex: 1, //..........................Ocupa espaco disponivel
-    justifyContent: 'space-between', //..Distribui campos
+    justifyContent: 'space-between', //..Distribui campos verticalmente
   },
 
   // Nome do Cliente

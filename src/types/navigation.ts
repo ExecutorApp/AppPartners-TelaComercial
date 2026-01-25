@@ -6,6 +6,7 @@ export type RootStackParamList = {
   CustomersHome: undefined;
   Schedule: undefined;
   DailyCommitmentHome: undefined;
+  CardSandbox: undefined; // TEMPORARIO - Apagar depois dos testes
   SalesHome: { autoOpenDiscount?: boolean } | undefined;
   PaymentFlowHome: { appointmentId?: string } | undefined;
   PaymentFlowPix: undefined;
@@ -85,6 +86,8 @@ export type RootStackParamList = {
   Security: undefined;
   Success: undefined;
   VerificationMethod: undefined;
+  TrainingHome: undefined;
+  TrainingDetail: { trainingId: string };
 };
 
 export const ScreenNames = {
@@ -95,6 +98,7 @@ export const ScreenNames = {
   CustomersHome: 'CustomersHome' as const,
   Schedule: 'Schedule' as const,
   DailyCommitmentHome: 'DailyCommitmentHome' as const,
+  CardSandbox: 'CardSandbox' as const, // TEMPORARIO - Apagar depois dos testes
   SalesHome: 'SalesHome' as const,
   PaymentFlowHome: 'PaymentFlowHome' as const,
   PaymentFlowPix: 'PaymentFlowPix' as const,
@@ -124,6 +128,8 @@ export const ScreenNames = {
   Security: 'Security' as const,
   Success: 'Success' as const,
   VerificationMethod: 'VerificationMethod' as const,
+  TrainingHome: 'TrainingHome' as const,
+  TrainingDetail: 'TrainingDetail' as const,
 } as const;
 
 export type ScreenNamesType = keyof RootStackParamList;

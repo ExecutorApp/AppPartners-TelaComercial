@@ -6,13 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   PanResponder,
+  ScrollView,
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
-import { COLORS } from './02.DailyCommitment-Types';
+import { COLORS, CommitmentCategory } from './02.DailyCommitment-Types';
 
 // ========================================
 // TIPOS
 // ========================================
+
+type FilterTab = 'data' | 'categoria' | 'tipos';
 
 interface FiltersModalProps {
   visible: boolean; //...............Visibilidade do modal
@@ -25,6 +28,8 @@ interface FiltersSelection {
   startDate?: Date | null; //........Data inicial
   endDate?: Date | null; //..........Data final
   quickLabel?: 'none' | '15 dias' | '30 dias' | '60 dias'; //..Atalho selecionado
+  categories?: string[]; //..........Categorias selecionadas
+  types?: string[]; //...............Tipos selecionados
 }
 
 // ========================================
@@ -44,6 +49,29 @@ const monthNames = [
   'Outubro',
   'Novembro',
   'Dezembro',
+];
+
+// Categorias disponiveis
+const FILTER_CATEGORIES: { key: CommitmentCategory | 'todas'; label: string }[] = [
+  { key: 'todas', label: 'Todas' },
+  { key: 'agenda', label: 'Agenda' },
+  { key: 'comercial', label: 'Comercial' },
+  { key: 'clientes', label: 'Clientes' },
+  { key: 'rotina', label: 'Rotina' },
+  { key: 'pendencias', label: 'Pendências' },
+];
+
+// Tipos de compromisso disponiveis
+const FILTER_TYPES: { key: string; label: string }[] = [
+  { key: 'todos', label: 'Todos' },
+  { key: 'reuniao', label: 'Reunião' },
+  { key: 'ligacao', label: 'Ligação' },
+  { key: 'mensagem', label: 'Enviar mensagem' },
+  { key: 'visita', label: 'Visita presencial' },
+  { key: 'followup', label: 'Follow-up' },
+  { key: 'proposta', label: 'Enviar proposta' },
+  { key: 'treinamento', label: 'Treinamento' },
+  { key: 'outros', label: 'Outros' },
 ];
 
 // ========================================
@@ -80,20 +108,64 @@ const ArrowRightIcon = () => (
   </Svg>
 );
 
+// Icone Check (para checkbox)
+const CheckIcon = () => (
+  <Svg width={10} height={8} viewBox="0 0 10 8" fill="none">
+    <Path
+      d="M1 4L3.5 6.5L9 1"
+      stroke={COLORS.white}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // ========================================
-// COMPONENTE
+// COMPONENTE CHECKBOX
+// ========================================
+
+interface CheckboxItemProps {
+  label: string; //................Label do item
+  checked: boolean; //..............Se esta marcado
+  onToggle: () => void; //..........Callback ao clicar
+}
+
+const CheckboxItem: React.FC<CheckboxItemProps> = ({ label, checked, onToggle }) => (
+  <TouchableOpacity
+    style={styles.checkboxRow}
+    onPress={onToggle}
+    activeOpacity={0.7}
+  >
+    <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+      {checked && <CheckIcon />}
+    </View>
+    <Text style={styles.checkboxLabel}>{label}</Text>
+  </TouchableOpacity>
+);
+
+// ========================================
+// COMPONENTE PRINCIPAL
 // ========================================
 
 const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }) => {
-  // Estados principais
+  // Estado da aba ativa
+  const [activeTab, setActiveTab] = React.useState<FilterTab>('data');
+
+  // Estados de data
   const [currentDate, setCurrentDate] = React.useState(new Date());
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
   const [quickLabel, setQuickLabel] = React.useState<'none' | '15 dias' | '30 dias' | '60 dias'>('none');
 
-  // Estados de selecao
+  // Estados de categoria
+  const [selectedCategories, setSelectedCategories] = React.useState<string[]>(['todas']);
+
+  // Estados de tipos
+  const [selectedTypes, setSelectedTypes] = React.useState<string[]>(['todos']);
+
+  // Estados de selecao de data
   const [selectMode, setSelectMode] = React.useState<'none' | 'start' | 'end' | 'drag'>('none');
-  const [canUseFinal, setCanUseFinal] = React.useState<boolean>(false);
 
   // Referencias para arraste
   const gridLayoutRef = React.useRef<{ x: number; y: number; width: number; height: number }>({ x: 0, y: 0, width: 0, height: 0 });
@@ -163,11 +235,11 @@ const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-  // Dimensoes para calculo do arraste (largura + margens)
+  // Dimensoes para calculo do arraste
   const cellWidth = 40;
   const cellHeight = 34;
-  const columnW = cellWidth + 4; //....Largura + margem horizontal (2+2)
-  const rowH = cellHeight + 4; //......Altura + margem vertical (2+2)
+  const columnW = cellWidth + 4;
+  const rowH = cellHeight + 4;
 
   // PanResponder para arraste
   const panResponder = React.useMemo(() => PanResponder.create({
@@ -187,7 +259,6 @@ const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }
         const e = hovered.getTime();
         if (e >= s) setEndDate(hovered);
         else {
-          // Se arrastar para tras, inverte
           setEndDate(startDate);
           setStartDate(hovered);
         }
@@ -199,6 +270,38 @@ const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }
     onPanResponderTerminationRequest: () => true,
   }), [selectMode, startDate]);
 
+  // Toggle categoria
+  const toggleCategory = (key: string) => {
+    if (key === 'todas') {
+      setSelectedCategories(['todas']);
+    } else {
+      setSelectedCategories(prev => {
+        const filtered = prev.filter(k => k !== 'todas');
+        if (filtered.includes(key)) {
+          const newList = filtered.filter(k => k !== key);
+          return newList.length === 0 ? ['todas'] : newList;
+        }
+        return [...filtered, key];
+      });
+    }
+  };
+
+  // Toggle tipo
+  const toggleType = (key: string) => {
+    if (key === 'todos') {
+      setSelectedTypes(['todos']);
+    } else {
+      setSelectedTypes(prev => {
+        const filtered = prev.filter(k => k !== 'todos');
+        if (filtered.includes(key)) {
+          const newList = filtered.filter(k => k !== key);
+          return newList.length === 0 ? ['todos'] : newList;
+        }
+        return [...filtered, key];
+      });
+    }
+  };
+
   // Aplicar filtros
   const handleApply = () => {
     let periodsLabel = 'Todos';
@@ -208,7 +311,14 @@ const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }
     else if (startDate || endDate) periodsLabel = `De ${formatDate(startDate)} à ${formatDate(endDate)}`;
 
     if (onApply) {
-      onApply({ periodsLabel, startDate, endDate, quickLabel });
+      onApply({
+        periodsLabel,
+        startDate,
+        endDate,
+        quickLabel,
+        categories: selectedCategories,
+        types: selectedTypes,
+      });
     }
     onClose();
   };
@@ -229,192 +339,252 @@ const FiltersModal: React.FC<FiltersModalProps> = ({ visible, onClose, onApply }
             </TouchableOpacity>
           </View>
 
-          {/* Container Data Inicial / Data Final */}
-          <View style={styles.dateRangeContainer}>
+          {/* Abas */}
+          <View style={styles.tabsContainer}>
             <TouchableOpacity
-              style={[
-                styles.dateBox,
-                selectMode === 'start' && styles.dateBoxActive,
-              ]}
-              onPress={() => {
-                setQuickLabel('none');
-                setSelectMode('start');
-                setStartDate(null);
-                setEndDate(null);
-              }}
+              style={[styles.tabButton, activeTab === 'data' && styles.tabButtonActive]}
+              onPress={() => setActiveTab('data')}
+              activeOpacity={0.7}
             >
-              <Text style={[
-                styles.dateBoxLabel,
-                selectMode === 'start' && styles.dateBoxLabelActive,
-              ]}>
-                Data Inicial
-              </Text>
-              <Text style={[
-                styles.dateBoxValue,
-                selectMode === 'start' && styles.dateBoxValueActive,
-              ]}>
-                {formatDate(startDate)}
+              <Text style={[styles.tabButtonText, activeTab === 'data' && styles.tabButtonTextActive]}>
+                Data
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.dateBox,
-                selectMode === 'end' && styles.dateBoxActive,
-              ]}
-              onPress={() => {
-                setQuickLabel('none');
-                setSelectMode('end');
-                setEndDate(null);
-              }}
+              style={[styles.tabButton, activeTab === 'categoria' && styles.tabButtonActive]}
+              onPress={() => setActiveTab('categoria')}
+              activeOpacity={0.7}
             >
-              <Text style={[
-                styles.dateBoxLabel,
-                selectMode === 'end' && styles.dateBoxLabelActive,
-              ]}>
-                Data Final
+              <Text style={[styles.tabButtonText, activeTab === 'categoria' && styles.tabButtonTextActive]}>
+                Categoria
               </Text>
-              <Text style={[
-                styles.dateBoxValue,
-                selectMode === 'end' && styles.dateBoxValueActive,
-              ]}>
-                {formatDate(endDate)}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tabButton, activeTab === 'tipos' && styles.tabButtonActive]}
+              onPress={() => setActiveTab('tipos')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabButtonText, activeTab === 'tipos' && styles.tabButtonTextActive]}>
+                Tipos
               </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Atalhos */}
-          <View style={styles.shortcutRow}>
-            <TouchableOpacity
-              style={[styles.shortcutItem, quickLabel === '15 dias' && styles.shortcutItemActive]}
-              onPress={() => {
-                setQuickLabel('15 dias');
-                setSelectMode('none');
-                setStartDate(startOfDay(today));
-                setEndDate(startOfDay(addDays(today, 14)));
-                setCanUseFinal(false);
-              }}
-            >
-              <Text style={[styles.shortcutText, quickLabel === '15 dias' && styles.shortcutTextActive]}>
-                15 Dias
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.shortcutItem, quickLabel === '30 dias' && styles.shortcutItemActive]}
-              onPress={() => {
-                setQuickLabel('30 dias');
-                setSelectMode('none');
-                setStartDate(startOfDay(today));
-                setEndDate(startOfDay(addDays(today, 29)));
-                setCanUseFinal(false);
-              }}
-            >
-              <Text style={[styles.shortcutText, quickLabel === '30 dias' && styles.shortcutTextActive]}>
-                30 dias
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.shortcutItem, quickLabel === '60 dias' && styles.shortcutItemActive]}
-              onPress={() => {
-                setQuickLabel('60 dias');
-                setSelectMode('none');
-                setStartDate(startOfDay(today));
-                setEndDate(startOfDay(addDays(today, 59)));
-                setCanUseFinal(false);
-              }}
-            >
-              <Text style={[styles.shortcutText, quickLabel === '60 dias' && styles.shortcutTextActive]}>
-                60 dias
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Navegacao do Mes */}
-          <View style={styles.monthNav}>
-            <TouchableOpacity style={styles.monthButton} onPress={goPrevMonth}>
-              <ArrowLeftIcon />
-            </TouchableOpacity>
-            <View style={styles.monthCenter}>
-              <Text style={styles.monthText}>{monthName}</Text>
-            </View>
-            <TouchableOpacity style={styles.monthButton} onPress={goNextMonth}>
-              <ArrowRightIcon />
-            </TouchableOpacity>
-          </View>
-
-          {/* Dias da Semana */}
-          <View style={styles.weekRow}>
-            {weekDays.map((name) => (
-              <View key={name} style={styles.weekCell}>
-                <Text style={styles.weekLabel}>{name}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Grid de Dias */}
-          <View
-            style={styles.daysGrid}
-            onLayout={(e) => {
-              const l = e?.nativeEvent?.layout;
-              gridLayoutRef.current = { x: l?.x ?? 0, y: l?.y ?? 0, width: l?.width ?? 0, height: l?.height ?? 0 };
-            }}
-            {...panResponder.panHandlers}
-          >
-            {cells.map((c, idx) => {
-              const s = startDate?.getTime();
-              const e = endDate?.getTime();
-              const t = c.date.getTime();
-              // Apenas destaca se for do mes atual
-              const inRange = c.inMonth && s != null && e != null && t >= Math.min(s, e) && t <= Math.max(s, e);
-              const isEdge = c.inMonth && ((s != null && t === s) || (e != null && t === e));
-              const isToday = c.date.getDate() === today.getDate() &&
-                c.date.getMonth() === today.getMonth() &&
-                c.date.getFullYear() === today.getFullYear();
-
-              return (
+          {/* Conteudo da Aba Data */}
+          {activeTab === 'data' && (
+            <View style={styles.tabContent}>
+              {/* Container Data Inicial / Data Final */}
+              <View style={styles.dateRangeContainer}>
                 <TouchableOpacity
-                  key={`d-${idx}`}
                   style={[
-                    styles.dayCell,
-                    !c.inMonth && styles.dayCellOut,
-                    isEdge && styles.dayCellSelected,
-                    inRange && !isEdge && styles.dayCellInRange,
+                    styles.dateBox,
+                    selectMode === 'start' && styles.dateBoxActive,
                   ]}
-                  onLongPress={() => {
-                    setQuickLabel('none');
-                    setSelectMode('drag');
-                    setStartDate(c.date);
-                    setEndDate(c.date);
-                    setCanUseFinal(false);
-                  }}
                   onPress={() => {
                     setQuickLabel('none');
-                    if (selectMode === 'start') {
-                      // Modo Data Inicial: atualiza apenas startDate e mantém foco
-                      setStartDate(c.date);
-                    } else if (selectMode === 'end') {
-                      // Modo Data Final: atualiza apenas endDate e mantém foco
-                      setEndDate(c.date);
-                    } else {
-                      // Clique avulso (sem modo): define ambas as datas iguais
-                      setStartDate(c.date);
-                      setEndDate(c.date);
-                    }
+                    setSelectMode('start');
+                    setStartDate(null);
+                    setEndDate(null);
                   }}
                 >
-                  <Text
-                    style={[
-                      styles.dayText,
-                      !c.inMonth && styles.dayTextOut,
-                      isEdge && styles.dayTextSelected,
-                    ]}
-                  >
-                    {String(c.label).padStart(2, '0')}
+                  <Text style={[
+                    styles.dateBoxLabel,
+                    selectMode === 'start' && styles.dateBoxLabelActive,
+                  ]}>
+                    Data Inicial
                   </Text>
-                  {isToday && <View style={styles.todayDot} />}
+                  <Text style={[
+                    styles.dateBoxValue,
+                    selectMode === 'start' && styles.dateBoxValueActive,
+                  ]}>
+                    {formatDate(startDate)}
+                  </Text>
                 </TouchableOpacity>
-              );
-            })}
-          </View>
+                <TouchableOpacity
+                  style={[
+                    styles.dateBox,
+                    selectMode === 'end' && styles.dateBoxActive,
+                  ]}
+                  onPress={() => {
+                    setQuickLabel('none');
+                    setSelectMode('end');
+                    setEndDate(null);
+                  }}
+                >
+                  <Text style={[
+                    styles.dateBoxLabel,
+                    selectMode === 'end' && styles.dateBoxLabelActive,
+                  ]}>
+                    Data Final
+                  </Text>
+                  <Text style={[
+                    styles.dateBoxValue,
+                    selectMode === 'end' && styles.dateBoxValueActive,
+                  ]}>
+                    {formatDate(endDate)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Atalhos */}
+              <View style={styles.shortcutRow}>
+                <TouchableOpacity
+                  style={[styles.shortcutItem, quickLabel === '15 dias' && styles.shortcutItemActive]}
+                  onPress={() => {
+                    setQuickLabel('15 dias');
+                    setSelectMode('none');
+                    setStartDate(startOfDay(today));
+                    setEndDate(startOfDay(addDays(today, 14)));
+                  }}
+                >
+                  <Text style={[styles.shortcutText, quickLabel === '15 dias' && styles.shortcutTextActive]}>
+                    15 Dias
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.shortcutItem, quickLabel === '30 dias' && styles.shortcutItemActive]}
+                  onPress={() => {
+                    setQuickLabel('30 dias');
+                    setSelectMode('none');
+                    setStartDate(startOfDay(today));
+                    setEndDate(startOfDay(addDays(today, 29)));
+                  }}
+                >
+                  <Text style={[styles.shortcutText, quickLabel === '30 dias' && styles.shortcutTextActive]}>
+                    30 dias
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.shortcutItem, quickLabel === '60 dias' && styles.shortcutItemActive]}
+                  onPress={() => {
+                    setQuickLabel('60 dias');
+                    setSelectMode('none');
+                    setStartDate(startOfDay(today));
+                    setEndDate(startOfDay(addDays(today, 59)));
+                  }}
+                >
+                  <Text style={[styles.shortcutText, quickLabel === '60 dias' && styles.shortcutTextActive]}>
+                    60 dias
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Navegacao do Mes */}
+              <View style={styles.monthNav}>
+                <TouchableOpacity style={styles.monthButton} onPress={goPrevMonth}>
+                  <ArrowLeftIcon />
+                </TouchableOpacity>
+                <View style={styles.monthCenter}>
+                  <Text style={styles.monthText}>{monthName}</Text>
+                </View>
+                <TouchableOpacity style={styles.monthButton} onPress={goNextMonth}>
+                  <ArrowRightIcon />
+                </TouchableOpacity>
+              </View>
+
+              {/* Dias da Semana */}
+              <View style={styles.weekRow}>
+                {weekDays.map((name) => (
+                  <View key={name} style={styles.weekCell}>
+                    <Text style={styles.weekLabel}>{name}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Grid de Dias */}
+              <View
+                style={styles.daysGrid}
+                onLayout={(e) => {
+                  const l = e?.nativeEvent?.layout;
+                  gridLayoutRef.current = { x: l?.x ?? 0, y: l?.y ?? 0, width: l?.width ?? 0, height: l?.height ?? 0 };
+                }}
+                {...panResponder.panHandlers}
+              >
+                {cells.map((c, idx) => {
+                  const s = startDate?.getTime();
+                  const e = endDate?.getTime();
+                  const t = c.date.getTime();
+                  const inRange = c.inMonth && s != null && e != null && t >= Math.min(s, e) && t <= Math.max(s, e);
+                  const isEdge = c.inMonth && ((s != null && t === s) || (e != null && t === e));
+                  const isToday = c.date.getDate() === today.getDate() &&
+                    c.date.getMonth() === today.getMonth() &&
+                    c.date.getFullYear() === today.getFullYear();
+
+                  return (
+                    <TouchableOpacity
+                      key={`d-${idx}`}
+                      style={[
+                        styles.dayCell,
+                        !c.inMonth && styles.dayCellOut,
+                        isEdge && styles.dayCellSelected,
+                        inRange && !isEdge && styles.dayCellInRange,
+                      ]}
+                      onLongPress={() => {
+                        setQuickLabel('none');
+                        setSelectMode('drag');
+                        setStartDate(c.date);
+                        setEndDate(c.date);
+                      }}
+                      onPress={() => {
+                        setQuickLabel('none');
+                        if (selectMode === 'start') {
+                          setStartDate(c.date);
+                        } else if (selectMode === 'end') {
+                          setEndDate(c.date);
+                        } else {
+                          setStartDate(c.date);
+                          setEndDate(c.date);
+                        }
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.dayText,
+                          !c.inMonth && styles.dayTextOut,
+                          isEdge && styles.dayTextSelected,
+                        ]}
+                      >
+                        {String(c.label).padStart(2, '0')}
+                      </Text>
+                      {isToday && <View style={styles.todayDot} />}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
+          {/* Conteudo da Aba Categoria */}
+          {activeTab === 'categoria' && (
+            <View style={styles.tabContent}>
+              <ScrollView style={styles.tabContentScroll} contentContainerStyle={styles.checkboxList}>
+                {FILTER_CATEGORIES.map((cat) => (
+                  <CheckboxItem
+                    key={cat.key}
+                    label={cat.label}
+                    checked={selectedCategories.includes(cat.key)}
+                    onToggle={() => toggleCategory(cat.key)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Conteudo da Aba Tipos */}
+          {activeTab === 'tipos' && (
+            <View style={styles.tabContent}>
+              <ScrollView style={styles.tabContentScroll} contentContainerStyle={styles.checkboxList}>
+                {FILTER_TYPES.map((type) => (
+                  <CheckboxItem
+                    key={type.key}
+                    label={type.label}
+                    checked={selectedTypes.includes(type.key)}
+                    onToggle={() => toggleType(type.key)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Footer */}
           <View style={styles.footer}>
@@ -456,6 +626,7 @@ const styles = StyleSheet.create({
   // Card do Modal
   modalCard: {
     width: 340, //....................Largura fixa
+    maxHeight: '85%', //..............Altura maxima
     backgroundColor: COLORS.white, //..Fundo branco
     borderRadius: 12, //..............Bordas arredondadas
     overflow: 'hidden', //.............Esconde overflow
@@ -489,12 +660,108 @@ const styles = StyleSheet.create({
     alignItems: 'center', //...........Centraliza
   },
 
+  // Container das Abas
+  tabsContainer: {
+    flexDirection: 'row', //.............Layout horizontal
+    height: 42, //.......................Altura fixa
+    marginHorizontal: 16, //.............Margem horizontal
+    marginVertical: 12, //................Margem vertical
+    padding: 4, //........................Padding 4px em todos os lados
+    backgroundColor: '#F4F4F4', //........Fundo cinza claro
+    borderRadius: 8, //...................Bordas arredondadas
+    borderWidth: 0.3, //..................Borda fina
+    borderColor: '#D8E0F0', //............Cor da borda
+    gap: 6, //............................Espaco entre abas
+  },
+
+  // Botao da Aba
+  tabButton: {
+    flex: 1, //.........................Ocupa espaco igual
+    height: 32, //......................Altura fixa
+    paddingHorizontal: 10, //............Padding horizontal
+    backgroundColor: '#FCFCFC', //........Fundo branco
+    borderRadius: 4, //..................Bordas arredondadas
+    justifyContent: 'center', //........Centraliza
+    alignItems: 'center', //............Centraliza
+  },
+
+  // Botao da Aba Ativo
+  tabButtonActive: {
+    paddingHorizontal: 15, //............Padding horizontal maior
+    backgroundColor: '#1777CF', //........Fundo azul
+  },
+
+  // Texto da Aba
+  tabButtonText: {
+    fontFamily: 'Inter_400Regular', //....Fonte regular
+    fontSize: 14, //....................Tamanho
+    color: '#3A3F51', //..................Cor do texto
+  },
+
+  // Texto da Aba Ativo
+  tabButtonTextActive: {
+    fontFamily: 'Inter_500Medium', //....Fonte media
+    color: '#FCFCFC', //..................Cor branca
+  },
+
+  // Conteudo da Aba (altura fixa para todas as abas)
+  tabContent: {
+    height: 440, //.....................Altura fixa igual para todas abas
+    paddingBottom: 8, //................Margem inferior
+  },
+
+  // Conteudo da Aba com Scroll
+  tabContentScroll: {
+    flex: 1, //........................Preenche espaco disponivel
+  },
+
+  // Lista de Checkboxes
+  checkboxList: {
+    paddingHorizontal: 16, //............Margem horizontal
+    paddingVertical: 8, //...............Margem vertical
+  },
+
+  // Linha do Checkbox
+  checkboxRow: {
+    flexDirection: 'row', //.............Layout horizontal
+    alignItems: 'center', //.............Centraliza vertical
+    paddingVertical: 12, //.............Margem vertical
+    borderBottomWidth: StyleSheet.hairlineWidth, //..Borda fina
+    borderBottomColor: COLORS.border, //..Cor da borda
+  },
+
+  // Checkbox
+  checkbox: {
+    width: 22, //.......................Largura
+    height: 22, //......................Altura
+    borderRadius: 6, //..................Bordas arredondadas
+    borderWidth: 2, //...................Borda
+    borderColor: COLORS.border, //........Cor da borda
+    backgroundColor: COLORS.white, //....Fundo branco
+    justifyContent: 'center', //........Centraliza
+    alignItems: 'center', //............Centraliza
+    marginRight: 12, //..................Margem direita
+  },
+
+  // Checkbox Marcado
+  checkboxChecked: {
+    backgroundColor: COLORS.primary, //..Fundo azul
+    borderColor: COLORS.primary, //......Borda azul
+  },
+
+  // Label do Checkbox
+  checkboxLabel: {
+    fontFamily: 'Inter_400Regular', //...Fonte regular
+    fontSize: 14, //....................Tamanho
+    color: COLORS.textPrimary, //........Cor do texto
+  },
+
   // Container Data Inicial / Data Final
   dateRangeContainer: {
     height: 60, //..........................Altura do container
     padding: 5, //..........................Padding interno
     marginHorizontal: 16, //.................Margem horizontal
-    marginTop: 12, //.......................Margem superior
+    marginTop: 4, //.......................Margem superior
     backgroundColor: COLORS.background, //..Fundo cinza
     borderRadius: 8, //.....................Bordas arredondadas
     borderWidth: 0.6, //....................Borda fina
@@ -524,12 +791,6 @@ const styles = StyleSheet.create({
   dateBoxActive: {
     backgroundColor: COLORS.primary, //.....Fundo azul
     borderColor: COLORS.primary, //..........Borda azul
-  },
-
-  // Box Desabilitado
-  dateBoxDisabled: {
-    backgroundColor: COLORS.background, //..Fundo cinza
-    opacity: 0.6, //.........................Transparencia
   },
 
   // Label do Box
@@ -664,7 +925,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap', //...............Quebra linha
     justifyContent: 'center', //.......Centraliza
     paddingHorizontal: 16, //..........Margem horizontal
-    marginBottom: 16, //...............Margem inferior
+    marginBottom: 8, //................Margem inferior
   },
 
   // Celula do Dia

@@ -13,6 +13,7 @@ import Header from '../5.Side Menu/2.Header';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import TimelineCard from './03.DailyCommitment-TimelineCard';
 import FiltersModal from './04.DailyCommitment-FiltersModal';
+import ConfirmModal from './05.DailyCommitment-ConfirmModal';
 import NewCommitmentTypeModal, { CommitmentType } from './05.NewCommitment-TypeModal';
 import NewCommitmentFormModal, { NewCommitmentData } from './06.NewCommitment-FormModal';
 import {
@@ -83,11 +84,14 @@ const DailyCommitmentHomeScreen: React.FC = () => {
   const [typeModalVisible, setTypeModalVisible] = useState(false); //.......Modal de tipo
   const [formModalVisible, setFormModalVisible] = useState(false); //.......Modal de formulario
   const [selectedType, setSelectedType] = useState<CommitmentType>('tarefa'); //..Tipo selecionado
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false); //..Modal de confirmacao
+  const [selectedItem, setSelectedItem] = useState<CommitmentItem | null>(null); //..Item selecionado
 
   // Contadores de status (calculados)
   const totalCommitments = useMemo(() => commitments.length, [commitments]);
   const completedCount = useMemo(() => commitments.filter(c => c.status === 'completed').length, [commitments]);
-  const pendingCount = useMemo(() => totalCommitments - completedCount, [totalCommitments, completedCount]);
+  const notCompletedCount = useMemo(() => totalCommitments - completedCount, [totalCommitments, completedCount]);
+  const delayedCount = useMemo(() => commitments.filter(c => c.timeBalance !== undefined && c.timeBalance < 0).length, [commitments]);
 
   // Abre menu lateral
   const openSideMenu = useCallback(() => {
@@ -109,6 +113,29 @@ const DailyCommitmentHomeScreen: React.FC = () => {
     // TODO: Navegar para tela de execucao correspondente
     console.log('Card pressed:', item.id, item.title);
   }, []);
+
+  // Callback ao clicar no numero ou swipe para confirmar
+  const handleConfirmPress = useCallback((item: CommitmentItem) => {
+    setSelectedItem(item);
+    setConfirmModalVisible(true);
+  }, []);
+
+  // Callback ao confirmar conclusao
+  const handleConfirmComplete = useCallback(() => {
+    if (selectedItem) {
+      // Atualiza status para concluido
+      setCommitments(prev =>
+        prev.map(c =>
+          c.id === selectedItem.id
+            ? { ...c, status: 'completed' as const, timeBalance: 0 }
+            : c
+        )
+      );
+      console.log('Atividade concluida:', selectedItem.id, selectedItem.title);
+    }
+    setConfirmModalVisible(false);
+    setSelectedItem(null);
+  }, [selectedItem]);
 
   // Abre modal de tipo de compromisso
   const openNewCommitment = useCallback(() => {
@@ -235,8 +262,13 @@ const DailyCommitmentHomeScreen: React.FC = () => {
         </View>
         <View style={styles.statusDivider} />
         <View style={styles.statusItem}>
-          <Text style={[styles.statusValue, styles.statusValuePending]}>{String(pendingCount).padStart(2, '0')}</Text>
-          <Text style={styles.statusLabel}>Pendentes</Text>
+          <Text style={[styles.statusValue, styles.statusValueNotCompleted]}>{String(notCompletedCount).padStart(2, '0')}</Text>
+          <Text style={styles.statusLabel}>Não concluídos</Text>
+        </View>
+        <View style={styles.statusDivider} />
+        <View style={styles.statusItem}>
+          <Text style={[styles.statusValue, styles.statusValueDelayed]}>{String(delayedCount).padStart(2, '0')}</Text>
+          <Text style={styles.statusLabel}>Em atraso</Text>
         </View>
       </View>
 
@@ -257,15 +289,31 @@ const DailyCommitmentHomeScreen: React.FC = () => {
               </Text>
             </View>
           ) : (
-            commitments.map((item, index) => (
-              <TimelineCard
-                key={item.id}
-                item={item}
-                isLast={index === commitments.length - 1}
-                isExpanded={isExpanded}
-                onPress={() => handleCardPress(item)}
-              />
-            ))
+            commitments.map((item, index) => {
+              // Verifica se e o primeiro item fora do expediente
+              const isFirstAfterHours = item.isAfterHours &&
+                (index === 0 || !commitments[index - 1].isAfterHours);
+
+              return (
+                <React.Fragment key={item.id}>
+                  {/* Linha divisoria para compromissos fora do expediente */}
+                  {isFirstAfterHours && (
+                    <View style={styles.afterHoursDivider}>
+                      <View style={styles.afterHoursLine} />
+                      <Text style={styles.afterHoursText}>Fora do expediente</Text>
+                      <View style={styles.afterHoursLine} />
+                    </View>
+                  )}
+                  <TimelineCard
+                    item={item}
+                    isLast={index === commitments.length - 1}
+                    isExpanded={isExpanded}
+                    onPress={() => handleCardPress(item)}
+                    onConfirmPress={() => handleConfirmPress(item)}
+                  />
+                </React.Fragment>
+              );
+            })
           )}
         </ScrollView>
       </View>
@@ -297,6 +345,17 @@ const DailyCommitmentHomeScreen: React.FC = () => {
         existingCommitments={commitments}
         onClose={() => setFormModalVisible(false)}
         onSave={handleSaveCommitment}
+      />
+
+      {/* Modal de Confirmacao de Conclusao */}
+      <ConfirmModal
+        visible={confirmModalVisible}
+        item={selectedItem}
+        onConfirm={handleConfirmComplete}
+        onCancel={() => {
+          setConfirmModalVisible(false);
+          setSelectedItem(null);
+        }}
       />
     </View>
   );
@@ -437,9 +496,14 @@ const styles = StyleSheet.create({
     color: '#1B883C', //..................Cor verde escuro
   },
 
-  // Valor Pendente
-  statusValuePending: {
-    color: COLORS.red, //................Cor vermelha
+  // Valor Nao Concluido
+  statusValueNotCompleted: {
+    color: COLORS.textSecondary, //........Cor cinza
+  },
+
+  // Valor Em Atraso
+  statusValueDelayed: {
+    color: COLORS.red, //..................Cor vermelha
   },
 
   // Label do Status
@@ -515,6 +579,29 @@ const styles = StyleSheet.create({
   emptyText: {
     fontFamily: 'Inter_400Regular', //..Fonte regular
     fontSize: 14, //..................Tamanho da fonte
+    color: COLORS.textSecondary, //....Cor secundaria
+  },
+
+  // Divisor Fora do Expediente
+  afterHoursDivider: {
+    flexDirection: 'row', //...........Layout horizontal
+    alignItems: 'center', //...........Centraliza verticalmente
+    marginHorizontal: 16, //...........Margem horizontal
+    marginVertical: 16, //.............Margem vertical
+    gap: 12, //.......................Espaco entre elementos
+  },
+
+  // Linha do Divisor
+  afterHoursLine: {
+    flex: 1, //........................Ocupa espaco disponivel
+    height: 1, //......................Altura da linha
+    backgroundColor: COLORS.border, //..Cor da linha
+  },
+
+  // Texto do Divisor
+  afterHoursText: {
+    fontFamily: 'Inter_500Medium', //..Fonte media
+    fontSize: 12, //...................Tamanho da fonte
     color: COLORS.textSecondary, //....Cor secundaria
   },
 });
