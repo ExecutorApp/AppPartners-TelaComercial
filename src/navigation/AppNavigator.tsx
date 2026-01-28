@@ -30,6 +30,8 @@ import DailyCommitmentHomeScreen from '../screens/13.Commitments/01.DailyCommitm
 import CardSandbox from '../screens/13.Commitments/99.CardSandbox'; // TEMPORARIO - Apagar depois dos testes
 import TrainingHomeScreen from '../screens/14.Training/01.Training-HomeScreen';
 import TrainingDetailScreen from '../screens/14.Training/05.Training-DetailScreen';
+import ProductDetailScreen from '../screens/14.Training/06.Training-ProductDetailScreen';
+import TrainingPlayerScreen from '../screens/14.Training/07.Training-PlayerScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -416,6 +418,24 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <TrainingDetailScreen />}
+        </Stack.Screen>
+        {/* Rota Detalhes do Produto */}
+        <Stack.Screen
+          name={ScreenNames.ProductDetail}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <ProductDetailScreen />}
+        </Stack.Screen>
+        {/* Rota Player de Treinamento */}
+        <Stack.Screen
+          name={ScreenNames.TrainingPlayer}
+          options={{
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <TrainingPlayerScreen />}
         </Stack.Screen>
         <Stack.Screen
           name={ScreenNames.CompanySelection}

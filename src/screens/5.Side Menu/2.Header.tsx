@@ -18,7 +18,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, notificationCount, onMenuPress, showBackButton = false, onBackPress, showAgendaIcons = false, onCalendarWeekPress, calendarWeekActive = false, onCalendarMonthPress, calendarMonthActive = false }) => {
   return (
     <View style={styles.header}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fcfcfc" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       
       <View style={styles.statusBar}>
         <Text style={[styles.statusTime, styles.statusTimeHidden]}>9:41</Text>
@@ -87,10 +87,11 @@ const Header: React.FC<HeaderProps> = ({ title, notificationCount, onMenuPress, 
 };
 
 const styles = StyleSheet.create({
+  // Container Principal do Header
   header: {
-    backgroundColor: '#fcfcfccc',
-    paddingTop: 1,
-    paddingBottom: 1,
+    backgroundColor: '#FFFFFF', //..Fundo branco padrao
+    paddingTop: 1, //...............Espaco superior
+    paddingBottom: 1, //............Espaco inferior
   },
   statusBar: {
     flexDirection: 'row',

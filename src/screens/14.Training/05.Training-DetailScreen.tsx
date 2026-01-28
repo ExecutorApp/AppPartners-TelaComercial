@@ -7,24 +7,44 @@ import {
   StatusBar,
   Platform,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
   COLORS,
-  TrainingItem,
   TrainingContentItem,
-  CATEGORY_LABELS,
-  STATUS_LABELS,
   BackIcon,
-  TimeIcon,
-  CheckIcon,
   getContentTypeIcon,
   formatDuration,
   MOCK_TRAININGS,
 } from './02.Training-Types';
 import { RootStackParamList, ScreenNames } from '../../types/navigation';
+
+// ========================================
+// CONSTANTES DA IMAGEM DO TREINAMENTO (HEADER)
+// ========================================
+
+const TRAINING_IMAGE_WIDTH = 65; //..........Largura da imagem do treinamento
+const TRAINING_IMAGE_HEIGHT = 80; //.........Altura da imagem do treinamento
+const TRAINING_IMAGE_BORDER_RADIUS = 8; //...Arredondamento da imagem
+
+// ========================================
+// CONSTANTES DO CARD DE AULA
+// ========================================
+
+const LESSON_NUMBER_WIDTH = 45; //..........Largura do container de numero
+const LESSON_NUMBER_HEIGHT = 60; //.........Altura do container de numero
+const LESSON_NUMBER_BORDER_RADIUS = 8; //...Arredondamento do container de numero
+const LESSON_NUMBER_MARGIN_RIGHT = 12; //...Margem direita do container de numero
+const LESSON_INFO_MIN_HEIGHT = 50; //.......Altura minima do container de info
+const LESSON_CARD_PADDING_TOP = 6; //.......Padding superior do card
+const LESSON_CARD_PADDING_BOTTOM = 6; //....Padding inferior do card
+const LESSON_CARD_PADDING_LEFT = 6; //......Padding esquerdo do card
+const LESSON_CARD_PADDING_RIGHT = 12; //.....Padding direito do card
+const LESSON_CARD_MARGIN_BOTTOM = 12; //....Margem inferior entre cards
+const LESSON_CARD_BORDER_RADIUS = 12; //....Arredondamento do card
 
 // ========================================
 // TIPOS DE NAVEGACAO
@@ -34,70 +54,81 @@ type TrainingDetailNavigationProp = StackNavigationProp<RootStackParamList>;
 type TrainingDetailRouteProp = RouteProp<RootStackParamList, 'TrainingDetail'>;
 
 // ========================================
-// COMPONENTE CONTENT ITEM
+// COMPONENTE LESSON ITEM
 // ========================================
 
-interface ContentItemProps {
-  item: TrainingContentItem; //......Item de conteudo
-  index: number; //..................Indice do item
-  onToggle: () => void; //...........Callback ao marcar
+interface LessonItemProps {
+  item: TrainingContentItem; //...............Dados da aula
+  index: number; //....................Indice da aula
+  onPress: () => void; //..............Callback ao clicar
 }
 
-const ContentItem: React.FC<ContentItemProps> = ({
+const LessonItemComponent: React.FC<LessonItemProps> = ({
   item,
   index,
-  onToggle,
+  onPress,
 }) => {
+  // Formata numero da aula com 2 digitos
+  const lessonNumber = String(index + 1).padStart(2, '0');
+
+  // Determina cor do indicador de status baseado no estado de conclusao
+  const getStatusColor = () => {
+    if (item.completed) {
+      return COLORS.primary;
+    }
+    return COLORS.textSecondary;
+  };
+
+  // Calcula porcentagem da aula baseado no status
+  const getLessonProgress = () => {
+    if (item.completed) {
+      return '100%';
+    }
+    return '00%';
+  };
+
   return (
     <TouchableOpacity
-      style={styles.contentItem}
-      onPress={onToggle}
+      style={styles.lessonCard}
+      onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Checkbox */}
-      <View
-        style={[
-          styles.checkbox,
-          item.completed && styles.checkboxCompleted,
-        ]}
-      >
-        {item.completed && <CheckIcon color={COLORS.white} />}
+      {/* Container do Numero da Aula */}
+      <View style={styles.lessonNumberContainer}>
+        <Text style={styles.lessonNumberText}>
+          {lessonNumber}
+        </Text>
       </View>
 
-      {/* Conteudo */}
-      <View style={styles.contentInfo}>
-        {/* Numero e Titulo */}
-        <View style={styles.contentTitleRow}>
-          <Text
-            style={[
-              styles.contentIndex,
-              item.completed && styles.contentTextCompleted,
-            ]}
-          >
-            {index + 1}.
-          </Text>
-          <Text
-            style={[
-              styles.contentTitle,
-              item.completed && styles.contentTextCompleted,
-            ]}
-            numberOfLines={2}
-          >
-            {item.title}
-          </Text>
-        </View>
+      {/* Container de Informacoes */}
+      <View style={styles.lessonInfoContainer}>
+        {/* Titulo da Aula */}
+        <Text style={styles.lessonTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
 
-        {/* Tipo e Duracao */}
-        <View style={styles.contentMetaRow}>
-          {/* Icone do Tipo */}
-          {getContentTypeIcon(item.type, COLORS.textSecondary)}
+        {/* Divisoria */}
+        <View style={styles.lessonDivider} />
 
-          {/* Duracao */}
-          {item.duration && (
-            <Text style={styles.contentDuration}>
-              {formatDuration(item.duration)}
-            </Text>
-          )}
+        {/* Linha de Execucao */}
+        <View style={styles.lessonExecutionRow}>
+          {/* Icone e Duracao */}
+          <View style={styles.lessonDurationContainer}>
+            {/* Icone do Tipo */}
+            {getContentTypeIcon(item.type, COLORS.textSecondary)}
+
+            {/* Duracao */}
+            {item.duration && (
+              <Text style={styles.lessonDuration}>
+                {formatDuration(item.duration)}
+              </Text>
+            )}
+          </View>
+
+          {/* Porcentagem */}
+          <Text style={[styles.lessonProgress, { color: getStatusColor() }]}>
+            {getLessonProgress()}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -145,25 +176,13 @@ const TrainingDetailScreen: React.FC = () => {
     navigation.goBack();
   }, [navigation]);
 
-  // Alterna estado de conclusao do item
-  const handleToggleContent = useCallback((itemId: string) => {
-    setContents(prev =>
-      prev.map(item =>
-        item.id === itemId
-          ? { ...item, completed: !item.completed }
-          : item
-      )
-    );
-  }, []);
-
-  // Continua para proximo conteudo nao concluido
-  const handleContinue = useCallback(() => {
-    const nextContent = contents.find(c => !c.completed);
-    if (nextContent) {
-      // Aqui navegaria para o player de video ou conteudo
-      console.log('Continuar para:', nextContent.title);
-    }
-  }, [contents]);
+  // Navega para o player ao clicar em uma aula
+  const handleLessonPress = useCallback((lessonIndex: number) => {
+    navigation.navigate(ScreenNames.TrainingPlayer, {
+      trainingId: trainingId,
+      lessonIndex: lessonIndex,
+    });
+  }, [navigation, trainingId]);
 
   // Se fontes nao carregaram ou treinamento nao existe
   if (!fontsLoaded || !training) return null;
@@ -181,146 +200,67 @@ const TrainingDetailScreen: React.FC = () => {
           onPress={handleGoBack}
           activeOpacity={0.7}
         >
-          <BackIcon color={COLORS.textPrimary} />
+          <BackIcon color={COLORS.primary} />
         </TouchableOpacity>
-
-        {/* Titulo */}
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          Treinamento
-        </Text>
-
-        {/* Espaco Vazio */}
-        <View style={styles.headerSpacer} />
       </View>
 
-      {/* Conteudo Principal */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Thumbnail / Video Area */}
-        <View style={styles.thumbnailContainer}>
-          <View style={styles.thumbnailPlaceholder}>
-            <Text style={styles.thumbnailText}>
-              {training.title.charAt(0).toUpperCase()}
-            </Text>
-          </View>
-        </View>
-
-        {/* Informacoes do Treinamento */}
-        <View style={styles.infoSection}>
-          {/* Titulo */}
-          <Text style={styles.trainingTitle}>{training.title}</Text>
-
-          {/* Meta: Categoria, Duracao, Progresso */}
-          <View style={styles.metaRow}>
-            {/* Categoria */}
-            <Text style={styles.categoryText}>
-              {CATEGORY_LABELS[training.category]}
-            </Text>
-
-            {/* Separador */}
-            <View style={styles.metaSeparator} />
-
-            {/* Duracao */}
-            <View style={styles.durationContainer}>
-              <TimeIcon color={COLORS.textSecondary} />
-              <Text style={styles.durationText}>
-                {formatDuration(training.estimatedMinutes)}
+      {/* Informacoes do Treinamento (Novo Layout Compacto) */}
+      <View style={styles.trainingInfoSection}>
+        {/* Imagem ou Letra */}
+        <View style={styles.trainingImageWrapper}>
+          {training.thumbnail ? (
+            <Image
+              source={{ uri: training.thumbnail }}
+              style={styles.trainingImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.trainingLetterContainer}>
+              <Text style={styles.trainingLetterText}>
+                {training.title.charAt(0).toUpperCase()}
               </Text>
             </View>
+          )}
+        </View>
 
-            {/* Separador */}
-            <View style={styles.metaSeparator} />
-
-            {/* Progresso */}
-            <Text style={styles.progressText}>
-              {currentProgress}% concluído
-            </Text>
-          </View>
+        {/* Info do Treinamento */}
+        <View style={styles.trainingInfo}>
+          <Text style={styles.trainingName}>{training.title}</Text>
+          <Text style={styles.trainingDescription} numberOfLines={2}>
+            {training.description}
+          </Text>
 
           {/* Barra de Progresso */}
-          <View style={styles.progressBarContainer}>
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  { width: `${currentProgress}%` },
-                ]}
-              />
+          <View style={styles.progressRow}>
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBarFill, { width: `${currentProgress}%` }]} />
             </View>
+            <Text style={styles.progressText}>{currentProgress}%</Text>
           </View>
         </View>
+      </View>
 
-        {/* Divisoria */}
-        <View style={styles.divider} />
+      {/* Divisoria */}
+      <View style={styles.divider} />
 
-        {/* Secao Sobre */}
-        <View style={styles.aboutSection}>
-          <Text style={styles.sectionTitle}>Sobre este treinamento</Text>
-          <Text style={styles.descriptionText}>{training.description}</Text>
+      {/* Secao de Aulas */}
+      <View style={styles.lessonsSection}>
+        <Text style={styles.sectionTitle}>Aulas</Text>
 
-          {/* Produto Relacionado */}
-          {training.relatedProduct && (
-            <View style={styles.relatedItem}>
-              <Text style={styles.relatedLabel}>Produto:</Text>
-              <Text style={styles.relatedValue}>{training.relatedProduct}</Text>
-            </View>
-          )}
-
-          {/* Fase Relacionada */}
-          {training.relatedPhase && (
-            <View style={styles.relatedItem}>
-              <Text style={styles.relatedLabel}>Fase:</Text>
-              <Text style={styles.relatedValue}>{training.relatedPhase}</Text>
-            </View>
-          )}
-
-          {/* Atividade Relacionada */}
-          {training.relatedActivity && (
-            <View style={styles.relatedItem}>
-              <Text style={styles.relatedLabel}>Atividade:</Text>
-              <Text style={styles.relatedValue}>{training.relatedActivity}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Divisoria */}
-        <View style={styles.divider} />
-
-        {/* Secao de Conteudo */}
-        <View style={styles.contentSection}>
-          <Text style={styles.sectionTitle}>Conteúdo</Text>
-
-          {/* Lista de Conteudos */}
+        <ScrollView
+          style={styles.lessonsList}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.lessonsListContent}
+        >
           {contents.map((item, index) => (
-            <ContentItem
+            <LessonItemComponent
               key={item.id}
               item={item}
               index={index}
-              onToggle={() => handleToggleContent(item.id)}
+              onPress={() => handleLessonPress(index)}
             />
           ))}
-        </View>
-      </ScrollView>
-
-      {/* Botao Continuar */}
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={[
-            styles.continueButton,
-            currentProgress === 100 && styles.continueButtonCompleted,
-          ]}
-          onPress={handleContinue}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.continueButtonText}>
-            {currentProgress === 100
-              ? 'Treinamento Concluído'
-              : 'Continuar Treinamento'}
-          </Text>
-        </TouchableOpacity>
+        </ScrollView>
       </View>
     </View>
   );
@@ -342,7 +282,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', //.........Layout horizontal
     alignItems: 'center', //.........Centraliza verticalmente
-    justifyContent: 'space-between', //..Distribui horizontalmente
     paddingHorizontal: 16, //........Padding horizontal
     paddingVertical: 12, //..........Padding vertical
     backgroundColor: COLORS.white, //..Fundo branco
@@ -358,121 +297,74 @@ const styles = StyleSheet.create({
     alignItems: 'center', //........Centraliza horizontalmente
   },
 
-  // Titulo do Header
-  headerTitle: {
-    flex: 1, //.....................Ocupa espaco disponivel
-    fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 18, //.................Tamanho da fonte
-    color: COLORS.textPrimary, //....Cor do texto
-    textAlign: 'center', //..........Centraliza texto
-  },
-
-  // Espaco Vazio do Header
-  headerSpacer: {
-    width: 40, //...................Largura igual ao botao
-  },
-
-  // ScrollView
-  scrollView: {
-    flex: 1, //.....................Ocupa espaco disponivel
-  },
-
-  // Conteudo do ScrollView
-  scrollContent: {
-    paddingBottom: 100, //...........Padding inferior para botao
-  },
-
-  // Container da Thumbnail
-  thumbnailContainer: {
-    width: '100%', //................Largura total
-    height: 200, //..................Altura fixa
+  // Secao de Informacoes do Treinamento
+  trainingInfoSection: {
+    flexDirection: 'row', //.........Layout horizontal
+    padding: 16, //..................Padding
     backgroundColor: COLORS.white, //..Fundo branco
   },
 
-  // Placeholder da Thumbnail
-  thumbnailPlaceholder: {
-    width: '100%', //................Largura total
-    height: '100%', //...............Altura total
-    backgroundColor: COLORS.primary, //..Fundo azul
-    justifyContent: 'center', //....Centraliza verticalmente
-    alignItems: 'center', //........Centraliza horizontalmente
+  // Wrapper da Imagem do Treinamento
+  trainingImageWrapper: {
+    marginRight: 12, //..............Margem direita
   },
 
-  // Texto da Thumbnail
-  thumbnailText: {
+  // Imagem do Treinamento
+  trainingImage: {
+    width: TRAINING_IMAGE_WIDTH, //...........Largura da imagem
+    height: TRAINING_IMAGE_HEIGHT, //..........Altura da imagem
+    borderRadius: TRAINING_IMAGE_BORDER_RADIUS, //..Bordas arredondadas
+  },
+
+  // Container da Letra do Treinamento
+  trainingLetterContainer: {
+    width: TRAINING_IMAGE_WIDTH, //...........Largura do container
+    height: TRAINING_IMAGE_HEIGHT, //..........Altura do container
+    borderRadius: TRAINING_IMAGE_BORDER_RADIUS, //..Bordas arredondadas
+    backgroundColor: '#021632', //...........Fundo escuro
+    justifyContent: 'center', //............Centraliza verticalmente
+    alignItems: 'center', //................Centraliza horizontalmente
+  },
+
+  // Texto da Letra do Treinamento
+  trainingLetterText: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 64, //.................Tamanho grande
-    color: COLORS.white, //..........Cor branca
+    fontSize: 32, //.................Tamanho da fonte
+    color: '#FCFCFC', //.............Cor clara
   },
 
-  // Secao de Informacoes
-  infoSection: {
-    paddingHorizontal: 16, //........Padding horizontal
-    paddingVertical: 16, //.........Padding vertical
-    backgroundColor: COLORS.white, //..Fundo branco
+  // Info do Treinamento
+  trainingInfo: {
+    flex: 1, //......................Ocupa espaco disponivel
+    justifyContent: 'center', //.....Centraliza verticalmente
   },
 
-  // Titulo do Treinamento
-  trainingTitle: {
+  // Nome do Treinamento
+  trainingName: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 20, //.................Tamanho da fonte
+    fontSize: 16, //.................Tamanho da fonte
     color: COLORS.textPrimary, //....Cor do texto
-    marginBottom: 12, //.............Margem inferior
+    marginBottom: 4, //..............Margem inferior
   },
 
-  // Linha de Metadados
-  metaRow: {
-    flexDirection: 'row', //.........Layout horizontal
-    alignItems: 'center', //.........Centraliza verticalmente
-    flexWrap: 'wrap', //.............Quebra linha se necessario
-    marginBottom: 12, //.............Margem inferior
-  },
-
-  // Texto da Categoria
-  categoryText: {
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 13, //.................Tamanho da fonte
-    color: COLORS.primary, //........Cor azul
-  },
-
-  // Separador de Meta
-  metaSeparator: {
-    width: 4, //....................Largura
-    height: 4, //...................Altura
-    borderRadius: 2, //..............Bordas arredondadas
-    backgroundColor: COLORS.border, //..Cor cinza
-    marginHorizontal: 8, //..........Margem horizontal
-  },
-
-  // Container da Duracao
-  durationContainer: {
-    flexDirection: 'row', //.........Layout horizontal
-    alignItems: 'center', //.........Centraliza verticalmente
-    gap: 4, //......................Espaco entre elementos
-  },
-
-  // Texto da Duracao
-  durationText: {
+  // Descricao do Treinamento
+  trainingDescription: {
     fontFamily: 'Inter_400Regular', //..Fonte regular
     fontSize: 13, //.................Tamanho da fonte
     color: COLORS.textSecondary, //..Cor secundaria
+    marginBottom: 8, //..............Margem inferior
   },
 
-  // Texto do Progresso
-  progressText: {
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 13, //.................Tamanho da fonte
-    color: COLORS.success, //........Cor verde
+  // Linha de Progresso
+  progressRow: {
+    flexDirection: 'row', //.........Layout horizontal
+    alignItems: 'center', //.........Centraliza verticalmente
+    gap: 8, //......................Espaco entre elementos
   },
 
   // Container da Barra de Progresso
   progressBarContainer: {
-    width: '100%', //................Largura total
-  },
-
-  // Fundo da Barra de Progresso
-  progressBarBackground: {
-    width: '100%', //................Largura total
+    flex: 1, //......................Ocupa espaco disponivel
     height: 6, //...................Altura
     backgroundColor: COLORS.border, //..Fundo cinza
     borderRadius: 3, //..............Bordas arredondadas
@@ -482,20 +374,30 @@ const styles = StyleSheet.create({
   // Preenchimento da Barra de Progresso
   progressBarFill: {
     height: '100%', //...............Altura total
-    backgroundColor: COLORS.success, //..Cor verde
+    backgroundColor: COLORS.primary, //..Cor azul
     borderRadius: 3, //..............Bordas arredondadas
+  },
+
+  // Texto do Progresso
+  progressText: {
+    fontFamily: 'Inter_500Medium', //..Fonte media
+    fontSize: 13, //.................Tamanho da fonte
+    color: COLORS.primary, //........Cor azul
+    width: 40, //....................Largura fixa
+    textAlign: 'right', //...........Alinha direita
   },
 
   // Divisoria
   divider: {
-    height: 8, //...................Altura
-    backgroundColor: COLORS.background, //..Fundo cinza
+    height: 1, //...................Altura fina
+    backgroundColor: COLORS.border, //..Cor da borda
   },
 
-  // Secao Sobre
-  aboutSection: {
+  // Secao de Aulas
+  lessonsSection: {
+    flex: 1, //......................Ocupa espaco disponivel
     paddingHorizontal: 16, //........Padding horizontal
-    paddingVertical: 16, //.........Padding vertical
+    paddingTop: 16, //...............Padding superior
     backgroundColor: COLORS.white, //..Fundo branco
   },
 
@@ -507,152 +409,95 @@ const styles = StyleSheet.create({
     marginBottom: 12, //.............Margem inferior
   },
 
-  // Texto da Descricao
-  descriptionText: {
-    fontFamily: 'Inter_400Regular', //..Fonte regular
-    fontSize: 14, //.................Tamanho da fonte
-    color: COLORS.textSecondary, //..Cor secundaria
-    lineHeight: 22, //...............Altura da linha
+  // Lista de Aulas
+  lessonsList: {
+    flex: 1, //......................Ocupa espaco disponivel
   },
 
-  // Item Relacionado
-  relatedItem: {
+  // Conteudo da Lista de Aulas
+  lessonsListContent: {
+    paddingBottom: 16, //...........Padding inferior
+  },
+
+  // Card de Aula (Container Pai)
+  lessonCard: {
+    flexDirection: 'row', //...............Layout horizontal
+    alignItems: 'stretch', //..............Estica itens na vertical
+    paddingTop: LESSON_CARD_PADDING_TOP, //..Padding superior
+    paddingBottom: LESSON_CARD_PADDING_BOTTOM, //..Padding inferior
+    paddingLeft: LESSON_CARD_PADDING_LEFT, //..Padding esquerdo
+    paddingRight: LESSON_CARD_PADDING_RIGHT, //..Padding direito
+    marginBottom: LESSON_CARD_MARGIN_BOTTOM, //..Margem inferior entre cards
+    borderWidth: 1, //.....................Borda em volta do card
+    borderColor: COLORS.border, //.........Cor cinza claro da borda
+    borderRadius: LESSON_CARD_BORDER_RADIUS, //..Bordas arredondadas
+    backgroundColor: COLORS.white, //......Fundo branco
+  },
+
+  // Container do Numero da Aula
+  lessonNumberContainer: {
+    width: LESSON_NUMBER_WIDTH, //...........Largura fixa
+    height: LESSON_NUMBER_HEIGHT, //.........Altura fixa
+    borderRadius: LESSON_NUMBER_BORDER_RADIUS, //..Bordas arredondadas
+    backgroundColor: '#021632', //...........Fundo azul escuro padrao
+    justifyContent: 'center', //.............Centraliza verticalmente
+    alignItems: 'center', //.................Centraliza horizontalmente
+    marginRight: LESSON_NUMBER_MARGIN_RIGHT, //..Margem direita
+  },
+
+  // Texto do Numero da Aula
+  lessonNumberText: {
+    fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
+    fontSize: 16, //...................Tamanho da fonte
+    color: COLORS.white, //............Cor branca
+  },
+
+  // Container de Informacoes da Aula
+  lessonInfoContainer: {
+    flex: 1, //........................Ocupa espaco disponivel
+    minHeight: LESSON_INFO_MIN_HEIGHT, //..Altura minima
+    justifyContent: 'center', //.......Centraliza verticalmente
+  },
+
+  // Titulo da Aula
+  lessonTitle: {
+    fontFamily: 'Inter_500Medium', //..Fonte media
+    fontSize: 14, //...................Tamanho da fonte
+    color: COLORS.textPrimary, //......Cor do texto
+  },
+
+  // Divisoria da Aula
+  lessonDivider: {
+    height: 1, //....................Altura fina
+    backgroundColor: COLORS.border, //..Cor cinza
+    marginVertical: 8, //.............Margem vertical
+  },
+
+  // Linha de Execucao
+  lessonExecutionRow: {
     flexDirection: 'row', //.........Layout horizontal
     alignItems: 'center', //.........Centraliza verticalmente
-    marginTop: 8, //.................Margem superior
+    justifyContent: 'space-between', //..Espaco entre elementos
   },
 
-  // Label do Item Relacionado
-  relatedLabel: {
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 13, //.................Tamanho da fonte
-    color: COLORS.textSecondary, //..Cor secundaria
-    marginRight: 4, //...............Margem direita
-  },
-
-  // Valor do Item Relacionado
-  relatedValue: {
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 13, //.................Tamanho da fonte
-    color: COLORS.primary, //........Cor azul
-  },
-
-  // Secao de Conteudo
-  contentSection: {
-    paddingHorizontal: 16, //........Padding horizontal
-    paddingVertical: 16, //.........Padding vertical
-    backgroundColor: COLORS.white, //..Fundo branco
-  },
-
-  // Item de Conteudo
-  contentItem: {
-    flexDirection: 'row', //.........Layout horizontal
-    alignItems: 'flex-start', //.....Alinha no topo
-    paddingVertical: 12, //.........Padding vertical
-    borderBottomWidth: 1, //.........Borda inferior
-    borderBottomColor: COLORS.border, //..Cor da borda
-  },
-
-  // Checkbox
-  checkbox: {
-    width: 24, //...................Largura
-    height: 24, //..................Altura
-    borderRadius: 12, //.............Bordas arredondadas
-    borderWidth: 2, //...............Largura da borda
-    borderColor: COLORS.border, //...Cor da borda
-    justifyContent: 'center', //....Centraliza verticalmente
-    alignItems: 'center', //........Centraliza horizontalmente
-    marginRight: 12, //.............Margem direita
-  },
-
-  // Checkbox Completo
-  checkboxCompleted: {
-    backgroundColor: COLORS.success, //..Fundo verde
-    borderColor: COLORS.success, //..Borda verde
-  },
-
-  // Info do Conteudo
-  contentInfo: {
-    flex: 1, //.....................Ocupa espaco disponivel
-  },
-
-  // Linha do Titulo do Conteudo
-  contentTitleRow: {
-    flexDirection: 'row', //.........Layout horizontal
-    alignItems: 'flex-start', //.....Alinha no topo
-  },
-
-  // Indice do Conteudo
-  contentIndex: {
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 14, //.................Tamanho da fonte
-    color: COLORS.textPrimary, //....Cor do texto
-    marginRight: 4, //...............Margem direita
-  },
-
-  // Titulo do Conteudo
-  contentTitle: {
-    flex: 1, //.....................Ocupa espaco disponivel
-    fontFamily: 'Inter_500Medium', //..Fonte media
-    fontSize: 14, //.................Tamanho da fonte
-    color: COLORS.textPrimary, //....Cor do texto
-    lineHeight: 20, //...............Altura da linha
-  },
-
-  // Texto de Conteudo Completo
-  contentTextCompleted: {
-    color: COLORS.textSecondary, //..Cor secundaria
-    textDecorationLine: 'line-through', //..Riscado
-  },
-
-  // Linha de Meta do Conteudo
-  contentMetaRow: {
+  // Container de Duracao
+  lessonDurationContainer: {
     flexDirection: 'row', //.........Layout horizontal
     alignItems: 'center', //.........Centraliza verticalmente
-    marginTop: 4, //.................Margem superior
     gap: 6, //......................Espaco entre elementos
   },
 
-  // Duracao do Conteudo
-  contentDuration: {
+  // Duracao da Aula
+  lessonDuration: {
     fontFamily: 'Inter_400Regular', //..Fonte regular
-    fontSize: 12, //.................Tamanho da fonte
-    color: COLORS.textSecondary, //..Cor secundaria
+    fontSize: 12, //...................Tamanho da fonte
+    color: COLORS.textSecondary, //....Cor secundaria
   },
 
-  // Container Inferior
-  bottomContainer: {
-    position: 'absolute', //.........Posicao absoluta
-    bottom: 0, //...................Fixo no fundo
-    left: 0, //.....................Esquerda
-    right: 0, //....................Direita
-    paddingHorizontal: 16, //........Padding horizontal
-    paddingVertical: 16, //.........Padding vertical
-    backgroundColor: COLORS.white, //..Fundo branco
-    borderTopWidth: 1, //............Borda superior
-    borderTopColor: COLORS.border, //..Cor da borda
-  },
-
-  // Botao Continuar
-  continueButton: {
-    width: '100%', //................Largura total
-    height: 48, //..................Altura
-    backgroundColor: COLORS.primary, //..Fundo azul
-    borderRadius: 8, //..............Bordas arredondadas
-    justifyContent: 'center', //....Centraliza verticalmente
-    alignItems: 'center', //........Centraliza horizontalmente
-  },
-
-  // Botao Continuar Completo
-  continueButtonCompleted: {
-    backgroundColor: COLORS.success, //..Fundo verde
-  },
-
-  // Texto do Botao Continuar
-  continueButtonText: {
+  // Progresso da Aula
+  lessonProgress: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
-    fontSize: 16, //.................Tamanho da fonte
-    color: COLORS.white, //..........Cor branca
+    fontSize: 12, //...................Tamanho da fonte
   },
 });
 

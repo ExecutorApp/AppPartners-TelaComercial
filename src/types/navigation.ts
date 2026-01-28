@@ -88,6 +88,8 @@ export type RootStackParamList = {
   VerificationMethod: undefined;
   TrainingHome: undefined;
   TrainingDetail: { trainingId: string };
+  ProductDetail: { productId: string };
+  TrainingPlayer: { trainingId: string; lessonIndex?: number };
 };
 
 export const ScreenNames = {
@@ -130,6 +132,8 @@ export const ScreenNames = {
   VerificationMethod: 'VerificationMethod' as const,
   TrainingHome: 'TrainingHome' as const,
   TrainingDetail: 'TrainingDetail' as const,
+  ProductDetail: 'ProductDetail' as const,
+  TrainingPlayer: 'TrainingPlayer' as const,
 } as const;
 
 export type ScreenNamesType = keyof RootStackParamList;

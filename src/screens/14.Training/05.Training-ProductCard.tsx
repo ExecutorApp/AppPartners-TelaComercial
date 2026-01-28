@@ -4,10 +4,11 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from 'react-native';
 import {
   COLORS,
-  TrainingItem,
+  ProductItem,
   formatDuration,
 } from './02.Training-Types';
 
@@ -15,34 +16,20 @@ import {
 // PROPS DO COMPONENTE
 // ========================================
 
-interface CourseCardProps {
-  training: TrainingItem; //......Dados do treinamento
-  onPress: () => void; //.........Callback ao clicar
-  useBlueProgress?: boolean; //...Usa cor azul na porcentagem
+interface ProductCardProps {
+  product: ProductItem; //......Dados do produto
+  onPress: () => void; //.......Callback ao clicar
+  useBlueProgress?: boolean; //..Usa cor azul na porcentagem
   useBorderedProgress?: boolean; //..Usa fundo branco com borda cinza
   useInlineProgress?: boolean; //....Exibe porcentagem inline na terceira linha
 }
 
 // ========================================
-// CONSTANTES DO CARD (LINHA 26)
+// COMPONENTE PRODUCT CARD
 // ========================================
 
-const CARD_PADDING_TOP = 6; //.........Padding superior do card
-const CARD_PADDING_BOTTOM = 6; //......Padding inferior do card
-const CARD_PADDING_LEFT = 6; //........Padding esquerdo do card
-const CARD_PADDING_RIGHT = 12; //......Padding direito do card
-
-const IMAGE_WIDTH = 70; //.............Largura da imagem
-const IMAGE_HEIGHT = 92; //............Altura da imagem
-const IMAGE_MARGIN_RIGHT = 12; //......Margem direita da imagem
-const IMAGE_BORDER_RADIUS = 8; //......Arredondamento da imagem
-
-// ========================================
-// COMPONENTE COURSE CARD
-// ========================================
-
-const CourseCard: React.FC<CourseCardProps> = ({
-  training,
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
   onPress,
   useBlueProgress = false,
   useBorderedProgress = false,
@@ -50,16 +37,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
 }) => {
   // Determina cor do progresso baseado no status
   const getProgressColor = () => {
-    if (training.progress === 100) return useBlueProgress ? COLORS.primary : COLORS.success;
-    if (training.progress > 0) return COLORS.textPrimary;
+    if (product.progress === 100) return useBlueProgress ? COLORS.primary : COLORS.success;
+    if (product.progress > 0) return COLORS.textPrimary;
     return COLORS.textSecondary;
   };
 
   // Determina cor de fundo do container de progresso
   const getProgressBackgroundColor = () => {
     if (useBorderedProgress) return COLORS.white;
-    if (training.progress === 100) return useBlueProgress ? 'rgba(23, 119, 207, 0.1)' : 'rgba(27, 136, 60, 0.1)';
-    if (training.progress > 0) return 'rgba(58, 63, 81, 0.1)';
+    if (product.progress === 100) return useBlueProgress ? 'rgba(23, 119, 207, 0.1)' : 'rgba(27, 136, 60, 0.1)';
+    if (product.progress > 0) return 'rgba(58, 63, 81, 0.1)';
     return 'rgba(125, 133, 146, 0.1)';
   };
 
@@ -74,14 +61,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
     return {};
   };
 
-  // Pega a primeira letra do titulo do treinamento
-  const firstLetter = training.title.charAt(0).toUpperCase();
+  // Pega a primeira letra do nome do produto
+  const firstLetter = product.name.charAt(0).toUpperCase();
 
   // Formata porcentagem com minimo de 2 digitos
-  const formattedProgress = String(training.progress).padStart(2, '0');
-
-  // Conta total de conteudos
-  const totalContents = training.contents.length;
+  const formattedProgress = String(product.progress).padStart(2, '0');
 
   return (
     <TouchableOpacity
@@ -91,17 +75,25 @@ const CourseCard: React.FC<CourseCardProps> = ({
     >
       {/* Container da Imagem ou Letra */}
       <View style={styles.imageWrapper}>
-        <View style={styles.letterContainer}>
-          <Text style={styles.letterText}>{firstLetter}</Text>
-        </View>
+        {product.image ? (
+          <Image
+            source={product.image}
+            style={styles.productImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.letterContainer}>
+            <Text style={styles.letterText}>{firstLetter}</Text>
+          </View>
+        )}
       </View>
 
       {/* Coluna Direita - Informacoes */}
       <View style={styles.contentWrapper}>
         <View style={styles.content}>
-          {/* Primeira Linha - Nome do Treinamento */}
-          <Text style={styles.trainingName} numberOfLines={1}>
-            {training.title}
+          {/* Primeira Linha - Nome do Produto */}
+          <Text style={styles.productName} numberOfLines={1}>
+            {product.name}
           </Text>
 
           {/* Divisoria abaixo do nome */}
@@ -113,7 +105,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <View style={[styles.infoColumn, useInlineProgress && { flex: 1 }]}>
               {/* Segunda Linha - Modulos */}
               <Text style={styles.infoText}>
-                Módulos: 00
+                Módulos: {String(product.totalModules).padStart(2, '0')}
               </Text>
 
               {/* Divisoria abaixo de Modulos */}
@@ -123,7 +115,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {useInlineProgress ? (
                 <View style={styles.inlineProgressRow}>
                   <Text style={styles.infoText}>
-                    Aulas: {String(totalContents).padStart(2, '0')}   Tempo: {formatDuration(training.estimatedMinutes)}
+                    Aulas: {String(product.totalLessons).padStart(2, '0')}   Tempo: {formatDuration(product.totalDuration)}
                   </Text>
                   <Text style={[styles.inlineProgressText, { color: getProgressColor() }]}>
                     {formattedProgress}%
@@ -131,7 +123,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 </View>
               ) : (
                 <Text style={styles.infoText}>
-                  Aulas: {String(totalContents).padStart(2, '0')}   Tempo: {formatDuration(training.estimatedMinutes)}
+                  Aulas: {String(product.totalLessons).padStart(2, '0')}   Tempo: {formatDuration(product.totalDuration)}
                 </Text>
               )}
             </View>
@@ -161,6 +153,36 @@ const CourseCard: React.FC<CourseCardProps> = ({
 // ESTILOS
 // ========================================
 
+// ============================================================
+// AJUSTES MANUAIS - CONTAINER DO CARD
+// ============================================================
+
+const CARD_PADDING_TOP = 6; //.........Linha 117: Padding superior do card
+const CARD_PADDING_BOTTOM = 6; //......Linha 118: Padding inferior do card
+const CARD_PADDING_LEFT = 6; //........Linha 119: Padding esquerdo do card
+const CARD_PADDING_RIGHT = 12; //......Linha 120: Padding direito do card
+
+// ============================================================
+// AJUSTES MANUAIS - CONTAINER DA IMAGEM
+// ============================================================
+
+const IMAGE_WIDTH = 70; //.............Linha 125: Largura da imagem
+const IMAGE_HEIGHT = 92; //............Linha 126: Altura da imagem
+const IMAGE_MARGIN_RIGHT = 12; //......Linha 127: Margem direita da imagem
+const IMAGE_BORDER_RADIUS = 8; //......Linha 128: Arredondamento da imagem
+const IMAGE_FONT_SIZE = 36; //.........Linha 129: Tamanho da letra
+
+// ============================================================
+// AJUSTES MANUAIS - CONTAINER DE INFORMACOES
+// ============================================================
+
+const INFO_PADDING_TOP = 0; //.........Linha 134: Padding superior das informacoes
+const INFO_PADDING_BOTTOM = 0; //......Linha 135: Padding inferior das informacoes
+const INFO_PADDING_LEFT = 0; //........Linha 136: Padding esquerdo das informacoes
+const INFO_PADDING_RIGHT = 0; //.......Linha 137: Padding direito das informacoes
+
+// ============================================================
+
 const styles = StyleSheet.create({
   // Container Principal
   container: {
@@ -170,10 +192,10 @@ const styles = StyleSheet.create({
     borderRadius: 12, //..............Bordas arredondadas
     borderWidth: 1, //................Largura da borda
     borderColor: COLORS.border, //....Cor da borda
-    paddingTop: CARD_PADDING_TOP, //..Padding superior
-    paddingBottom: CARD_PADDING_BOTTOM, //..Padding inferior
-    paddingLeft: CARD_PADDING_LEFT, //..Padding esquerdo
-    paddingRight: CARD_PADDING_RIGHT, //..Padding direito
+    paddingTop: CARD_PADDING_TOP, //..Padding superior (LINHA 150)
+    paddingBottom: CARD_PADDING_BOTTOM, //..Padding inferior (LINHA 151)
+    paddingLeft: CARD_PADDING_LEFT, //..Padding esquerdo (LINHA 152)
+    paddingRight: CARD_PADDING_RIGHT, //..Padding direito (LINHA 153)
     marginBottom: 12, //..............Margem inferior
   },
 
@@ -181,15 +203,22 @@ const styles = StyleSheet.create({
   imageWrapper: {
     justifyContent: 'center', //.....Centraliza verticalmente
     alignItems: 'center', //..........Centraliza horizontalmente
-    marginRight: IMAGE_MARGIN_RIGHT, //..Margem direita
+    marginRight: IMAGE_MARGIN_RIGHT, //..Margem direita (LINHA 161)
   },
 
-  // Container da Letra
+  // Imagem do Produto
+  productImage: {
+    width: IMAGE_WIDTH, //............Largura da imagem
+    height: IMAGE_HEIGHT, //..........Altura da imagem
+    borderRadius: IMAGE_BORDER_RADIUS, //..Arredondamento
+  },
+
+  // Container da Letra (quando nao tem imagem)
   letterContainer: {
     width: IMAGE_WIDTH, //............Largura do container
     height: IMAGE_HEIGHT, //..........Altura do container
     borderRadius: IMAGE_BORDER_RADIUS, //..Arredondamento
-    backgroundColor: '#021632', //....Fundo azul escuro
+    backgroundColor: '#021632', //..Fundo cinza azulado
     justifyContent: 'center', //.....Centraliza verticalmente
     alignItems: 'center', //..........Centraliza horizontalmente
   },
@@ -209,14 +238,14 @@ const styles = StyleSheet.create({
 
   // Conteudo do Card (Informacoes)
   content: {
-    paddingTop: 0, //................Padding superior
-    paddingBottom: 0, //..............Padding inferior
-    paddingLeft: 0, //................Padding esquerdo
-    paddingRight: 0, //...............Padding direito
+    paddingTop: INFO_PADDING_TOP, //..Padding superior (LINHA 188)
+    paddingBottom: INFO_PADDING_BOTTOM, //..Padding inferior (LINHA 189)
+    paddingLeft: INFO_PADDING_LEFT, //..Padding esquerdo (LINHA 190)
+    paddingRight: INFO_PADDING_RIGHT, //..Padding direito (LINHA 191)
   },
 
-  // Nome do Treinamento
-  trainingName: {
+  // Nome do Produto
+  productName: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
     fontSize: 15, //...................Tamanho da fonte
     color: COLORS.textPrimary, //......Cor do texto
@@ -235,7 +264,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch', //.........Estica para altura igual
   },
 
-  // Coluna de Informacoes
+  // Coluna de Informacoes (Modulos e Aulas)
   infoColumn: {
     flex: 1, //......................Ocupa espaco disponivel
   },
@@ -276,4 +305,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CourseCard;
+export default ProductCard;

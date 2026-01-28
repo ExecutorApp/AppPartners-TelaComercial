@@ -21,3 +21,6 @@ build/
 .DS_Store
 Thumbs.db
 .expo/
+
+# Arquivos de video grandes
+public/*.mp4
