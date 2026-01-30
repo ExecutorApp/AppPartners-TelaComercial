@@ -158,6 +158,8 @@ interface MiniPlayerProviderProps {
 }
 
 export const MiniPlayerProvider: React.FC<MiniPlayerProviderProps> = ({ children }) => {
+  console.log('[MINIPLAYER_PROVIDER] ✅ MiniPlayerProvider iniciando sem erros');
+
   // Estado de ativacao
   const [isActive, setIsActive] = useState(false); //..........Se o player esta ativo
   const [isMinimized, setIsMinimized] = useState(false); //....Se esta minimizado
@@ -249,6 +251,54 @@ export const MiniPlayerProvider: React.FC<MiniPlayerProviderProps> = ({ children
     console.log('[CONTEXT_STATE] ================================================================');
   }, [isPlaying]);
 
+  // ========================================
+  // FUNCOES DE PERSISTENCIA
+  // ========================================
+
+  // Salva o progresso no AsyncStorage
+  const saveProgressToStorage = useCallback(async (progressMap: Map<string, LessonProgress>) => {
+    try {
+      // Converte Map para objeto serializavel
+      const progressObject: Record<string, LessonProgress> = {};
+      progressMap.forEach((value, key) => {
+        progressObject[key] = value;
+      });
+
+      const jsonValue = JSON.stringify(progressObject);
+      await AsyncStorage.setItem(LESSONS_PROGRESS_STORAGE_KEY, jsonValue);
+
+      console.log('[PROGRESS_STORAGE] Progresso salvo com sucesso:', Object.keys(progressObject).length, 'aulas');
+    } catch (error) {
+      console.error('[PROGRESS_STORAGE] Erro ao salvar progresso:', error);
+    }
+  }, []);
+
+  // Carrega o progresso do AsyncStorage
+  const loadProgressFromStorage = useCallback(async (): Promise<Map<string, LessonProgress>> => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(LESSONS_PROGRESS_STORAGE_KEY);
+
+      if (jsonValue !== null) {
+        const progressObject: Record<string, LessonProgress> = JSON.parse(jsonValue);
+        const progressMap = new Map<string, LessonProgress>();
+
+        // Converte objeto de volta para Map
+        Object.entries(progressObject).forEach(([key, value]) => {
+          progressMap.set(key, value);
+        });
+
+        console.log('[PROGRESS_STORAGE] Progresso carregado com sucesso:', progressMap.size, 'aulas');
+        return progressMap;
+      }
+
+      console.log('[PROGRESS_STORAGE] Nenhum progresso salvo encontrado');
+      return new Map();
+    } catch (error) {
+      console.error('[PROGRESS_STORAGE] Erro ao carregar progresso:', error);
+      return new Map();
+    }
+  }, []);
+
   // Carrega progresso do storage quando o provider monta
   useEffect(() => {
     const loadProgress = async () => {
@@ -314,54 +364,6 @@ export const MiniPlayerProvider: React.FC<MiniPlayerProviderProps> = ({ children
   const calculateRealProgress = useCallback((totalWatched: number, duration: number): number => {
     if (duration <= 0) return 0;
     return Math.min(100, (totalWatched / duration) * 100);
-  }, []);
-
-  // ========================================
-  // FUNCOES DE PERSISTENCIA
-  // ========================================
-
-  // Salva o progresso no AsyncStorage
-  const saveProgressToStorage = useCallback(async (progressMap: Map<string, LessonProgress>) => {
-    try {
-      // Converte Map para objeto serializavel
-      const progressObject: Record<string, LessonProgress> = {};
-      progressMap.forEach((value, key) => {
-        progressObject[key] = value;
-      });
-
-      const jsonValue = JSON.stringify(progressObject);
-      await AsyncStorage.setItem(LESSONS_PROGRESS_STORAGE_KEY, jsonValue);
-
-      console.log('[PROGRESS_STORAGE] Progresso salvo com sucesso:', Object.keys(progressObject).length, 'aulas');
-    } catch (error) {
-      console.error('[PROGRESS_STORAGE] Erro ao salvar progresso:', error);
-    }
-  }, []);
-
-  // Carrega o progresso do AsyncStorage
-  const loadProgressFromStorage = useCallback(async (): Promise<Map<string, LessonProgress>> => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(LESSONS_PROGRESS_STORAGE_KEY);
-
-      if (jsonValue !== null) {
-        const progressObject: Record<string, LessonProgress> = JSON.parse(jsonValue);
-        const progressMap = new Map<string, LessonProgress>();
-
-        // Converte objeto de volta para Map
-        Object.entries(progressObject).forEach(([key, value]) => {
-          progressMap.set(key, value);
-        });
-
-        console.log('[PROGRESS_STORAGE] Progresso carregado com sucesso:', progressMap.size, 'aulas');
-        return progressMap;
-      }
-
-      console.log('[PROGRESS_STORAGE] Nenhum progresso salvo encontrado');
-      return new Map();
-    } catch (error) {
-      console.error('[PROGRESS_STORAGE] Erro ao carregar progresso:', error);
-      return new Map();
-    }
   }, []);
 
   // ========================================
