@@ -60,6 +60,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
     Comfortaa_400Regular,
   });
 
+  // Fallback: força fontes como carregadas após 2s (evita tela branca)
+  const [forceFontsLoaded, setForceFontsLoaded] = React.useState(false);
+
+  // Timer de fallback para fontes (roda apenas uma vez)
+  React.useEffect(() => {
+    const fontFallbackTimer = setTimeout(() => {
+      try { console.log('[Login] Font loading timeout - forcing fallback'); } catch {}
+      setForceFontsLoaded(true);
+    }, 100); // 100ms - quase instantaneo
+
+    return () => clearTimeout(fontFallbackTimer);
+  }, []); // Sem dependências - roda apenas uma vez
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -105,7 +118,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
     navigation.navigate(ScreenNames.VerificationMethod);
   };
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !forceFontsLoaded) {
+    try { console.log('[Login] fontsLoaded=false, waiting...'); } catch {}
     return null;
   }
 

@@ -20,7 +20,7 @@ const CheckIcon = () => (
       cx={12}
       cy={12}
       r={10}
-      fill="#1B883C"
+      fill={COLORS.primary}
     />
     <Path
       d="M8 12L11 15L16 9"

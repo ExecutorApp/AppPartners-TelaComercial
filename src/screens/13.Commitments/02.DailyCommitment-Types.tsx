@@ -12,7 +12,6 @@ export const COLORS = {
   background: '#F4F4F4', //......Cor de fundo
   white: '#FCFCFC', //...........Cor branca
   border: '#D8E0F0', //..........Cor da borda
-  green: '#4CAF50', //...........Cor verde (concluido)
   red: '#E53935', //.............Cor vermelha (atraso)
   orange: '#FF9800', //..........Cor laranja (alerta)
 };

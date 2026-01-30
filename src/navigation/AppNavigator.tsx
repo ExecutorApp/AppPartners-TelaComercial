@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer, getStateFromPath as navigationGetStateFromPath } from '@react-navigation/native';
+import React, { createRef } from 'react';
+import { NavigationContainer, getStateFromPath as navigationGetStateFromPath, NavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SplashScreen } from '../screens/0.SplashScreen/SplashScreen';
 import { LoginScreen } from '../screens/1.Login/1. LoginScreen';
@@ -33,11 +33,33 @@ import TrainingDetailScreen from '../screens/14.Training/05.Training-DetailScree
 import ProductDetailScreen from '../screens/14.Training/06.Training-ProductDetailScreen';
 import TrainingPlayerScreen from '../screens/14.Training/07.Training-PlayerScreen';
 
+// ========================================
+// REFERENCIA DE NAVEGACAO GLOBAL
+// ========================================
+
+// Referencia de navegacao para uso fora do NavigationContainer
+export const navigationRef = createRef<NavigationContainerRef<RootStackParamList>>();
+
+// Funcao para navegar de fora do NavigationContainer
+export function navigate<RouteName extends keyof RootStackParamList>(
+  name: RouteName,
+  params?: RootStackParamList[RouteName]
+) {
+  if (navigationRef.current) {
+    navigationRef.current.navigate(name, params as any);
+  }
+}
+
+// ========================================
+// STACK NAVIGATOR
+// ========================================
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer
+      ref={navigationRef}
       linking={{
         prefixes: [
           'https://partners.app',

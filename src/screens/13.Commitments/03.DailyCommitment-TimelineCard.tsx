@@ -45,6 +45,28 @@ const TimeIcon = ({ color = COLORS.textSecondary }: { color?: string }) => (
 );
 
 // ========================================
+// ICONE CHECK (CONCLUIDO)
+// ========================================
+
+const CheckIcon = ({ color = COLORS.primary }: { color?: string }) => (
+  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+    <Circle
+      cx={12}
+      cy={12}
+      r={10}
+      fill={color}
+    />
+    <Path
+      d="M8 12L11 15L16 9"
+      stroke={COLORS.white}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// ========================================
 // FUNCAO PARA FORMATAR TELEFONE
 // ========================================
 
@@ -69,6 +91,8 @@ interface TimelineCardProps {
   isExpanded: boolean; //................Se esta expandido (olhinho)
   onPress: () => void; //................Callback ao clicar no card
   onConfirmPress: () => void; //.........Callback ao confirmar conclusao
+  onLongPress?: () => void; //...........Callback ao pressionar longo (drag)
+  isDragging?: boolean; //...............Se esta sendo arrastado
 }
 
 // ========================================
@@ -81,6 +105,8 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
   isExpanded,
   onPress,
   onConfirmPress,
+  onLongPress,
+  isDragging = false,
 }) => {
   // Modelo do card (1, 2 ou 3)
   const cardModel = getCardModel(item);
@@ -118,17 +144,40 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
 
   // Cor do circulo baseada no status
   const getCircleStyle = () => {
+    // Fixo/Selecionado: fundo solido azul
+    if (item.isFixed) {
+      return [styles.numberCircle, styles.numberCircleFixed];
+    }
+    // Concluido: fundo azul claro
     if (isCompleted) {
       return [styles.numberCircle, styles.numberCircleCompleted];
     }
-    if (item.isFixed) {
-      return [styles.numberCircle, styles.numberCircleFixed];
+    // Atrasado: fundo vermelho claro
+    if (isDelayed) {
+      return [styles.numberCircle, styles.numberCircleDelayed];
     }
     return [styles.numberCircle];
   };
 
+  // Cor do texto do numero baseada no status
+  const getNumberTextStyle = () => {
+    // Fixo/Selecionado: texto branco
+    if (item.isFixed) {
+      return [styles.numberText, styles.numberTextFixed];
+    }
+    // Concluido: texto azul
+    if (isCompleted) {
+      return [styles.numberText, styles.numberTextCompleted];
+    }
+    // Atrasado: texto vermelho
+    if (isDelayed) {
+      return [styles.numberText, styles.numberTextDelayed];
+    }
+    return [styles.numberText];
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDragging && styles.containerDragging]}>
       {/* Linha Conectora (posicao absoluta) */}
       {!isLast && <View style={styles.connectorLine} />}
 
@@ -138,10 +187,7 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
         onPress={onConfirmPress}
         activeOpacity={0.7}
       >
-        <Text style={[
-          styles.numberText,
-          (item.isFixed || isCompleted) && styles.numberTextFixed,
-        ]}>
+        <Text style={getNumberTextStyle()}>
           {item.number}
         </Text>
       </TouchableOpacity>
@@ -153,8 +199,11 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
             styles.card,
             isCompleted && styles.cardCompleted,
             isDelayed && styles.cardDelayed,
+            isDragging && styles.cardDragging,
           ]}
           onPress={onPress}
+          onLongPress={onLongPress}
+          delayLongPress={150}
           activeOpacity={0.9}
         >
           {/* Conteudo do Card (Layout Horizontal) */}
@@ -178,12 +227,20 @@ const TimelineCard: React.FC<TimelineCardProps> = ({
 
             {/* Bloco Direito: Categoria + Subcategoria + Titulo */}
             <View style={styles.rightBlock}>
-              {/* Linha Categoria + Duracao */}
+              {/* Linha Categoria + Duracao + Check */}
               <View style={styles.categoryRow}>
                 <Text style={styles.categoryText}>{CATEGORY_LABELS[item.category]}</Text>
-                <View style={styles.durationContainer}>
-                  <TimeIcon color={COLORS.textSecondary} />
-                  <Text style={styles.durationText}>{formatDuration(item.estimatedMinutes)}</Text>
+                <View style={styles.durationCheckContainer}>
+                  <View style={styles.durationContainer}>
+                    <TimeIcon color={COLORS.textSecondary} />
+                    <Text style={styles.durationText}>{formatDuration(item.estimatedMinutes)}</Text>
+                  </View>
+                  {/* Icone Check - Aparece quando concluido */}
+                  {isCompleted && (
+                    <View style={styles.checkIconContainer}>
+                      <CheckIcon color={COLORS.primary} />
+                    </View>
+                  )}
                 </View>
               </View>
               <View style={styles.rightDivider} />
@@ -315,15 +372,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row', //............Layout horizontal
     alignItems: 'flex-start', //........Alinha ao topo
     marginBottom: 12, //................Espaco entre cards
-    paddingLeft: 8, //..................Margem esquerda
+    paddingLeft: 16, //.................Margem esquerda
     paddingRight: 16, //................Margem direita
     position: 'relative' as const, //...Para linha absoluta
+  },
+
+  // Container Durante Arrasto
+  containerDragging: {
+    opacity: 0.95, //...................Leve transparencia
+    transform: [{ scale: 1.02 }], //....Leve aumento
   },
 
   // Linha Conectora (posicao absoluta)
   connectorLine: {
     position: 'absolute' as const, //...Posicao absoluta
-    left: 23, //........................Centro do numero (8 + 32/2 - 1)
+    left: 31, //........................Centro do numero (16 + 32/2 - 1)
     top: 38, //.........................Abaixo do numero com espaco
     width: 2, //.........................Largura da linha
     height: 'calc(100% - 32px)' as any, //..Altura com espacos
@@ -344,26 +407,42 @@ const styles = StyleSheet.create({
     marginRight: 8, //...................Espaco entre numero e card
   },
 
-  // Circulo Concluido
+  // Circulo Concluido (fundo claro)
   numberCircleCompleted: {
-    backgroundColor: '#1B883C', //........Fundo verde escuro
-    borderColor: '#1B883C', //............Borda verde escuro
+    backgroundColor: 'rgba(23, 119, 207, 0.1)', //..Fundo azul claro 10%
+    borderColor: COLORS.primary, //................Borda azul principal
   },
 
-  // Circulo Fixo (Agenda)
+  // Circulo Atrasado (fundo claro)
+  numberCircleDelayed: {
+    backgroundColor: 'rgba(229, 57, 53, 0.15)', //..Fundo vermelho claro 15%
+    borderColor: COLORS.red, //....................Borda vermelha
+  },
+
+  // Circulo Fixo/Selecionado (Agenda - fundo solido)
   numberCircleFixed: {
-    backgroundColor: COLORS.primary, //..Fundo azul
+    backgroundColor: COLORS.primary, //..Fundo azul solido
     borderColor: COLORS.primary, //......Borda azul
   },
 
-  // Texto do Numero
+  // Texto do Numero (padrao)
   numberText: {
     fontFamily: 'Inter_600SemiBold', //..Fonte semi-bold
     fontSize: 12, //.....................Tamanho da fonte
     color: COLORS.textPrimary, //........Cor do texto
   },
 
-  // Texto do Numero Fixo
+  // Texto do Numero Concluido (azul)
+  numberTextCompleted: {
+    color: COLORS.primary, //.............Cor azul
+  },
+
+  // Texto do Numero Atrasado (vermelho)
+  numberTextDelayed: {
+    color: COLORS.red, //..................Cor vermelha
+  },
+
+  // Texto do Numero Fixo/Selecionado (branco)
   numberTextFixed: {
     color: COLORS.white, //..............Cor branca
   },
@@ -384,15 +463,27 @@ const styles = StyleSheet.create({
 
   // Card Concluido
   cardCompleted: {
-    backgroundColor: 'rgba(222, 251, 230, 0.5)', //..Fundo verde claro 50%
-    borderColor: 'rgba(27, 136, 60, 0.5)', //.......Borda verde
+    backgroundColor: 'rgba(23, 119, 207, 0.1)', //..Fundo azul claro 10%
+    borderColor: 'rgba(23, 119, 207, 0.5)', //......Borda azul 50%
     borderWidth: StyleSheet.hairlineWidth, //.......Borda mais fina
   },
 
   // Card em Atraso
   cardDelayed: {
-    borderColor: 'rgba(220, 53, 69, 0.5)', //..Borda vermelha
-    borderWidth: StyleSheet.hairlineWidth, //..Borda mais fina
+    backgroundColor: 'rgba(229, 57, 53, 0.12)', //..Fundo vermelho claro 12%
+    borderColor: 'rgba(229, 57, 53, 0.5)', //.......Borda vermelha 50%
+    borderWidth: StyleSheet.hairlineWidth, //.......Borda mais fina
+  },
+
+  // Card Durante Arrasto
+  cardDragging: {
+    borderColor: COLORS.primary, //......Borda azul solida
+    borderWidth: 2, //...................Borda mais grossa
+    shadowColor: '#000', //..............Cor da sombra
+    shadowOffset: { width: 0, height: 4 }, //..Deslocamento da sombra
+    shadowOpacity: 0.2, //...............Opacidade da sombra
+    shadowRadius: 8, //..................Raio da sombra
+    elevation: 8, //.....................Elevacao Android
   },
 
   // Conteudo do Card (layout horizontal)
@@ -455,6 +546,13 @@ const styles = StyleSheet.create({
     color: COLORS.primary, //.............Cor azul
   },
 
+  // Container Duracao + Check
+  durationCheckContainer: {
+    flexDirection: 'row', //.............Layout horizontal
+    alignItems: 'center', //.............Centraliza verticalmente
+    gap: 8, //...........................Espaco entre duracao e check
+  },
+
   // Container Duracao
   durationContainer: {
     flexDirection: 'row', //.............Layout horizontal
@@ -467,6 +565,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_500Medium', //....Fonte media
     fontSize: 12, //.....................Tamanho da fonte
     color: COLORS.textSecondary, //......Cor cinza
+  },
+
+  // Container Icone Check
+  checkIconContainer: {
+    justifyContent: 'center', //........Centraliza verticalmente
+    alignItems: 'center', //.............Centraliza horizontalmente
   },
 
   // Divisoria Direita

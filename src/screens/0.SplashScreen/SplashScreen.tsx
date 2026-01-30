@@ -13,14 +13,29 @@ interface SplashScreenProps {}
 
 export const SplashScreen: React.FC<SplashScreenProps> = () => {
   const navigation = useNavigation<SplashScreenNavigationProp>();
-  
+
   const [fontsLoaded] = useFonts({
     DMSans_700Bold,
     Comfortaa_400Regular,
   });
 
+  // Fallback: força fontes como carregadas após 2s (evita tela branca)
+  const [forceFontsLoaded, setForceFontsLoaded] = React.useState(false);
+
+  // Timer de fallback para fontes (roda apenas uma vez)
+  useEffect(() => {
+    const fontFallbackTimer = setTimeout(() => {
+      try { console.log('[Splash] Font loading timeout - forcing fallback'); } catch {}
+      setForceFontsLoaded(true);
+    }, 100); // 100ms - quase instantaneo
+
+    return () => clearTimeout(fontFallbackTimer);
+  }, []); // Sem dependências - roda apenas uma vez
+
+  // Timer de navegação
   useEffect(() => {
     try { console.log('[Splash] mount'); } catch {}
+
     const timer = setTimeout(() => {
       try { console.log('[Splash] navigating to Login'); } catch {}
       navigation.replace(ScreenNames.Login);
@@ -29,7 +44,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = () => {
     return () => clearTimeout(timer);
   }, [navigation]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !forceFontsLoaded) {
     try { console.log('[Splash] fontsLoaded=false'); } catch {}
     return (
       <>

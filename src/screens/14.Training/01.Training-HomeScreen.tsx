@@ -14,7 +14,7 @@ import Header from '../5.Side Menu/2.Header';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import CategoryCard from './03.Training-CategoryCard';
 import CourseCard from './04.Training-CourseCard';
-import ProductCard from './05.Training-ProductCard';
+import ProductCard from './05.Training-ProductCard'; 
 import {
   COLORS,
   TrainingCategory,

@@ -171,6 +171,35 @@ const DailyCommitmentHomeScreen: React.FC = () => {
     console.log('Novo compromisso criado:', data);
   }, [commitments.length]);
 
+  // Renderiza item da lista
+  const renderItem = useCallback((item: CommitmentItem, index: number) => {
+    const isLast = index === commitments.length - 1;
+
+    // Verifica se e o primeiro item fora do expediente
+    const isFirstAfterHours = item.isAfterHours &&
+      (index === 0 || !commitments[index - 1]?.isAfterHours);
+
+    return (
+      <View key={item.id}>
+        {/* Linha divisoria para compromissos fora do expediente */}
+        {isFirstAfterHours && (
+          <View style={styles.afterHoursDivider}>
+            <View style={styles.afterHoursLine} />
+            <Text style={styles.afterHoursText}>Fora do expediente</Text>
+            <View style={styles.afterHoursLine} />
+          </View>
+        )}
+        <TimelineCard
+          item={item}
+          isLast={isLast}
+          isExpanded={isExpanded}
+          onPress={() => handleCardPress(item)}
+          onConfirmPress={() => handleConfirmPress(item)}
+        />
+      </View>
+    );
+  }, [commitments, isExpanded, handleCardPress, handleConfirmPress]);
+
   // Aguarda fontes
   if (!fontsLoaded) return null;
 
@@ -277,45 +306,21 @@ const DailyCommitmentHomeScreen: React.FC = () => {
 
       {/* Lista de Compromissos */}
       <View style={styles.scrollWrapper}>
-        <ScrollView
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={true}
-        >
-          {commitments.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                Nenhum compromisso para este período
-              </Text>
-            </View>
-          ) : (
-            commitments.map((item, index) => {
-              // Verifica se e o primeiro item fora do expediente
-              const isFirstAfterHours = item.isAfterHours &&
-                (index === 0 || !commitments[index - 1].isAfterHours);
-
-              return (
-                <React.Fragment key={item.id}>
-                  {/* Linha divisoria para compromissos fora do expediente */}
-                  {isFirstAfterHours && (
-                    <View style={styles.afterHoursDivider}>
-                      <View style={styles.afterHoursLine} />
-                      <Text style={styles.afterHoursText}>Fora do expediente</Text>
-                      <View style={styles.afterHoursLine} />
-                    </View>
-                  )}
-                  <TimelineCard
-                    item={item}
-                    isLast={index === commitments.length - 1}
-                    isExpanded={isExpanded}
-                    onPress={() => handleCardPress(item)}
-                    onConfirmPress={() => handleConfirmPress(item)}
-                  />
-                </React.Fragment>
-              );
-            })
-          )}
-        </ScrollView>
+        {commitments.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              Nenhum compromisso para este período
+            </Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {commitments.map((item, index) => renderItem(item, index))}
+          </ScrollView>
+        )}
       </View>
 
       {/* Menu Lateral */}
@@ -493,7 +498,7 @@ const styles = StyleSheet.create({
 
   // Valor Concluido
   statusValueCompleted: {
-    color: '#1B883C', //..................Cor verde escuro
+    color: COLORS.primary, //..............Cor azul principal
   },
 
   // Valor Nao Concluido

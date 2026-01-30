@@ -15,8 +15,8 @@ export const MINI_PLAYER_WIDTH_SMALL = 200; //.......................Largura peq
 export const MINI_PLAYER_HEIGHT_SMALL = 112; //......................Altura pequeno (16:9)
 export const MINI_PLAYER_WIDTH_MEDIUM = 280; //......................Largura medio (tamanho 2)
 export const MINI_PLAYER_HEIGHT_MEDIUM = 158; //.....................Altura medio (16:9)
-export const MINI_PLAYER_MARGIN_RIGHT = 15; //.......................Margem da direita (15px)
-export const MINI_PLAYER_MARGIN_BOTTOM = 15; //......................Margem de baixo (15px)
+export const MINI_PLAYER_MARGIN_RIGHT = 10; //.......................Margem da direita (ALTERAR AQUI)
+export const MINI_PLAYER_MARGIN_BOTTOM = 10; //......................Margem de baixo (ALTERAR AQUI)
 
 // ========================================
 // AJUSTES MANUAIS - ESTADO NORMAL (Player no topo)
@@ -29,10 +29,10 @@ export const NORMAL_FULLSCREEN_BTN_RIGHT = 20; //......Distancia da direita (ALT
 // ========================================
 // AJUSTES MANUAIS - ESTADO FULLSCREEN (Expandido)
 // ========================================
-export const FULLSCREEN_TIME_BADGE_BOTTOM = 25; //.....Distancia do fundo (ALTERAR AQUI)
-export const FULLSCREEN_TIME_BADGE_LEFT = 15; //.......Distancia da esquerda (ALTERAR AQUI)
-export const FULLSCREEN_BTN_BOTTOM = 25; //............Distancia do fundo (ALTERAR AQUI)
-export const FULLSCREEN_BTN_RIGHT = 20; //.............Distancia da direita (ALTERAR AQUI)
+export const FULLSCREEN_TIME_BADGE_BOTTOM = 35; //.....Distancia do fundo (ALTERAR AQUI)
+export const FULLSCREEN_TIME_BADGE_LEFT = 12; //.......Distancia da esquerda (ALTERAR AQUI)
+export const FULLSCREEN_BTN_BOTTOM = 30; //............Distancia do fundo (ALTERAR AQUI)
+export const FULLSCREEN_BTN_RIGHT = 12; //.............Distancia da direita (ALTERAR AQUI)
 
 // ========================================
 // AJUSTES MANUAIS - ESTADO LANDSCAPE (Celular virado)
@@ -41,6 +41,13 @@ export const LANDSCAPE_TIME_BADGE_BOTTOM = 25; //......Distancia do fundo (ALTER
 export const LANDSCAPE_TIME_BADGE_LEFT = 15; //........Distancia da esquerda (ALTERAR AQUI)
 export const LANDSCAPE_FULLSCREEN_BTN_BOTTOM = 25; //..Distancia do fundo (ALTERAR AQUI)
 export const LANDSCAPE_FULLSCREEN_BTN_RIGHT = 20; //...Distancia da direita (ALTERAR AQUI)
+
+// ========================================
+// AJUSTES MANUAIS - BARRA DE PROGRESSO (Modo Expandido)
+// ========================================
+export const PROGRESS_BAR_EXPANDED_BOTTOM = 15; //.......Margem inferior (ALTERAR AQUI)
+export const PROGRESS_BAR_EXPANDED_LEFT = 15; //........Margem esquerda (ALTERAR AQUI)
+export const PROGRESS_BAR_EXPANDED_RIGHT = 15; //.......Margem direita (ALTERAR AQUI)
 
 // ========================================
 // ESTILOS DO PLAYER
@@ -62,7 +69,7 @@ export const styles = StyleSheet.create({
     height: VIDEO_HEIGHT, //.........Altura proporcional 16:9
     backgroundColor: '#000000', //...Fundo preto
     position: 'relative', //.........Posicao relativa para controles
-    zIndex: 1, //...................Fica acima de outros elementos
+    zIndex: 10, //..................Fica ACIMA do video (que tem zIndex 1)
     overflow: 'visible', //.........Permite barra visivel fora do container
   },
 
@@ -108,6 +115,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center', //.........Centraliza verticalmente
     gap: 40, //......................Espaco entre botoes
     backgroundColor: 'rgba(0,0,0,0.3)', //..Fundo semi-transparente
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Botao Skip (Anterior/Proximo)
@@ -142,7 +150,7 @@ export const styles = StyleSheet.create({
     left: 0, //.....................Sem margem esquerda
     right: 0, //....................Sem margem direita
     height: 20, //..................Altura maior para area de toque
-    zIndex: 10, //..................Fica por cima de tudo
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Fundo da Barra de Progresso (vai de ponta a ponta)
@@ -195,7 +203,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2, //..........Padding vertical
     backgroundColor: 'rgba(0,0,0,0.3)', //..Fundo semi-transparente
     borderRadius: 6, //..............Cantos arredondados
-    zIndex: 10, //..................Fica por cima de tudo
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Texto do Badge de Tempo
@@ -217,7 +225,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row', //.........Layout horizontal
     alignItems: 'center', //........Centraliza verticalmente
     gap: 15, //.....................Espaco entre elementos
-    zIndex: 20, //..................Fica por cima dos controles centrais
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Container Botoes Esquerda (Voltar + Minimizar)
@@ -227,7 +235,7 @@ export const styles = StyleSheet.create({
     left: 16, //....................Distancia da esquerda
     flexDirection: 'column', //.....Layout vertical
     gap: 8, //......................Espaco entre botoes
-    zIndex: 20, //..................Fica por cima dos controles centrais
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Botao Voltar (Seta para tela anterior) - ACIMA
@@ -280,7 +288,7 @@ export const styles = StyleSheet.create({
   // Container do Botao Fullscreen (posicao controlada no PlayerScreen por estado)
   fullscreenButtonContainer: {
     position: 'absolute', //.........Posicao absoluta
-    zIndex: 20, //..................Fica por cima dos controles centrais
+    zIndex: 100, //..................Muito acima do video fixed (zIndex 1)
   },
 
   // Indicador de Progresso (bolinha)
@@ -468,13 +476,23 @@ export const styles = StyleSheet.create({
   },
 
   // Container do Mini Player (livre para mover, sem afetar layout)
+  // Estilos sincronizados com GlobalMiniPlayer para aparencia consistente
   miniPlayerContainer: {
     position: 'absolute', //.........Posicao absoluta (nao afeta layout)
     top: 0, //........................Ponto de referencia no topo
     left: 0, //.......................Ponto de referencia na esquerda
     borderRadius: 12, //.............Bordas arredondadas
     zIndex: 9999, //..................Acima de todos os elementos
-    elevation: 9999, //...............Elevacao Android (acima de tudo)
+    overflow: 'visible', //...........Permite overflow da sombra
+    ...(Platform.OS === 'web'
+      ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)' as any }
+      : {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 10,
+        }),
   },
 
   // Video do Mini Player (preenche todo o container)
@@ -519,13 +537,14 @@ export const styles = StyleSheet.create({
     zIndex: 10, //..................Fica por cima de tudo
   },
 
-  // Controles Centrais do Mini Player
+  // Controles Centrais do Mini Player (sincronizado com GlobalMiniPlayer)
+  // AJUSTE MANUAL: Altere 'top' para mover os icones verticalmente
   miniPlayerCenterControls: {
     position: 'absolute', //.........Posicao absoluta
-    top: 0, //......................Topo
+    top: 15, //.......................AJUSTAVEL: Margem do topo (aumente para descer os icones)
     left: 0, //.....................Esquerda
     right: 0, //....................Direita
-    bottom: 0, //...................Fundo
+    bottom: 20, //..................Deixa espaco para barra de progresso
     flexDirection: 'row', //.........Layout horizontal
     justifyContent: 'center', //....Centraliza horizontalmente
     alignItems: 'center', //.........Centraliza verticalmente

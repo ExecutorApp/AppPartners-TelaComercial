@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  Platform,
 } from 'react-native';
 import { 
   useFonts,
@@ -171,14 +172,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#FCFCFC',
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 8,
+    ...(Platform.OS === 'web'
+      ? { boxShadow: '0px 0px 12px rgba(0, 0, 0, 0.25)' as any }
+      : {
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 0,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 12,
+          elevation: 8,
+        }),
   },
   modalTitle: {
     fontSize: 16,
