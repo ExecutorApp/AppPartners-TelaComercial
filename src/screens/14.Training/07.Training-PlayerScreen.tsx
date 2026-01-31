@@ -1457,21 +1457,12 @@ const TrainingPlayerScreen: React.FC = () => {
       return;
     }
 
-    // Se o contexto global ja esta ativo (mas nao minimizado), minimiza
+    // Se o contexto global ja esta ativo (mas nao minimizado), desativa completamente
     if (miniPlayerContext.isActive && !miniPlayerContext.isMinimized) {
-      console.log('[TRANSITION_DEBUG] Context active, minimizing...');
+      console.log('[TRANSITION_DEBUG] Context active but not minimized, deactivating completely...');
 
-      // Atualiza estado no contexto
-      miniPlayerContext.updateVideoState({
-        isPlaying,
-        progress: videoProgress,
-        duration: videoDuration,
-        position: videoPosition,
-        isLoading,
-      });
-
-      // Minimiza (isso move o video para GlobalMiniPlayer)
-      miniPlayerContext.minimize();
+      // Desativa o player completamente (nao minimiza)
+      miniPlayerContext.deactivate();
 
       // Navega de volta
       setTimeout(() => {
@@ -1480,30 +1471,11 @@ const TrainingPlayerScreen: React.FC = () => {
       return;
     }
 
-    // Contexto NAO esta ativo - ativa e minimiza
-    console.log('[TRANSITION_DEBUG] Activating and minimizing...');
+    // Contexto NAO esta ativo - apenas volta sem ativar
+    console.log('[TRANSITION_DEBUG] Context not active, just going back...');
 
-    const simpleLessonsList = contents.map(c => ({ id: c.id, title: c.title }));
-
-    // Ativa o contexto
-    miniPlayerContext.activate(trainingId, currentLessonIndex, simpleLessonsList);
-
-    // Atualiza estado
-    miniPlayerContext.updateVideoState({
-      isPlaying,
-      progress: videoProgress,
-      duration: videoDuration,
-      position: videoPosition,
-      isLoading,
-    });
-
-    // Minimiza (isso move o video para GlobalMiniPlayer)
-    miniPlayerContext.minimize();
-
-    // Navega de volta
-    setTimeout(() => {
-      navigation.goBack();
-    }, 50);
+    // Apenas navega de volta sem ativar o mini player
+    navigation.goBack();
   }, [
     navigation,
     contents,
@@ -1983,7 +1955,7 @@ const TrainingPlayerScreen: React.FC = () => {
                 left: miniPlayerContext.expandedVideoLayout?.left || 0,
                 width: miniPlayerContext.expandedVideoLayout?.width || SCREEN_WIDTH,
                 height: miniPlayerContext.expandedVideoLayout?.height || VIDEO_HEIGHT,
-                zIndex: 2147483647, //..........zIndex maximo (32-bit integer max)
+                zIndex: showLessonDetailsModal ? 1 : 2147483647, //..zIndex reduzido quando modal aberto
                 pointerEvents: 'auto' as any, //..Permite cliques no wrapper para mostrar controles
               };
               return style;
@@ -2003,7 +1975,7 @@ const TrainingPlayerScreen: React.FC = () => {
             return (
             <>
               {/* Container Botoes Esquerda (Voltar + Minimizar) */}
-              <View style={[styles.leftButtonsContainer, { pointerEvents: 'auto' as any, zIndex: 1000000 }]}>
+              <View style={[styles.leftButtonsContainer, { pointerEvents: 'auto' as any, zIndex: showLessonDetailsModal ? 1 : 1000000 }]}>
                 {/* Botao Voltar (Seta para tela anterior) - ACIMA */}
                 <TouchableOpacity
                   style={styles.backArrowButton}
@@ -2033,7 +2005,7 @@ const TrainingPlayerScreen: React.FC = () => {
               </View>
 
               {/* Controles Superiores Direita (Autoplay + Settings) */}
-              <View style={[styles.topControlsContainer, { pointerEvents: 'auto' as any, zIndex: 1000000 }]}>
+              <View style={[styles.topControlsContainer, { pointerEvents: 'auto' as any, zIndex: showLessonDetailsModal ? 1 : 1000000 }]}>
                 <TouchableOpacity
                   onPress={() => {
                     console.log('[CLICK_TEST] Botao AUTOPLAY clicado!');

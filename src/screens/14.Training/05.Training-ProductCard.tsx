@@ -19,6 +19,7 @@ import {
 interface ProductCardProps {
   product: ProductItem; //......Dados do produto
   onPress: () => void; //.......Callback ao clicar
+  onImagePress?: () => void; //..Callback ao clicar na imagem
   useBlueProgress?: boolean; //..Usa cor azul na porcentagem
   useBorderedProgress?: boolean; //..Usa fundo branco com borda cinza
   useInlineProgress?: boolean; //....Exibe porcentagem inline na terceira linha
@@ -31,6 +32,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onPress,
+  onImagePress,
   useBlueProgress = false,
   useBorderedProgress = false,
   useInlineProgress = false,
@@ -73,8 +75,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Container da Imagem ou Letra */}
-      <View style={styles.imageWrapper}>
+      {/* Container da Imagem ou Letra - Clicavel */}
+      <TouchableOpacity
+        style={styles.imageWrapper}
+        onPress={onImagePress}
+        activeOpacity={onImagePress ? 0.7 : 1}
+        disabled={!onImagePress}
+      >
         {product.image ? (
           <Image
             source={product.image}
@@ -86,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <Text style={styles.letterText}>{firstLetter}</Text>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
 
       {/* Coluna Direita - Informacoes */}
       <View style={styles.contentWrapper}>

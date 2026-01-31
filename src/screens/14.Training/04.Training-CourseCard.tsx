@@ -17,7 +17,8 @@ import {
 
 interface CourseCardProps {
   training: TrainingItem; //......Dados do treinamento
-  onPress: () => void; //.........Callback ao clicar
+  onPress: () => void; //.........Callback ao clicar no card
+  onImagePress?: () => void; //...Callback ao clicar na imagem (opcional)
   useBlueProgress?: boolean; //...Usa cor azul na porcentagem
   useBorderedProgress?: boolean; //..Usa fundo branco com borda cinza
   useInlineProgress?: boolean; //....Exibe porcentagem inline na terceira linha
@@ -44,6 +45,7 @@ const IMAGE_BORDER_RADIUS = 8; //......Arredondamento da imagem
 const CourseCard: React.FC<CourseCardProps> = ({
   training,
   onPress,
+  onImagePress,
   useBlueProgress = false,
   useBorderedProgress = false,
   useInlineProgress = false,
@@ -91,9 +93,22 @@ const CourseCard: React.FC<CourseCardProps> = ({
     >
       {/* Container da Imagem ou Letra */}
       <View style={styles.imageWrapper}>
-        <View style={styles.letterContainer}>
-          <Text style={styles.letterText}>{firstLetter}</Text>
-        </View>
+        {onImagePress ? (
+          <TouchableOpacity
+            style={styles.letterContainer}
+            onPress={(e) => {
+              e.stopPropagation();
+              onImagePress();
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.letterText}>{firstLetter}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.letterContainer}>
+            <Text style={styles.letterText}>{firstLetter}</Text>
+          </View>
+        )}
       </View>
 
       {/* Coluna Direita - Informacoes */}

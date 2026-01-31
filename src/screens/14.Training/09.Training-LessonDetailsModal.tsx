@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import { TrainingContentItem, COLORS } from './02.Training-Types';
-import { VIDEO_HEIGHT } from './07.Training-PlayerStyles';
 import { useMiniPlayer } from '../../context/MiniPlayerContext';
 
 // ========================================
@@ -40,9 +39,31 @@ const ClockIcon: React.FC<ClockIconProps> = ({ color = '#FFFFFF', size = 20 }) =
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window'); //..Altura da tela
 
-// Calcula altura do modal para ficar 10px abaixo da divisoria
-// Video + Descricao (~65px) + Divisoria (1px) + Margem (10px) = VIDEO_HEIGHT + 76
-const MODAL_TOP_OFFSET = VIDEO_HEIGHT + 76; //..................Distancia do topo ate o modal
+// ========================================
+// CONTAINER DE DURACAO E PROGRESSO
+//
+// INSTRUCOES:
+// 1. Altere os valores abaixo para ajustar espacamentos do container
+// 2. As constantes estao aplicadas nos estilos (procure por "ANCORA: ajustar aqui")
+// 3. Valores em pixels
+//
+// NAVEGACAO RAPIDA:
+// - Padding interno do container: TIMELINE_INFO_PADDING
+// - Margem inferior do container: TIMELINE_INFO_MARGIN_BOTTOM
+// - Espaco entre linhas (Duracao/Progresso): TIMELINE_INFO_ROW_MARGIN
+// - Altura da divisoria: TIMELINE_DIVIDER_HEIGHT
+// - Margem da divisoria (acima/abaixo): TIMELINE_DIVIDER_MARGIN_VERTICAL
+// ========================================
+
+const TIMELINE_INFO_PADDING = 16; //............Padding interno do container (todos os lados)
+const TIMELINE_INFO_MARGIN_BOTTOM = 20; //......Margem inferior do container inteiro
+const TIMELINE_INFO_ROW_MARGIN = 0; //..........Margem inferior da primeira linha (Duracao total)
+const TIMELINE_DIVIDER_HEIGHT = 0.5; //...........Altura (espessura) da divisoria entre linhas
+const TIMELINE_DIVIDER_MARGIN_VERTICAL = 12; //.Margem vertical da divisoria (espaco acima e abaixo)
+
+// Calcula altura do modal para ficar alinhado com modal de perfil
+// Mesma altura do modal que aparece ao clicar na foto de perfil no header
+const MODAL_TOP_OFFSET = 76; //..................................Distancia do topo ate o modal
 const MODAL_HEIGHT = SCREEN_HEIGHT - MODAL_TOP_OFFSET; //.......Altura do modal
 
 // ========================================
@@ -75,6 +96,9 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
   // Estado para controlar visualizacao (description ou timeline)
   const [viewMode, setViewMode] = useState<'description' | 'timeline'>('description');
 
+  // Estado para controlar qual faixa esta selecionada (index ou null)
+  const [selectedRangeIndex, setSelectedRangeIndex] = useState<number | null>(null);
+
   // Valor animado para posicao do modal
   const slideAnim = useRef(new Animated.Value(MODAL_HEIGHT)).current;
 
@@ -100,6 +124,12 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
   // Formata numero da aula com 2 digitos
   const lessonNumber = String(lessonIndex + 1).padStart(2, '0');
 
+  // Formata numero de faixa com 2 digitos
+  const formatRangeNumber = (index: number) => String(index + 1).padStart(2, '0');
+
+  // Calcula duracao de uma faixa em ms
+  const calculateRangeDuration = (start: number, end: number) => end - start;
+
   // Se nao tem aula, nao renderiza
   if (!lesson) return null;
 
@@ -122,10 +152,14 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                 { transform: [{ translateY: slideAnim }] },
               ]}
             >
-              {/* Barra de Arrasto (Handle) - sobre a imagem */}
-              <View style={styles.handleContainer}>
+              {/* Barra de Arrasto (Handle) - sobre a imagem - Toque para fechar */}
+              <TouchableOpacity
+                style={styles.handleContainer}
+                onPress={onClose}
+                activeOpacity={0.7}
+              >
                 <View style={styles.handle} />
-              </View>
+              </TouchableOpacity>
 
               {/* Imagem no Topo (ocupa toda a largura) */}
               {lessonImage && (
@@ -138,11 +172,20 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
 
                   {/* Botao de Toggle Timeline - canto inferior direito da imagem */}
                   <TouchableOpacity
-                    style={styles.timelineToggleButton}
-                    onPress={() => setViewMode(prev => prev === 'description' ? 'timeline' : 'description')}
+                    style={[
+                      styles.timelineToggleButton,
+                      viewMode === 'timeline' && styles.timelineToggleButtonActive,
+                    ]}
+                    onPress={() => {
+                      setViewMode(prev => prev === 'description' ? 'timeline' : 'description');
+                      setSelectedRangeIndex(null); // Reseta selecao ao trocar de modo
+                    }}
                     activeOpacity={0.7}
                   >
-                    <ClockIcon color={COLORS.white} size={20} />
+                    <ClockIcon
+                      color={viewMode === 'timeline' ? COLORS.primary : COLORS.white}
+                      size={20}
+                    />
                   </TouchableOpacity>
                 </View>
               )}
@@ -165,14 +208,17 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                 ) : (
                   /* Timeline de Progresso */
                   <View style={styles.timelineContainer}>
-                    {/* Informacoes de Duracao */}
+                    {/* Informacoes de Duracao e Progresso */}
                     <View style={styles.timelineInfo}>
                       <View style={styles.timelineInfoRow}>
                         <Text style={styles.timelineInfoLabel}>Duração total:</Text>
                         <Text style={styles.timelineInfoValue}>{formatVideoTime(videoDuration)}</Text>
                       </View>
 
-                      <View style={styles.timelineInfoRow}>
+                      {/* Divisoria slim entre duração e progresso */}
+                      <View style={styles.timelineDivider} />
+
+                      <View style={[styles.timelineInfoRow, { marginBottom: 0 }]}>
                         <Text style={styles.timelineInfoLabel}>Progresso real:</Text>
                         <Text style={styles.timelineInfoValue}>
                           {lesson?.id ? getRealProgress(lesson.id).toFixed(1) : '0.0'}%
@@ -180,9 +226,11 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                       </View>
                     </View>
 
+                    {/* Titulo da secao de faixas - fora do container */}
+                    <Text style={styles.timelineVisualizationTitle}>Faixas assistidas:</Text>
+
                     {/* Visualizacao das Faixas Assistidas */}
                     <View style={styles.timelineVisualization}>
-                      <Text style={styles.timelineVisualizationTitle}>Faixas assistidas:</Text>
 
                       {/* Barra de Progresso Visual */}
                       <View style={styles.timelineBar}>
@@ -193,6 +241,8 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                         {getCurrentLessonProgress()?.watchedRanges.map((range, index) => {
                           const startPercent = videoDuration > 0 ? (range.start / videoDuration) * 100 : 0;
                           const widthPercent = videoDuration > 0 ? ((range.end - range.start) / videoDuration) * 100 : 0;
+                          const isSelected = selectedRangeIndex === index;
+                          const hasSelection = selectedRangeIndex !== null;
 
                           return (
                             <View
@@ -202,6 +252,15 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                                 {
                                   left: `${startPercent}%`,
                                   width: `${widthPercent}%`,
+                                  // Se este segmento esta selecionado: cor mais escura
+                                  // Se outro segmento esta selecionado: cor mais clara
+                                  // Se nenhum selecionado: cor padrao
+                                  backgroundColor: isSelected
+                                    ? '#0D4E8A'
+                                    : COLORS.primary,
+                                  opacity: hasSelection
+                                    ? (isSelected ? 1.0 : 0.3)
+                                    : 0.8,
                                 },
                               ]}
                             />
@@ -212,13 +271,56 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
                       {/* Lista de Faixas */}
                       <View style={styles.timelineRangesList}>
                         {getCurrentLessonProgress()?.watchedRanges.length ? (
-                          getCurrentLessonProgress()?.watchedRanges.map((range, index) => (
-                            <View key={index} style={styles.timelineRangeItem}>
-                              <Text style={styles.timelineRangeText}>
-                                Faixa {index + 1}: {formatVideoTime(range.start)} - {formatVideoTime(range.end)}
-                              </Text>
-                            </View>
-                          ))
+                          getCurrentLessonProgress()?.watchedRanges.map((range, index) => {
+                            const isSelected = selectedRangeIndex === index;
+                            const rangeNumber = formatRangeNumber(index);
+                            const rangeDuration = calculateRangeDuration(range.start, range.end);
+
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.timelineRangeItem,
+                                  isSelected && styles.timelineRangeItemSelected,
+                                ]}
+                                onPress={() => {
+                                  // Toggle: se ja esta selecionado, desmarca; senao, seleciona
+                                  setSelectedRangeIndex(isSelected ? null : index);
+                                }}
+                                activeOpacity={0.7}
+                              >
+                                {/* Container Esquerdo: Numero da Faixa */}
+                                <View style={styles.timelineRangeNumber}>
+                                  <Text style={[
+                                    styles.timelineRangeNumberText,
+                                    isSelected && styles.timelineRangeNumberTextSelected,
+                                  ]}>
+                                    {rangeNumber}
+                                  </Text>
+                                </View>
+
+                                {/* Container Centro: Tempo Inicio - Fim */}
+                                <View style={styles.timelineRangeTime}>
+                                  <Text style={[
+                                    styles.timelineRangeTimeText,
+                                    isSelected && styles.timelineRangeTextSelected,
+                                  ]}>
+                                    {formatVideoTime(range.start)} - {formatVideoTime(range.end)}
+                                  </Text>
+                                </View>
+
+                                {/* Container Direito: Duracao Assistida */}
+                                <View style={styles.timelineRangeDuration}>
+                                  <Text style={[
+                                    styles.timelineRangeDurationText,
+                                    isSelected && styles.timelineRangeTextSelected,
+                                  ]}>
+                                    {formatVideoTime(rangeDuration)}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          })
                         ) : (
                           <Text style={styles.timelineEmptyText}>
                             Nenhuma faixa assistida ainda. Comece a assistir a aula para ver seu progresso aqui.
@@ -239,6 +341,9 @@ const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
 
 // ========================================
 // ESTILOS DO MODAL
+//
+// NOTA: Para ajustar espacamentos do container de Duracao/Progresso,
+// busque por "⚓ ANCORAS DE AJUSTE" no inicio do arquivo
 // ========================================
 
 const styles = StyleSheet.create({
@@ -247,6 +352,8 @@ const styles = StyleSheet.create({
     flex: 1, //.........................Ocupa tela inteira
     backgroundColor: 'rgba(0,0,0,0.5)', //..Fundo escuro semi-transparente
     justifyContent: 'flex-end', //......Alinha modal na parte inferior
+    zIndex: 9999, //....................Z-index alto para ficar na frente do video
+    elevation: 9999, //.................Elevation alto para Android
   },
 
   // Container do Modal
@@ -304,6 +411,7 @@ const styles = StyleSheet.create({
     fontSize: 18, //....................Tamanho da fonte
     color: COLORS.textPrimary, //.......Cor preta padrao
     marginBottom: 12, //................Margem inferior
+    marginLeft: 5, //...................Margem esquerda (respiro)
   },
 
   // Descricao da Aula
@@ -329,6 +437,11 @@ const styles = StyleSheet.create({
     zIndex: 5, //.......................Acima da imagem
   },
 
+  // Botao de Toggle Timeline - Estado Ativo
+  timelineToggleButtonActive: {
+    backgroundColor: COLORS.white, //...Fundo branco quando ativo
+  },
+
   // Container da Timeline
   timelineContainer: {
     paddingBottom: 20, //...............Padding inferior
@@ -338,8 +451,8 @@ const styles = StyleSheet.create({
   timelineInfo: {
     backgroundColor: COLORS.background, //..Fundo cinza claro
     borderRadius: 12, //....................Bordas arredondadas
-    padding: 16, //.........................Padding interno
-    marginBottom: 20, //....................Margem inferior
+    padding: TIMELINE_INFO_PADDING, //......Padding interno (ANCORA: ajustar aqui)
+    marginBottom: TIMELINE_INFO_MARGIN_BOTTOM, //..Margem inferior (ANCORA: ajustar aqui)
   },
 
   // Linha de Informacao
@@ -347,7 +460,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', //..............Layout horizontal
     justifyContent: 'space-between', //...Espaco entre label e valor
     alignItems: 'center', //..............Alinha verticalmente
-    marginBottom: 8, //....................Margem inferior
+    marginBottom: TIMELINE_INFO_ROW_MARGIN, //..Margem inferior (ANCORA: ajustar aqui)
   },
 
   // Label da Informacao
@@ -364,17 +477,27 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary, //...........Cor preta
   },
 
-  // Visualizacao da Timeline
-  timelineVisualization: {
-    marginBottom: 20, //....................Margem inferior
+  // Divisoria Slim entre info e faixas
+  timelineDivider: {
+    height: TIMELINE_DIVIDER_HEIGHT, //..Altura fina (ANCORA: ajustar aqui)
+    backgroundColor: COLORS.textSecondary, //..Cor cinza
+    opacity: 0.2, //....................Semi-transparente
+    marginVertical: TIMELINE_DIVIDER_MARGIN_VERTICAL, //..Margem vertical (ANCORA: ajustar aqui)
   },
 
-  // Titulo da Visualizacao
+  // Titulo da Visualizacao (dentro do container de info)
   timelineVisualizationTitle: {
     fontFamily: 'Inter_600SemiBold', //....Fonte semi-bold
     fontSize: 15, //........................Tamanho da fonte
     color: COLORS.textPrimary, //...........Cor preta
-    marginBottom: 12, //....................Margem inferior
+    marginTop: 4, //.......................Margem superior
+    marginBottom: 8, //.....................Margem inferior (respiro)
+    marginLeft: 5, //.......................Margem esquerda (respiro)
+  },
+
+  // Visualizacao da Timeline
+  timelineVisualization: {
+    marginBottom: 20, //....................Margem inferior
   },
 
   // Barra de Progresso Visual
@@ -401,8 +524,7 @@ const styles = StyleSheet.create({
     position: 'absolute', //.................Posicao absoluta
     top: 0, //...............................Topo
     height: '100%', //.......................Altura total
-    backgroundColor: COLORS.primary, //.......Cor azul
-    opacity: 0.8, //.........................Semi-transparente para ver sobreposicoes
+    // backgroundColor e opacity aplicados dinamicamente inline
   },
 
   // Lista de Faixas Assistidas
@@ -412,6 +534,9 @@ const styles = StyleSheet.create({
 
   // Item de Faixa Assistida
   timelineRangeItem: {
+    flexDirection: 'row', //................Layout horizontal
+    alignItems: 'center', //.................Alinha verticalmente
+    justifyContent: 'space-between', //.....Distribui espaco
     paddingVertical: 8, //..................Padding vertical
     paddingHorizontal: 12, //...............Padding horizontal
     backgroundColor: COLORS.background, //..Fundo cinza claro
@@ -419,11 +544,74 @@ const styles = StyleSheet.create({
     marginBottom: 8, //.....................Margem inferior
   },
 
+  // Item de Faixa Assistida - Estado Selecionado
+  timelineRangeItemSelected: {
+    backgroundColor: '#0D4E8A', //..........Azul escuro para destaque
+  },
+
   // Texto de Faixa Assistida
   timelineRangeText: {
     fontFamily: 'Inter_400Regular', //......Fonte regular
     fontSize: 13, //........................Tamanho da fonte
     color: COLORS.textSecondary, //.........Cor cinza escuro
+  },
+
+  // Texto de Faixa Assistida - Estado Selecionado
+  timelineRangeTextSelected: {
+    color: COLORS.white, //................Texto branco quando selecionado
+  },
+
+  // Label da Faixa (Faixa 1:, Faixa 2:, etc) - Destacado
+  timelineRangeLabel: {
+    fontFamily: 'Inter_600SemiBold', //....Fonte semi-bold para destaque
+    color: COLORS.primary, //..............Cor azul para destacar
+  },
+
+  // Container Esquerdo: Numero da Faixa
+  timelineRangeNumber: {
+    minWidth: 32, //........................Largura minima para alinhar
+    justifyContent: 'center', //............Centraliza conteudo
+    alignItems: 'flex-start', //............Alinha a esquerda
+  },
+
+  // Texto do Numero da Faixa
+  timelineRangeNumberText: {
+    fontFamily: 'Inter_600SemiBold', //.....Fonte semi-bold
+    fontSize: 14, //........................Tamanho da fonte
+    color: COLORS.primary, //...............Cor azul para destaque
+  },
+
+  // Texto do Numero da Faixa - Estado Selecionado
+  timelineRangeNumberTextSelected: {
+    color: COLORS.white, //.................Texto branco quando selecionado
+  },
+
+  // Container Centro: Tempo Inicio - Fim
+  timelineRangeTime: {
+    flex: 1, //..............................Ocupa espaco disponivel
+    paddingHorizontal: 12, //................Padding horizontal
+    justifyContent: 'center', //.............Centraliza conteudo
+  },
+
+  // Texto do Tempo da Faixa
+  timelineRangeTimeText: {
+    fontFamily: 'Inter_400Regular', //.......Fonte regular
+    fontSize: 13, //.........................Tamanho da fonte
+    color: COLORS.textSecondary, //..........Cor cinza escuro
+  },
+
+  // Container Direito: Duracao Assistida
+  timelineRangeDuration: {
+    minWidth: 48, //.........................Largura minima para alinhar
+    justifyContent: 'center', //.............Centraliza conteudo
+    alignItems: 'flex-end', //...............Alinha a direita
+  },
+
+  // Texto da Duracao Assistida
+  timelineRangeDurationText: {
+    fontFamily: 'Inter_500Medium', //........Fonte medium
+    fontSize: 13, //.........................Tamanho da fonte
+    color: COLORS.textSecondary, //..........Cor cinza escuro
   },
 
   // Texto de Lista Vazia

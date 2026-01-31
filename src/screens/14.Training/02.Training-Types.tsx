@@ -860,14 +860,74 @@ export const MOCK_TRAININGS: TrainingItem[] = [
     title: 'Perfil',
     category: 'aplicativo',
     description: 'Aprenda tudo sobre a área de perfil do usuário: como editar informações, atualizar foto e gerenciar dados pessoais.',
-    status: 'completed',
-    progress: 100,
+    status: 'not_started',
+    progress: 0,
     estimatedMinutes: 15,
     contents: [
-      { id: 'app-01-1', type: 'video', title: 'Visão geral do perfil', duration: 4, completed: true },
-      { id: 'app-01-2', type: 'video', title: 'Editando informações pessoais', duration: 5, completed: true },
-      { id: 'app-01-3', type: 'text', title: 'Atualizando foto e dados', duration: 3, completed: true },
-      { id: 'app-01-4', type: 'tip', title: 'Dicas de uso', duration: 3, completed: true },
+      {
+        id: 'app-01-1',
+        type: 'video',
+        title: 'Visão geral do perfil',
+        duration: 4,
+        completed: false,
+        description: 'Nesta aula introdutória, você aprenderá todos os fundamentos sobre a área de perfil do usuário no aplicativo Partner. Entenderá a importância de manter suas informações sempre atualizadas e como isso impacta diretamente na sua credibilidade profissional.\n\nO perfil é o seu cartão de visitas digital dentro do sistema. É através dele que outros usuários, gestores e clientes poderão conhecer você, suas qualificações e sua experiência profissional. Manter um perfil completo e bem estruturado demonstra profissionalismo e comprometimento com a plataforma.\n\nVocê aprenderá a navegar por todas as seções do perfil, desde as informações básicas até configurações avançadas. Descobrirá como personalizar sua foto de perfil, adicionar informações de contato e gerenciar suas preferências de privacidade.\n\nAo final desta aula, você terá uma visão completa de todas as funcionalidades disponíveis na área de perfil e saberá exatamente como aproveitar cada uma delas para construir uma presença profissional sólida dentro do aplicativo Partner.'
+      },
+      {
+        id: 'app-01-2',
+        type: 'video',
+        title: 'Editando informações pessoais',
+        duration: 5,
+        completed: false,
+        description: 'Aprenda o passo a passo detalhado para editar todas as suas informações pessoais no aplicativo Partner. Esta aula aborda desde campos básicos como nome e telefone até informações mais complexas como endereço completo e dados bancários.\n\nVocê descobrirá quais campos são obrigatórios e quais são opcionais, entendendo a importância de preencher cada um deles corretamente. Aprenderá também sobre as validações do sistema e como garantir que suas informações estejam sempre em conformidade com os padrões da plataforma.\n\nA aula inclui demonstrações práticas de como acessar o modo de edição, realizar alterações em múltiplos campos simultaneamente e salvar suas mudanças de forma segura. Você também aprenderá sobre os mecanismos de segurança que protegem suas informações pessoais.\n\nAo concluir esta lição, você será capaz de atualizar qualquer informação do seu perfil de forma rápida e eficiente, mantendo seus dados sempre precisos e atualizados para garantir a melhor experiência no uso do aplicativo.'
+      },
+      {
+        id: 'app-01-3',
+        type: 'text',
+        title: 'Atualizando foto e dados',
+        duration: 3,
+        completed: false,
+        description: 'Descubra as melhores práticas para atualizar sua foto de perfil e gerenciar todos os dados visuais associados à sua conta no Partner. Uma foto profissional bem escolhida pode fazer toda a diferença na forma como você é percebido dentro da plataforma.\n\nNesta lição, você aprenderá sobre os requisitos técnicos para upload de fotos, incluindo formatos aceitos, dimensões recomendadas e tamanho máximo de arquivo. Também receberá orientações sobre iluminação, enquadramento e apresentação pessoal para garantir uma imagem profissional.\n\nAlém da foto principal, você descobrirá como adicionar documentos, certificados e outros materiais de apoio ao seu perfil. Aprenderá a organizar esses arquivos de forma lógica e acessível, facilitando a verificação de suas credenciais por gestores e clientes.\n\nA aula também cobre aspectos importantes de privacidade e segurança relacionados ao compartilhamento de imagens e documentos, garantindo que você tenha controle total sobre quem pode visualizar cada tipo de informação no seu perfil.'
+      },
+      {
+        id: 'app-01-4',
+        type: 'tip',
+        title: 'Dicas de uso',
+        duration: 3,
+        completed: false,
+        description: 'Confira dicas valiosas e estratégias avançadas para otimizar o uso da área de perfil e maximizar sua presença profissional no aplicativo Partner. Essas orientações foram coletadas a partir das melhores práticas de usuários experientes e gestores da plataforma.\n\nVocê aprenderá sobre a frequência ideal para revisar e atualizar suas informações, garantindo que seu perfil sempre reflita sua situação atual. Descobrirá também como utilizar palavras-chave estratégicas na sua descrição profissional para aumentar sua visibilidade dentro do sistema.\n\nA lição inclui dicas sobre como estruturar sua biografia profissional de forma atrativa e informativa, destacando suas principais competências e experiências sem ser excessivamente extenso. Você aprenderá o equilíbrio perfeito entre profissionalismo e autenticidade.\n\nPor fim, você receberá orientações sobre como usar as configurações de privacidade de forma inteligente, protegendo informações sensíveis enquanto mantém a transparência necessária para construir confiança com gestores, colegas e clientes dentro do ecossistema Partner.'
+      },
+      {
+        id: 'app-01-5',
+        type: 'video',
+        title: 'Configurações de privacidade',
+        duration: 6,
+        completed: false,
+        description: 'Domine todas as configurações de privacidade disponíveis no seu perfil para ter controle total sobre quais informações são visíveis e para quem. A privacidade é um aspecto fundamental na era digital, e o aplicativo Partner oferece diversas opções para você gerenciar seus dados com segurança.\n\nNesta aula, você explorará cada configuração de privacidade disponível, desde as opções básicas de visibilidade do perfil até controles avançados de compartilhamento de dados específicos. Aprenderá a diferença entre perfil público, perfil profissional e perfil privado, escolhendo a configuração mais adequada para suas necessidades.\n\nVocê descobrirá como controlar quem pode ver sua foto, seus dados de contato, seu histórico profissional e suas estatísticas de desempenho. A aula também aborda configurações de notificações relacionadas à privacidade, permitindo que você seja sempre informado quando alguém visualiza seu perfil ou solicita acesso a informações específicas.\n\nAprenderá também sobre os direitos relacionados aos seus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD), incluindo como solicitar acesso, correção ou exclusão de informações. Ao final desta lição, você terá pleno controle sobre sua privacidade digital dentro do aplicativo Partner.\n\nA aula inclui cenários práticos e recomendações personalizadas baseadas no seu tipo de uso da plataforma, seja você um usuário iniciante, intermediário ou avançado, garantindo que suas configurações de privacidade estejam alinhadas com suas necessidades profissionais e pessoais.'
+      },
+      {
+        id: 'app-01-6',
+        type: 'text',
+        title: 'Segurança da conta',
+        duration: 5,
+        completed: false,
+        description: 'Aprenda a proteger sua conta Partner com medidas de segurança robustas e práticas recomendadas de segurança digital. A segurança da sua conta é essencial para proteger não apenas suas informações pessoais, mas também os dados dos seus clientes e parceiros de negócio.\n\nEsta lição aborda em detalhes todos os recursos de segurança disponíveis no aplicativo, começando pela autenticação de dois fatores (2FA). Você aprenderá como ativar e configurar o 2FA usando diferentes métodos, incluindo SMS, e-mail e aplicativos autenticadores, escolhendo a opção mais conveniente e segura para você.\n\nVocê descobrirá as melhores práticas para criar senhas fortes e únicas, incluindo o uso de gerenciadores de senhas para facilitar o gerenciamento sem comprometer a segurança. A aula também cobre a importância de trocar senhas regularmente e como identificar tentativas de phishing ou acesso não autorizado à sua conta.\n\nAprenderá a monitorar o histórico de acessos à sua conta, identificando dispositivos e localizações de login recentes. Descobrirá como revogar acesso de dispositivos não reconhecidos e configurar alertas de segurança para ser notificado imediatamente sobre atividades suspeitas.\n\nA lição também inclui orientações sobre o que fazer em caso de suspeita de comprometimento da conta, incluindo procedimentos de recuperação de acesso e medidas emergenciais para proteger seus dados. Ao concluir esta aula, você terá implementado múltiplas camadas de segurança na sua conta Partner, garantindo proteção máxima contra acessos não autorizados.'
+      },
+      {
+        id: 'app-01-7',
+        type: 'video',
+        title: 'Personalização avançada',
+        duration: 7,
+        completed: false,
+        description: 'Explore todas as opções de personalização avançada do seu perfil Partner para criar uma experiência única e alinhada com sua identidade profissional. A personalização vai muito além de uma simples foto de perfil - é sobre criar uma presença digital que verdadeiramente representa quem você é e o que você oferece.\n\nNesta aula avançada, você aprenderá a customizar a aparência do seu perfil utilizando temas, cores e layouts disponíveis na plataforma. Descobrirá como escolher combinações de cores que reflitam sua marca pessoal enquanto mantêm a legibilidade e profissionalismo necessários em um ambiente corporativo.\n\nVocê explorará as opções de organização de seções do perfil, aprendendo a priorizar informações mais relevantes e criar um fluxo de navegação intuitivo para quem visita seu perfil. A aula cobre técnicas para destacar suas principais conquistas, certificações e resultados de forma visualmente atraente.\n\nAprenderá também a adicionar elementos multimídia ao seu perfil, incluindo vídeos de apresentação, portfólios digitais e links para redes sociais profissionais. Descobrirá como integrar seu perfil Partner com outras plataformas e ferramentas que você utiliza no dia a dia, criando um ecossistema digital coeso.\n\nA lição inclui estudos de caso de perfis bem-sucedidos e análise de elementos que os tornam eficazes. Você aprenderá princípios de design aplicados a perfis profissionais, incluindo hierarquia visual, uso estratégico de espaços em branco e princípios de comunicação visual que maximizam o impacto do seu perfil.\n\nAo final desta aula, você terá transformado seu perfil básico em uma poderosa ferramenta de marketing pessoal e networking profissional dentro do ecossistema Partner.'
+      },
+      {
+        id: 'app-01-8',
+        type: 'tip',
+        title: 'Melhores práticas',
+        duration: 4,
+        completed: false,
+        description: 'Descubra as melhores práticas essenciais para manter seu perfil Partner sempre otimizado, profissional e eficaz. Esta lição compila anos de experiência de usuários bem-sucedidos da plataforma, oferecendo insights valiosos que podem acelerar significativamente seus resultados.\n\nVocê aprenderá sobre a importância da consistência na apresentação do seu perfil, mantendo todas as informações alinhadas e coerentes em todas as seções. Descobrirá como criar uma narrativa profissional convincente que conte sua história de forma autêntica e engajadora.\n\nA lição aborda estratégias para manter seu perfil sempre atualizado sem dedicar tempo excessivo a essa tarefa. Você aprenderá a criar uma rotina de manutenção eficiente, incluindo lembretes e checklists para revisões periódicas de informações-chave.\n\nDescubra também como usar seu perfil como ferramenta ativa de networking e geração de oportunidades, não apenas como um repositório passivo de informações. Aprenderá técnicas para aumentar sua visibilidade na plataforma, participar de comunidades relevantes e construir uma reputação sólida.\n\nA aula inclui dicas sobre erros comuns que você deve evitar, desde informações incompletas ou desatualizadas até exageros ou falta de autenticidade. Você receberá orientações claras sobre o tom apropriado para diferentes seções do perfil, equilibrando profissionalismo com personalidade.\n\nPor fim, você aprenderá sobre métricas e indicadores que pode monitorar para avaliar a eficácia do seu perfil, incluindo visualizações, conexões estabelecidas e oportunidades geradas. Ao concluir esta lição, você terá um conjunto completo de melhores práticas para manter seu perfil Partner operando em nível máximo de performance.'
+      },
     ],
   },
   // Treinamentos do Aplicativo - 02. Dashboard

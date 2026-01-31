@@ -14,7 +14,9 @@ import Header from '../5.Side Menu/2.Header';
 import SideMenuScreen from '../5.Side Menu/1.SideMenuScreen';
 import CategoryCard from './03.Training-CategoryCard';
 import CourseCard from './04.Training-CourseCard';
-import ProductCard from './05.Training-ProductCard'; 
+import ProductCard from './05.Training-ProductCard';
+import TrainingInfoModal from './10.Training-InfoModal';
+import { ProductInfoModal } from './06.Training-ProductDetailScreen';
 import {
   COLORS,
   TrainingCategory,
@@ -28,6 +30,7 @@ import {
   countByStatus,
   filterByCategory,
 } from './02.Training-Types';
+import { useTrainingProgress } from './04.Training-useProgress';
 import { RootStackParamList, ScreenNames } from '../../types/navigation';
 
 // ========================================
@@ -98,12 +101,21 @@ const TrainingHomeScreen: React.FC = () => {
   // Navegacao
   const navigation = useNavigation<TrainingNavigationProp>();
 
+  // Hook de progresso
+  const { getTrainingsWithProgress } = useTrainingProgress();
+
   // Estados
   const [sideMenuVisible, setSideMenuVisible] = useState(false); //......Menu lateral
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory>('aplicativo'); //..Categoria selecionada
-  const [trainings] = useState<TrainingItem[]>(MOCK_TRAININGS); //......Lista de treinamentos
   const [categories] = useState<CategoryItem[]>(MOCK_CATEGORIES); //....Lista de categorias
   const [products] = useState<ProductItem[]>(MOCK_PRODUCTS); //..........Lista de produtos
+  const [infoModalVisible, setInfoModalVisible] = useState(false); //....Modal de informacoes do treinamento
+  const [selectedTraining, setSelectedTraining] = useState<TrainingItem | null>(null); //..Treinamento selecionado para info
+  const [productInfoModalVisible, setProductInfoModalVisible] = useState(false); //..Modal de informacoes do produto
+  const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null); //..Produto selecionado para info
+
+  // Lista de treinamentos com progresso aplicado
+  const trainings = useMemo(() => getTrainingsWithProgress(MOCK_TRAININGS), [getTrainingsWithProgress]);
 
   // Progresso geral calculado
   const overallProgress = useMemo(() => calculateOverallProgress(trainings), [trainings]);
@@ -144,6 +156,30 @@ const TrainingHomeScreen: React.FC = () => {
   const handleProductPress = useCallback((product: ProductItem) => {
     navigation.navigate(ScreenNames.ProductDetail, { productId: product.id });
   }, [navigation]);
+
+  // Abre modal de informacoes do treinamento
+  const handleTrainingImagePress = useCallback((training: TrainingItem) => {
+    setSelectedTraining(training);
+    setInfoModalVisible(true);
+  }, []);
+
+  // Fecha modal de informacoes
+  const handleCloseInfoModal = useCallback(() => {
+    setInfoModalVisible(false);
+  }, []);
+
+  // Abre modal de informacoes do produto (se tiver modulos)
+  const handleProductImagePress = useCallback((product: ProductItem) => {
+    if (product.modules && product.modules.length > 0) {
+      setSelectedProduct(product);
+      setProductInfoModalVisible(true);
+    }
+  }, []);
+
+  // Fecha modal de informacoes do produto
+  const handleCloseProductInfoModal = useCallback(() => {
+    setProductInfoModalVisible(false);
+  }, []);
 
   // Se fontes nao carregaram, nao renderiza
   if (!fontsLoaded) return null;
@@ -284,6 +320,7 @@ const TrainingHomeScreen: React.FC = () => {
                     key={product.id}
                     product={product}
                     onPress={() => handleProductPress(product)}
+                    onImagePress={() => handleProductImagePress(product)}
                     useBlueProgress={true}
                     useInlineProgress={true}
                   />
@@ -303,6 +340,7 @@ const TrainingHomeScreen: React.FC = () => {
                     key={training.id}
                     training={training}
                     onPress={() => handleTrainingPress(training)}
+                    onImagePress={() => handleTrainingImagePress(training)}
                     useBlueProgress={true}
                     useInlineProgress={true}
                   />
@@ -312,6 +350,23 @@ const TrainingHomeScreen: React.FC = () => {
           </View>
         </ScrollView>
       </View>
+
+      {/* Modal de Informacoes do Treinamento */}
+      <TrainingInfoModal
+        visible={infoModalVisible}
+        onClose={handleCloseInfoModal}
+        training={selectedTraining}
+      />
+
+      {/* Modal de Informacoes do Produto */}
+      {selectedProduct && (
+        <ProductInfoModal
+          visible={productInfoModalVisible}
+          onClose={handleCloseProductInfoModal}
+          product={selectedProduct}
+          modules={selectedProduct.modules || []}
+        />
+      )}
 
       {/* Menu Lateral */}
       <SideMenuScreen isVisible={sideMenuVisible} onClose={closeSideMenu} />

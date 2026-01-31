@@ -689,15 +689,15 @@ export const MiniPlayerProvider: React.FC<MiniPlayerProviderProps> = ({ children
   // UTILITARIOS
   // ========================================
 
-  // Formata tempo do video em mm:ss
+  // Formata tempo do video em mm:ss (com no minimo 2 digitos)
   const formatVideoTime = useCallback((milliseconds: number) => {
     if (!milliseconds || isNaN(milliseconds) || !isFinite(milliseconds)) {
-      return '0:00';
+      return '00:00';
     }
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }, []);
 
   // ========================================
