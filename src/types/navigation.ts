@@ -90,6 +90,13 @@ export type RootStackParamList = {
   TrainingDetail: { trainingId: string };
   ProductDetail: { productId: string };
   TrainingPlayer: { trainingId: string; lessonIndex?: number };
+  CommercialHome: undefined;
+  LeadChatScreen: {
+    leadId: string;
+    leadName: string;
+    leadPhone: string;
+    leadPhoto?: string;
+  };
 };
 
 export const ScreenNames = {
@@ -134,6 +141,8 @@ export const ScreenNames = {
   TrainingDetail: 'TrainingDetail' as const,
   ProductDetail: 'ProductDetail' as const,
   TrainingPlayer: 'TrainingPlayer' as const,
+  CommercialHome: 'CommercialHome' as const,
+  LeadChatScreen: 'LeadChatScreen' as const,
 } as const;
 
 export type ScreenNamesType = keyof RootStackParamList;

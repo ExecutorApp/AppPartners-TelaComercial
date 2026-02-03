@@ -32,6 +32,8 @@ import TrainingHomeScreen from '../screens/14.Training/01.Training-HomeScreen';
 import TrainingDetailScreen from '../screens/14.Training/05.Training-DetailScreen';
 import ProductDetailScreen from '../screens/14.Training/06.Training-ProductDetailScreen';
 import TrainingPlayerScreen from '../screens/14.Training/07.Training-PlayerScreen';
+import CommercialScreen from '../screens/15.Commercial/00.CommercialScreen';
+import LeadLolaSwipeContainer from '../screens/15.Commercial/components/Chat/10.00.LeadLolaSwipeContainer';
 
 // ========================================
 // REFERENCIA DE NAVEGACAO GLOBAL
@@ -458,6 +460,25 @@ export const AppNavigator: React.FC = () => {
           }}
         >
           {() => <TrainingPlayerScreen />}
+        </Stack.Screen>
+        <Stack.Screen
+          name={ScreenNames.CommercialHome}
+          options={{
+            headerShown: false,
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <CommercialScreen />}
+        </Stack.Screen>
+        {/* Rota Chat com Lead + Lola (Swipe) */}
+        <Stack.Screen
+          name={ScreenNames.LeadChatScreen}
+          options={{
+            headerShown: false,
+            animationTypeForReplace: 'push',
+          }}
+        >
+          {() => <LeadLolaSwipeContainer />}
         </Stack.Screen>
         <Stack.Screen
           name={ScreenNames.CompanySelection}
