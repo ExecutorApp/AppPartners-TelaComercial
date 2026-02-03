@@ -253,80 +253,94 @@ export const KanbanProvider: React.FC<KanbanProviderProps> = ({
     }
   };
 
-  // Carregar contatos do WhatsApp como cards
+  // Converter contato WhatsApp em KanbanCard
+  const convertContactToCard = useCallback((contact: any, index: number): KanbanCard => {
+    // Extrair numero do telefone do remoteJid (ex: "5517991870378@s.whatsapp.net")
+    const jid = contact.remoteJid || contact.id || '';
+    const phone = jid.split('@')[0] || '';
+
+    // Nome do contato vem do pushName
+    const contactName = contact.pushName || phone || 'Contato Desconhecido';
+
+    return {
+      id: `whatsapp-${phone}-${index}`,
+      leadId: `lead-whatsapp-${phone}`,
+      leadName: contactName,                 //......Nome do contato
+      leadPhone: phone,                      //......Telefone do lead
+      leadPhoto: contact.profilePicUrl || contact.profilePictureUrl || undefined,
+      columnId: 'col-1',                     //......Primeira coluna (Novos)
+      phaseId: 'phase-1',                    //......Primeira fase
+      status: 'cold' as LeadStatus,          //......Status frio
+      value: 0,                              //......Valor zero
+      enteredAt: new Date(),                 //......Data atual
+      movedBy: 'whatsapp',                   //......Origem WhatsApp
+      lastInteraction: new Date(),           //......Interacao recente
+      history: [],                           //......Sem historico
+      notes: [],                             //......Sem notas
+      tags: ['whatsapp'],                    //......Tag WhatsApp
+      aiAutomation: false,                   //......IA desativada
+      phoneNumber: phone,                    //......Numero WhatsApp
+      isWhatsAppContact: true,               //......Flag de WhatsApp
+      whatsAppJid: jid,                      //......JID completo
+    } as KanbanCard;
+  }, []);
+
+  // Carregar contatos do WhatsApp progressivamente
   const loadWhatsAppContacts = useCallback(async () => {
+    // Inicio medicao de performance
+    const perfStart = performance.now();
+    console.log('[PERF] loadWhatsAppContacts - START (Progressivo)');
+
     try {
       setIsLoadingWhatsAppContacts(true);
-      console.log('[KanbanContext] Carregando contatos do WhatsApp...');
 
       const instanceName = `partners_${currentUserId}`;
+      let totalCardIndex = 0;
 
-      // Buscar chats do WhatsApp
-      const chats = await evolutionService.fetchChats(instanceName);
-      console.log('[KanbanContext] Chats recebidos:', chats?.length || 0);
-
-      if (chats && chats.length > 0) {
-        // Debug: mostrar estrutura do primeiro contato
-        if (chats[0]) {
-          console.log('[KanbanContext] Estrutura do contato:', {
-            id: chats[0].id,
-            remoteJid: chats[0].remoteJid,
-            pushName: chats[0].pushName,
-            profilePicUrl: chats[0].profilePicUrl,
-          });
-        }
+      // Callback para processar cada batch
+      const handleBatch = (contacts: any[], batchNumber: number, totalLoaded: number) => {
+        const batchStart = performance.now();
 
         // Filtrar apenas contatos individuais (ignorar grupos @g.us)
-        const individualContacts = chats.filter((chat: any) => {
+        const individualContacts = contacts.filter((chat: any) => {
           const jid = chat.remoteJid || chat.id || '';
           return jid && !jid.includes('@g.us');
         });
 
-        console.log('[KanbanContext] Contatos individuais:', individualContacts.length);
-
-        // Converter contatos em cards do Kanban
-        const whatsappCards: KanbanCard[] = individualContacts.map((contact: any, index: number) => {
-          // Extrair numero do telefone do remoteJid (ex: "5517991870378@s.whatsapp.net")
-          const jid = contact.remoteJid || contact.id || '';
-          const phone = jid.split('@')[0] || '';
-
-          // Nome do contato vem do pushName
-          const contactName = contact.pushName || phone || 'Contato Desconhecido';
-
-          return {
-            id: `whatsapp-${phone}-${index}`,
-            leadId: `lead-whatsapp-${phone}`,
-            leadName: contactName,                 //......Nome do contato
-            leadPhone: phone,                      //......Telefone do lead
-            leadPhoto: contact.profilePicUrl || contact.profilePictureUrl || undefined,
-            columnId: 'col-1',                     //......Primeira coluna (Novos)
-            phaseId: 'phase-1',                    //......Primeira fase
-            status: 'cold' as LeadStatus,          //......Status frio
-            value: 0,                              //......Valor zero
-            enteredAt: new Date(),                 //......Data atual
-            movedBy: 'whatsapp',                   //......Origem WhatsApp
-            lastInteraction: new Date(),           //......Interacao recente
-            history: [],                           //......Sem historico
-            notes: [],                             //......Sem notas
-            tags: ['whatsapp'],                    //......Tag WhatsApp
-            aiAutomation: false,                   //......IA desativada
-            phoneNumber: phone,                    //......Numero WhatsApp
-            isWhatsAppContact: true,               //......Flag de WhatsApp
-            whatsAppJid: jid,                      //......JID completo
-          } as KanbanCard;
+        // Converter contatos em cards
+        const newCards = individualContacts.map((contact, i) => {
+          const card = convertContactToCard(contact, totalCardIndex + i);
+          return card;
         });
 
-        console.log('[KanbanContext] Cards criados:', whatsappCards.length);
+        totalCardIndex += individualContacts.length;
 
-        // Substituir cards mockados pelos do WhatsApp
-        setCards(whatsappCards);
-      }
+        console.log(`[PERF] Batch ${batchNumber} processado - ${newCards.length} cards em ${(performance.now() - batchStart).toFixed(0)}ms`);
+
+        // Atualizar cards acumulando com batches anteriores
+        setCards(prev => {
+          // Se for primeiro batch, substituir
+          if (batchNumber === 1) {
+            return newCards;
+          }
+          // Senao, acumular
+          return [...prev, ...newCards];
+        });
+      };
+
+      // Carregar progressivamente
+      const { totalContacts, batches } = await evolutionService.fetchChatsProgressive(
+        instanceName,
+        handleBatch
+      );
+
+      console.log(`[PERF] TOTAL loadWhatsAppContacts - ${totalContacts} contatos em ${batches} batches em ${(performance.now() - perfStart).toFixed(0)}ms`);
     } catch (error) {
-      console.error('[KanbanContext] Erro ao carregar contatos:', error);
+      console.error('[PERF] ERRO loadWhatsAppContacts:', error);
     } finally {
       setIsLoadingWhatsAppContacts(false);
     }
-  }, [currentUserId]);
+  }, [currentUserId, convertContactToCard]);
 
   // ========================================
   // Handlers de Selecao
@@ -540,13 +554,35 @@ export const KanbanProvider: React.FC<KanbanProviderProps> = ({
   }, []);
 
   // ========================================
+  // Cache de Cards por Coluna (O(1) lookup)
+  // ========================================
+
+  // Map de cards agrupados por columnId
+  const cardsByColumnMap = useMemo(() => {
+    const perfStart = performance.now();
+    const map = new Map<string, KanbanCard[]>();
+
+    // Agrupar cards por coluna
+    cards.forEach(card => {
+      const columnId = card.columnId;
+      if (!map.has(columnId)) {
+        map.set(columnId, []);         //......Inicializar array
+      }
+      map.get(columnId)!.push(card);   //......Adicionar ao array
+    });
+
+    console.log(`[PERF] cardsByColumnMap criado - ${(performance.now() - perfStart).toFixed(1)}ms - ${cards.length} cards em ${map.size} colunas`);
+    return map;
+  }, [cards]);
+
+  // ========================================
   // Utilitarios
   // ========================================
 
-  // Obter cards de uma coluna
+  // Obter cards de uma coluna (O(1) com cache)
   const getColumnCards = useCallback((columnId: string): KanbanCard[] => {
-    return cards.filter(card => card.columnId === columnId);
-  }, [cards]);
+    return cardsByColumnMap.get(columnId) || [];
+  }, [cardsByColumnMap]);
 
   // Obter estatisticas de uma fase
   const getPhaseStats = useCallback((phaseId: string): { total: number; value: number } => {

@@ -1,6 +1,7 @@
 // ========================================
 // Hook useContacts
 // Busca contatos da agenda e do WhatsApp
+// Com cache e otimizacoes de performance
 // ========================================
 
 // ========================================
@@ -10,10 +11,13 @@ import {                                  //......React hooks
   useState,                               //......Hook de estado
   useEffect,                              //......Hook de efeito
   useCallback,                            //......Hook de callback
+  useRef,                                 //......Hook de referencia
+  useMemo,                                //......Hook de memo
 } from 'react';                           //......Biblioteca React
 import {                                  //......React Native
   Platform,                               //......Plataforma
 } from 'react-native';                    //......Biblioteca RN
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ========================================
 // Imports de Servicos
@@ -24,6 +28,10 @@ import { evolutionService } from '../../../services/evolutionService';
 // Constantes
 // ========================================
 const LOG_PREFIX = '[useContacts]';       //......Prefixo de log
+const CACHE_KEY_WHATSAPP = '@contacts_whatsapp';
+const CACHE_KEY_PHONE = '@contacts_phone';
+const CACHE_TTL = 5 * 60 * 1000;          //......5 minutos em ms
+const CONTACTS_PER_PAGE = 50;             //......Contatos por pagina
 
 // ========================================
 // Interface de Contato Unificado
@@ -65,6 +73,14 @@ interface WhatsAppContact {
 }
 
 // ========================================
+// Interface de Cache
+// ========================================
+interface CacheData {
+  contacts: UnifiedContact[];             //......Contatos em cache
+  timestamp: number;                      //......Timestamp do cache
+}
+
+// ========================================
 // Interface de Retorno do Hook
 // ========================================
 interface UseContactsReturn {
@@ -78,6 +94,8 @@ interface UseContactsReturn {
   refreshPhoneContacts: () => Promise<void>;
   refreshWhatsAppContacts: () => Promise<void>;
   refreshAll: () => Promise<void>;        //......Atualiza todos
+  loadMoreWhatsApp: () => Promise<void>;  //......Carrega mais WhatsApp
+  hasMoreWhatsApp: boolean;               //......Se tem mais WhatsApp
 }
 
 // ========================================
@@ -105,6 +123,43 @@ const extractPhoneFromJid = (jid: string): string => {
 };
 
 // ========================================
+// Funcao para carregar cache
+// ========================================
+const loadCache = async (key: string): Promise<CacheData | null> => {
+  try {
+    const cached = await AsyncStorage.getItem(key);
+    if (cached) {
+      const data: CacheData = JSON.parse(cached);
+      // Verifica se cache ainda e valido
+      if (Date.now() - data.timestamp < CACHE_TTL) {
+        console.log(`${LOG_PREFIX} Cache valido para ${key}`);
+        return data;
+      }
+      console.log(`${LOG_PREFIX} Cache expirado para ${key}`);
+    }
+  } catch (error) {
+    console.error(`${LOG_PREFIX} Erro ao carregar cache:`, error);
+  }
+  return null;
+};
+
+// ========================================
+// Funcao para salvar cache
+// ========================================
+const saveCache = async (key: string, contacts: UnifiedContact[]): Promise<void> => {
+  try {
+    const data: CacheData = {
+      contacts,
+      timestamp: Date.now(),
+    };
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+    console.log(`${LOG_PREFIX} Cache salvo para ${key}`);
+  } catch (error) {
+    console.error(`${LOG_PREFIX} Erro ao salvar cache:`, error);
+  }
+};
+
+// ========================================
 // Hook Principal useContacts
 // ========================================
 export const useContacts = (instanceName?: string): UseContactsReturn => {
@@ -117,6 +172,13 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
   const [isLoadingWhatsApp, setIsLoadingWhatsApp] = useState(false);
   const [errorPhone, setErrorPhone] = useState<string | null>(null);
   const [errorWhatsApp, setErrorWhatsApp] = useState<string | null>(null);
+  const [hasMoreWhatsApp, setHasMoreWhatsApp] = useState(true);
+
+  // ========================================
+  // Refs para paginacao
+  // ========================================
+  const whatsappOffsetRef = useRef(0);
+  const isLoadingMoreRef = useRef(false);
 
   // ========================================
   // Buscar Contatos da Agenda (Mobile)
@@ -126,6 +188,13 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
     if (Platform.OS === 'web') {
       console.log(`${LOG_PREFIX} Agenda nao disponivel na Web`);
       setPhoneContacts([]);               //......Vazio na web
+      return;
+    }
+
+    // Tenta carregar do cache primeiro
+    const cached = await loadCache(CACHE_KEY_PHONE);
+    if (cached) {
+      setPhoneContacts(cached.contacts);
       return;
     }
 
@@ -166,23 +235,24 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
           return;
         }
 
-        // Adiciona cada telefone como contato separado
-        contact.phoneNumbers.forEach((phoneNumber, index) => {
+        // Adiciona apenas o primeiro telefone valido
+        for (const phoneNumber of contact.phoneNumbers) {
           const formattedPhone = formatPhoneNumber(phoneNumber.number);
 
           // Pula se telefone invalido
           if (formattedPhone.length < 10) {
-            return;
+            continue;
           }
 
           unified.push({
-            id: `phone_${contact.id}_${index}`,
+            id: `phone_${contact.id}`,
             name: contact.name || contact.firstName || 'Sem nome',
             phone: formattedPhone,
             photo: contact.image?.uri,
             source: 'phone',
           });
-        });
+          break;                          //......Apenas primeiro telefone valido
+        }
       });
 
       // Ordena por nome
@@ -190,6 +260,9 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
 
       console.log(`${LOG_PREFIX} Contatos da agenda processados:`, unified.length);
       setPhoneContacts(unified);          //......Define contatos
+
+      // Salva no cache
+      await saveCache(CACHE_KEY_PHONE, unified);
 
     } catch (error: any) {
       console.error(`${LOG_PREFIX} Erro ao buscar contatos da agenda:`, error);
@@ -203,7 +276,7 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
   // ========================================
   // Buscar Contatos do WhatsApp (Evolution)
   // ========================================
-  const fetchWhatsAppContacts = useCallback(async () => {
+  const fetchWhatsAppContacts = useCallback(async (reset: boolean = true) => {
     // Precisa de instanceName
     if (!instanceName) {
       console.log(`${LOG_PREFIX} instanceName nao fornecido`);
@@ -211,14 +284,38 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
       return;
     }
 
-    setIsLoadingWhatsApp(true);           //......Inicia loading
+    // Se nao resetar e ja esta carregando, ignora
+    if (!reset && isLoadingMoreRef.current) {
+      return;
+    }
+
+    // Tenta carregar do cache primeiro (apenas no reset)
+    if (reset) {
+      const cached = await loadCache(`${CACHE_KEY_WHATSAPP}_${instanceName}`);
+      if (cached) {
+        setWhatsappContacts(cached.contacts);
+        setHasMoreWhatsApp(cached.contacts.length >= CONTACTS_PER_PAGE);
+        whatsappOffsetRef.current = cached.contacts.length;
+        return;
+      }
+      whatsappOffsetRef.current = 0;
+    }
+
+    if (reset) {
+      setIsLoadingWhatsApp(true);         //......Inicia loading
+    }
+    isLoadingMoreRef.current = true;
     setErrorWhatsApp(null);               //......Limpa erro
 
     try {
-      console.log(`${LOG_PREFIX} Buscando contatos do WhatsApp...`);
+      console.log(`${LOG_PREFIX} Buscando contatos do WhatsApp... offset:`, whatsappOffsetRef.current);
 
-      // Busca contatos via Evolution API
-      const contacts = await evolutionService.fetchContacts(instanceName);
+      // Busca contatos via Evolution API com paginacao
+      const contacts = await evolutionService.fetchContacts(
+        instanceName,
+        CONTACTS_PER_PAGE,
+        whatsappOffsetRef.current
+      );
 
       console.log(`${LOG_PREFIX} Contatos do WhatsApp encontrados:`, contacts.length);
 
@@ -234,7 +331,7 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
           const phone = extractPhoneFromJid(jid);
 
           return {
-            id: `whatsapp_${jid}_${index}`,
+            id: `whatsapp_${jid}_${whatsappOffsetRef.current + index}`,
             name: contact.pushName || phone || 'Sem nome',
             phone: phone,
             photo: contact.profilePictureUrl,
@@ -247,16 +344,46 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
       unified.sort((a, b) => a.name.localeCompare(b.name));
 
       console.log(`${LOG_PREFIX} Contatos do WhatsApp processados:`, unified.length);
-      setWhatsappContacts(unified);       //......Define contatos
+
+      // Atualiza estado
+      if (reset) {
+        setWhatsappContacts(unified);
+        // Salva no cache
+        await saveCache(`${CACHE_KEY_WHATSAPP}_${instanceName}`, unified);
+      } else {
+        setWhatsappContacts(prev => {
+          const newList = [...prev, ...unified];
+          // Salva no cache
+          saveCache(`${CACHE_KEY_WHATSAPP}_${instanceName}`, newList);
+          return newList;
+        });
+      }
+
+      // Atualiza paginacao
+      whatsappOffsetRef.current += contacts.length;
+      setHasMoreWhatsApp(contacts.length >= CONTACTS_PER_PAGE);
 
     } catch (error: any) {
       console.error(`${LOG_PREFIX} Erro ao buscar contatos do WhatsApp:`, error);
       setErrorWhatsApp(error?.message || 'Erro ao buscar contatos');
-      setWhatsappContacts([]);
+      if (reset) {
+        setWhatsappContacts([]);
+      }
     } finally {
       setIsLoadingWhatsApp(false);        //......Finaliza loading
+      isLoadingMoreRef.current = false;
     }
   }, [instanceName]);
+
+  // ========================================
+  // Carregar Mais WhatsApp
+  // ========================================
+  const loadMoreWhatsApp = useCallback(async () => {
+    if (!hasMoreWhatsApp || isLoadingMoreRef.current) {
+      return;
+    }
+    await fetchWhatsAppContacts(false);
+  }, [hasMoreWhatsApp, fetchWhatsAppContacts]);
 
   // ========================================
   // Atualizar Todos os Contatos
@@ -264,14 +391,16 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
   const refreshAll = useCallback(async () => {
     await Promise.all([
       fetchPhoneContacts(),               //......Busca agenda
-      fetchWhatsAppContacts(),            //......Busca WhatsApp
+      fetchWhatsAppContacts(true),        //......Busca WhatsApp
     ]);
   }, [fetchPhoneContacts, fetchWhatsAppContacts]);
 
   // ========================================
-  // Combinar Todos os Contatos
+  // Combinar Todos os Contatos (Memo)
   // ========================================
-  const allContacts = [...whatsappContacts, ...phoneContacts];
+  const allContacts = useMemo(() => {
+    return [...whatsappContacts, ...phoneContacts];
+  }, [whatsappContacts, phoneContacts]);
 
   // ========================================
   // Efeito: Buscar contatos ao montar
@@ -292,8 +421,10 @@ export const useContacts = (instanceName?: string): UseContactsReturn => {
     errorPhone,                           //......Erro agenda
     errorWhatsApp,                        //......Erro WhatsApp
     refreshPhoneContacts: fetchPhoneContacts,
-    refreshWhatsAppContacts: fetchWhatsAppContacts,
+    refreshWhatsAppContacts: () => fetchWhatsAppContacts(true),
     refreshAll,                           //......Atualiza todos
+    loadMoreWhatsApp,                     //......Carrega mais WhatsApp
+    hasMoreWhatsApp,                      //......Se tem mais WhatsApp
   };
 };
 

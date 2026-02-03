@@ -649,17 +649,25 @@ export const evolutionService = {
   // BUSCAR CHATS E CONTATOS
   // ========================================
 
-  // Obter lista de contatos do WhatsApp
-  async fetchChats(instanceName: string): Promise<any[]> {
-    console.log('[EvolutionService] fetchChats (usando findContacts):', instanceName);
+  // Obter lista de contatos do WhatsApp com paginacao
+  async fetchChats(
+    instanceName: string,
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<{ contacts: any[]; total: number; hasMore: boolean }> {
+    console.log('[EvolutionService] fetchChats:', instanceName, 'limit:', limit, 'offset:', offset);
     try {
-      // Endpoint correto: POST /chat/findContacts com body {"where": {}}
+      // Endpoint: POST /chat/findContacts com paginacao
       const response = await fetch(
         `${EVOLUTION_URL}/chat/findContacts/${instanceName}`,
         {
           method: 'POST',                        //......Metodo POST
           headers,                               //......Headers padrao
-          body: JSON.stringify({ where: {} }),   //......Body com where vazio
+          body: JSON.stringify({
+            where: {},                           //......Filtro vazio
+            limit: limit,                        //......Limite por pagina
+            offset: offset,                      //......Offset para paginacao
+          }),
         }
       );
 
@@ -668,22 +676,111 @@ export const evolutionService = {
       if (response.ok) {
         const result = await response.json();    //......Retorna JSON
         const contacts = Array.isArray(result) ? result : [];
-        console.log('[EvolutionService] Contatos encontrados:', contacts.length);
-        return contacts;                         //......Retorna array
+        const total = contacts.length;
+        const hasMore = contacts.length === limit;
+        console.log('[EvolutionService] Contatos carregados:', total, 'hasMore:', hasMore);
+        return { contacts, total, hasMore };     //......Retorna objeto
       } else {
         const errorText = await response.text();
         console.error('[EvolutionService] fetchChats erro:', errorText);
-        return [];                               //......Retorna vazio em erro
+        return { contacts: [], total: 0, hasMore: false };
       }
     } catch (error: any) {
       console.error('[EvolutionService] fetchChats exception:', error?.message);
-      return [];                                 //......Retorna vazio em erro
+      return { contacts: [], total: 0, hasMore: false };
     }
   },
 
-  // Obter lista de contatos (alias para fetchChats)
-  async fetchContacts(instanceName: string): Promise<any[]> {
-    return this.fetchChats(instanceName);        //......Usa mesmo endpoint
+  // Obter todos os contatos (carrega em batches para performance)
+  async fetchAllChats(instanceName: string): Promise<any[]> {
+    console.log('[EvolutionService] fetchAllChats:', instanceName);
+    const allContacts: any[] = [];
+    let offset = 0;
+    const limit = 100;                           //......100 por batch
+    let hasMore = true;
+
+    while (hasMore) {
+      const result = await this.fetchChats(instanceName, limit, offset);
+      allContacts.push(...result.contacts);
+      hasMore = result.hasMore;
+      offset += limit;
+
+      // Limite de seguranca: max 5000 contatos
+      if (allContacts.length >= 5000) {
+        console.log('[EvolutionService] Limite de 5000 contatos atingido');
+        break;
+      }
+    }
+
+    console.log('[EvolutionService] Total de contatos:', allContacts.length);
+    return allContacts;
+  },
+
+  // Carregamento progressivo com callback (atualiza UI em batches)
+  async fetchChatsProgressive(
+    instanceName: string,
+    onBatch: (contacts: any[], batchNumber: number, total: number) => void,
+    abortSignal?: AbortSignal
+  ): Promise<{ totalContacts: number; batches: number }> {
+    console.log('[PERF] fetchChatsProgressive - START');
+    const perfStart = performance.now();
+
+    let offset = 0;
+    const limit = 100;                           //......100 por batch
+    let hasMore = true;
+    let batchNumber = 0;
+    let totalContacts = 0;
+
+    while (hasMore) {
+      // Verificar se foi cancelado
+      if (abortSignal?.aborted) {
+        console.log('[PERF] fetchChatsProgressive - ABORTADO');
+        break;
+      }
+
+      const batchStart = performance.now();
+      const result = await this.fetchChats(instanceName, limit, offset);
+      const batchTime = performance.now() - batchStart;
+
+      batchNumber++;
+      totalContacts += result.contacts.length;
+
+      console.log(`[PERF] Batch ${batchNumber}: ${result.contacts.length} contatos em ${batchTime.toFixed(0)}ms (total: ${totalContacts})`);
+
+      // Callback para atualizar UI com o batch
+      if (result.contacts.length > 0) {
+        onBatch(result.contacts, batchNumber, totalContacts);
+      }
+
+      hasMore = result.hasMore;
+      offset += limit;
+
+      // Limite de seguranca: max 5000 contatos
+      if (totalContacts >= 5000) {
+        console.log('[PERF] Limite de 5000 contatos atingido');
+        break;
+      }
+    }
+
+    const totalTime = performance.now() - perfStart;
+    console.log(`[PERF] fetchChatsProgressive TOTAL - ${totalContacts} contatos em ${batchNumber} batches em ${totalTime.toFixed(0)}ms`);
+
+    return { totalContacts, batches: batchNumber };
+  },
+
+  // Obter lista de contatos paginada
+  async fetchContacts(
+    instanceName: string,
+    limit?: number,
+    offset?: number
+  ): Promise<any[]> {
+    // Se nao especificar paginacao, carrega primeira pagina
+    if (limit === undefined && offset === undefined) {
+      const result = await this.fetchChats(instanceName, 50, 0);
+      return result.contacts;
+    }
+    const result = await this.fetchChats(instanceName, limit || 50, offset || 0);
+    return result.contacts;
   },
 
   // ========================================

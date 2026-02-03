@@ -12,6 +12,7 @@ import React, {                           //......React core
   useCallback,                            //......Hook de callback
   useMemo,                                //......Hook de memo
   useEffect,                              //......Hook de efeito
+  useRef,                                 //......Hook de referencia
 } from 'react';                           //......Biblioteca React
 import {                                  //......Componentes RN
   View,                                   //......Container basico
@@ -51,6 +52,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ICON_COLOR = '#3A3F51';             //......Cor dos icones
 const PRIMARY_COLOR = '#1777CF';          //......Cor primaria azul
 const BORDER_COLOR = '#E5E7EB';           //......Cor das bordas
+
+// ========================================
+// Constantes de Performance
+// ========================================
+const DEBOUNCE_DELAY = 300;               //......Delay do debounce em ms
+const ITEM_HEIGHT = 73;                   //......Altura de cada item (padding 12 + avatar 48 + padding 12 + border 1)
+const INITIAL_NUM_TO_RENDER = 15;         //......Itens iniciais renderizados
+const MAX_TO_RENDER_PER_BATCH = 10;       //......Itens por batch
+const WINDOW_SIZE = 5;                    //......Tamanho da janela
 
 // ========================================
 // Tipo de Aba
@@ -259,15 +269,32 @@ const getInitials = (name: string): string => {
 };
 
 // ========================================
-// Componente Item de Contato
+// Componente Item de Contato (Memoizado)
 // ========================================
 const ContactItem: React.FC<{
   contact: UnifiedContact;
   selected: boolean;
   onPress: () => void;
-}> = ({ contact, selected, onPress }) => {
+}> = React.memo(({ contact, selected, onPress }) => {
+  // Estado de loading da imagem
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   // Gera iniciais do nome usando a nova funcao
   const initials = getInitials(contact.name);
+
+  // Handler de carregamento da imagem
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  // Handler de erro da imagem
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+  }, []);
+
+  // Verifica se deve mostrar imagem
+  const showImage = contact.photo && !imageError;
 
   return (
     <Pressable
@@ -276,11 +303,31 @@ const ContactItem: React.FC<{
     >
       {/* Avatar - todos azuis */}
       <View style={styles.contactAvatar}>
-        {contact.photo ? (
-          <Image
-            source={{ uri: contact.photo }}
-            style={styles.contactAvatarImage}
-          />
+        {showImage ? (
+          <>
+            {/* Placeholder enquanto carrega */}
+            {!imageLoaded && (
+              <View style={[styles.contactAvatarPlaceholder, styles.avatarLoading]}>
+                <Text style={styles.contactAvatarInitials}>
+                  {initials}
+                </Text>
+              </View>
+            )}
+            {/* Imagem com cache */}
+            <Image
+              source={{
+                uri: contact.photo,
+                cache: 'force-cache',
+              }}
+              style={[
+                styles.contactAvatarImage,
+                !imageLoaded && styles.imageHidden,
+              ]}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              progressiveRenderingEnabled={true}
+            />
+          </>
         ) : (
           <View style={styles.contactAvatarPlaceholder}>
             <Text style={styles.contactAvatarInitials}>
@@ -306,7 +353,7 @@ const ContactItem: React.FC<{
       <Checkbox selected={selected} />
     </Pressable>
   );
-};
+});
 
 // ========================================
 // Componente Principal ShareModal
@@ -336,11 +383,17 @@ const ShareModal: React.FC<ShareModalProps> = ({
   // Estados
   // ========================================
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('whatsapp');
   const [inputHeight, setInputHeight] = useState(40);
+
+  // ========================================
+  // Refs
+  // ========================================
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ========================================
   // Constantes de Altura do Input
@@ -368,6 +421,34 @@ const ShareModal: React.FC<ShareModalProps> = ({
   }, [visible, refreshAll]);
 
   // ========================================
+  // Efeito: Debounce da Busca
+  // ========================================
+  useEffect(() => {
+    // Limpa timeout anterior
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Se query vazia, atualiza imediatamente
+    if (searchQuery === '') {
+      setDebouncedSearch('');
+      return;
+    }
+
+    // Configura novo timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, DEBOUNCE_DELAY);
+
+    // Cleanup
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // ========================================
   // Contatos da Aba Ativa
   // ========================================
   const tabContacts = useMemo(() => {
@@ -383,20 +464,21 @@ const ShareModal: React.FC<ShareModalProps> = ({
   }, [activeTab, whatsappContacts, phoneContacts, allContacts]);
 
   // ========================================
-  // Filtrar Contatos pela Busca
+  // Filtrar Contatos pela Busca (com Debounce)
   // ========================================
   const filteredContacts = useMemo(() => {
-    if (!searchQuery.trim()) {
+    // Usa debouncedSearch para filtrar
+    if (!debouncedSearch.trim()) {
       return tabContacts;
     }
 
-    const query = searchQuery.toLowerCase();
+    const query = debouncedSearch.toLowerCase();
     return tabContacts.filter(
       (contact) =>
         contact.name.toLowerCase().includes(query) ||
         contact.phone.includes(query)
     );
-  }, [searchQuery, tabContacts]);
+  }, [debouncedSearch, tabContacts]);
 
   // ========================================
   // Loading Geral
@@ -427,10 +509,16 @@ const ShareModal: React.FC<ShareModalProps> = ({
       // Chama callback de encaminhamento
       await onForward(selectedContacts, message);
 
+      // Limpa timeout de debounce
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+
       // Limpa estados
       setSelectedContacts([]);
       setMessage('');
       setSearchQuery('');
+      setDebouncedSearch('');
       setInputHeight(MIN_INPUT_HEIGHT);
 
       // Fecha modal
@@ -446,10 +534,16 @@ const ShareModal: React.FC<ShareModalProps> = ({
   // Handler de Fechar
   // ========================================
   const handleClose = useCallback(() => {
+    // Limpa timeout de debounce
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     // Limpa estados
     setSelectedContacts([]);
     setMessage('');
     setSearchQuery('');
+    setDebouncedSearch('');
     setActiveTab('whatsapp');
     setInputHeight(MIN_INPUT_HEIGHT);
 
@@ -475,6 +569,18 @@ const ShareModal: React.FC<ShareModalProps> = ({
   // Key Extractor
   // ========================================
   const keyExtractor = useCallback((item: UnifiedContact) => item.id, []);
+
+  // ========================================
+  // Get Item Layout (Otimizacao)
+  // ========================================
+  const getItemLayout = useCallback((
+    _data: ArrayLike<UnifiedContact> | null | undefined,
+    index: number
+  ) => ({
+    length: ITEM_HEIGHT,                  //......Altura do item
+    offset: ITEM_HEIGHT * index,          //......Offset baseado no index
+    index,                                //......Index do item
+  }), []);
 
   // ========================================
   // Render Lista Vazia / Loading / Erro
@@ -652,7 +758,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             </View>
           )}
 
-          {/* Lista de Contatos */}
+          {/* Lista de Contatos (Otimizada) */}
           <FlatList
             data={filteredContacts}
             renderItem={renderContactItem}
@@ -661,6 +767,12 @@ const ShareModal: React.FC<ShareModalProps> = ({
             contentContainerStyle={styles.contactListContent}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderListEmpty}
+            getItemLayout={getItemLayout}
+            initialNumToRender={INITIAL_NUM_TO_RENDER}
+            maxToRenderPerBatch={MAX_TO_RENDER_PER_BATCH}
+            windowSize={WINDOW_SIZE}
+            removeClippedSubviews={true}
+            updateCellsBatchingPeriod={50}
           />
 
           {/* Footer com Input e Botao empilhados */}
@@ -904,6 +1016,22 @@ const styles = StyleSheet.create({
     width: 48,                            //......Largura
     height: 48,                           //......Altura
     borderRadius: 8,                      //......Cantos levemente arredondados
+    position: 'absolute',                 //......Sobrepoe placeholder
+    top: 0,                               //......Posicao topo
+    left: 0,                              //......Posicao esquerda
+  },
+
+  // Imagem escondida enquanto carrega
+  imageHidden: {
+    opacity: 0,                           //......Invisivel enquanto carrega
+  },
+
+  // Avatar carregando
+  avatarLoading: {
+    position: 'absolute',                 //......Sobrepoe
+    top: 0,                               //......Posicao topo
+    left: 0,                              //......Posicao esquerda
+    zIndex: 1,                            //......Acima da imagem
   },
 
   // Placeholder do avatar - quadrado com cantos arredondados, azul

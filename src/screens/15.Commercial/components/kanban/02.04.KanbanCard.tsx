@@ -168,9 +168,9 @@ const getChannelName = (card: KanbanCardType): string => {
 };
 
 // ========================================
-// Componente KanbanCard
+// Componente KanbanCard (Memoizado)
 // ========================================
-const KanbanCard: React.FC<KanbanCardProps> = ({
+const KanbanCardComponent: React.FC<KanbanCardProps> = ({
   card,                               //......Dados do card
   onPress,                            //......Callback info modal
   onChatPress,                        //......Callback chat
@@ -362,6 +362,45 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
     </View>
   );
 };
+
+// ========================================
+// Funcao de Comparacao para Memoizacao
+// ========================================
+const arePropsEqual = (
+  prevProps: KanbanCardProps,         //......Props anteriores
+  nextProps: KanbanCardProps,         //......Props novas
+): boolean => {
+  // Comparar ID do card
+  if (prevProps.card.id !== nextProps.card.id) return false;
+
+  // Comparar ultima mensagem
+  if (prevProps.card.lastMessage !== nextProps.card.lastMessage) return false;
+
+  // Comparar nome do lead
+  if (prevProps.card.leadName !== nextProps.card.leadName) return false;
+
+  // Comparar foto do lead
+  if (prevProps.card.leadPhoto !== nextProps.card.leadPhoto) return false;
+
+  // Comparar status de arraste
+  if (prevProps.isDragging !== nextProps.isDragging) return false;
+
+  // Comparar coluna
+  if (prevProps.card.columnId !== nextProps.card.columnId) return false;
+
+  // Comparar tags (shallow)
+  const prevTags = prevProps.card.tags || [];
+  const nextTags = nextProps.card.tags || [];
+  if (prevTags.length !== nextTags.length) return false;
+
+  // Props iguais, nao precisa re-render
+  return true;
+};
+
+// ========================================
+// Componente Memoizado
+// ========================================
+const KanbanCard = React.memo(KanbanCardComponent, arePropsEqual);
 
 // ========================================
 // Export Default

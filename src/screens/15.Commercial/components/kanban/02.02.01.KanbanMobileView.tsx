@@ -11,6 +11,7 @@ import React, {                       //......React core
   useMemo,                            //......Hook de memorizacao
   useCallback,                        //......Hook de callback
   useRef,                             //......Hook de referencia
+  useEffect,                          //......Hook de efeito
 } from 'react';                       //......Biblioteca React
 import {                              //......Componentes RN
   View,                               //......Container basico
@@ -212,6 +213,16 @@ const KanbanMobileView: React.FC<KanbanMobileViewProps> = ({
   const cardsAreaHeight = windowHeight - HEADER_HEIGHT;
 
   // ========================================
+  // Constantes de Performance
+  // ========================================
+  const DEBOUNCE_DELAY = 300;           //......Delay debounce em ms
+  const INITIAL_VISIBLE = 30;           //......Cards iniciais visiveis
+  const LOAD_MORE_COUNT = 30;           //......Cards por lote
+  const CARD_HEIGHT = 180;              //......Altura estimada do card
+  const CARD_MARGIN = 10;               //......Margem entre cards
+  const ITEM_HEIGHT = CARD_HEIGHT + CARD_MARGIN; //..Altura total do item
+
+  // ========================================
   // Estados
   // ========================================
   const [selectedPhaseId, setSelectedPhaseId] = useState<string>(
@@ -220,12 +231,50 @@ const KanbanMobileView: React.FC<KanbanMobileViewProps> = ({
   const [currentColumnIndex, setCurrentColumnIndex] = useState(0);
   const [showPhaseDropdown, setShowPhaseDropdown] = useState(false);
   const [showActionsModal, setShowActionsModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); //..Busca
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
 
   // ========================================
   // Refs
   // ========================================
   const translateX = useRef(new Animated.Value(0)).current;
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ========================================
+  // Efeito: Debounce da Busca
+  // ========================================
+  useEffect(() => {
+    // Limpa timeout anterior
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Se query vazia, atualiza imediatamente
+    if (searchQuery === '') {
+      setDebouncedSearch('');
+      setVisibleCount(INITIAL_VISIBLE);
+      return;
+    }
+
+    // Configura novo timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setVisibleCount(INITIAL_VISIBLE);
+    }, DEBOUNCE_DELAY);
+
+    // Cleanup
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // Efeito: Reset visibleCount quando muda coluna
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE);
+  }, [currentColumnIndex, selectedPhaseId]);
 
   // ========================================
   // Memos
@@ -252,16 +301,41 @@ const KanbanMobileView: React.FC<KanbanMobileViewProps> = ({
     return cards.filter(c => c.columnId === currentColumn.id);
   }, [cards, currentColumn]);
 
-  // Cards filtrados pela busca
+  // Cards filtrados pela busca (usa debounce)
   const filteredCards = useMemo(() => {
-    if (!searchQuery.trim()) return columnCards;
-    const query = searchQuery.toLowerCase();
+    if (!debouncedSearch.trim()) return columnCards;
+    const query = debouncedSearch.toLowerCase();
     return columnCards.filter(card => {
       const nameMatch = card.leadName?.toLowerCase().includes(query);
       const phoneMatch = card.leadPhone?.toLowerCase().includes(query);
       return nameMatch || phoneMatch;
     });
-  }, [columnCards, searchQuery]);
+  }, [columnCards, debouncedSearch]);
+
+  // Cards visiveis (limitados para performance)
+  const visibleCards = useMemo(() => {
+    return filteredCards.slice(0, visibleCount);
+  }, [filteredCards, visibleCount]);
+
+  // Se tem mais cards para carregar
+  const hasMoreCards = useMemo(() => {
+    return filteredCards.length > visibleCount;
+  }, [filteredCards.length, visibleCount]);
+
+  // Handler para carregar mais cards
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount(prev => prev + LOAD_MORE_COUNT);
+  }, []);
+
+  // Funcao getItemLayout para FlatList (otimizacao de scroll)
+  const getItemLayout = useCallback((
+    _data: KanbanCardType[] | null | undefined,
+    index: number,
+  ) => ({
+    length: ITEM_HEIGHT,              //......Altura do item
+    offset: ITEM_HEIGHT * index,      //......Posicao do item
+    index,                            //......Indice do item
+  }), []);
 
   // Valor total da coluna
   const columnTotal = useMemo(() => {
@@ -358,61 +432,41 @@ const KanbanMobileView: React.FC<KanbanMobileViewProps> = ({
   }, []);
 
   // ========================================
-  // PanResponder para Swipe
+  // PanResponder para Swipe (Otimizado)
   // ========================================
   const panResponder = useMemo(() => {
     return PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => {
-        console.log('[PanResponder] onStartShouldSetPanResponder - SEMPRE RETORNA FALSE');
-        return false;
-      },
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => {
-        console.log('[PanResponder] onStartShouldSetPanResponderCapture - SEMPRE RETORNA FALSE');
-        return false;
-      },
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
+      onStartShouldSetPanResponder: () => false,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
         // Capturar apenas gestos predominantemente horizontais
         const absDx = Math.abs(gestureState.dx);
         const absDy = Math.abs(gestureState.dy);
         const isHorizontalSwipe = absDx > absDy * 2;
         const hasMinimumMovement = absDx > 15;
-        const shouldCapture = isHorizontalSwipe && hasMinimumMovement;
-        console.log(`[PanResponder] onMoveShouldSetPanResponder - dx:${gestureState.dx.toFixed(1)} dy:${gestureState.dy.toFixed(1)} absDx:${absDx.toFixed(1)} absDy:${absDy.toFixed(1)} isHoriz:${isHorizontalSwipe} hasMin:${hasMinimumMovement} CAPTURA:${shouldCapture}`);
-        return shouldCapture;
+        return isHorizontalSwipe && hasMinimumMovement;
       },
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        console.log('[PanResponder] onMoveShouldSetPanResponderCapture - SEMPRE RETORNA FALSE');
-        return false;
-      },
-      onPanResponderGrant: (evt, gestureState) => {
-        console.log('[PanResponder] onPanResponderGrant - CAPTUROU O GESTO!');
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        console.log(`[PanResponder] onPanResponderMove - dx:${gestureState.dx.toFixed(1)} dy:${gestureState.dy.toFixed(1)}`);
+      onMoveShouldSetPanResponderCapture: () => false,
+      onPanResponderGrant: () => {},
+      onPanResponderMove: (_, gestureState) => {
         translateX.setValue(gestureState.dx);
       },
-      onPanResponderRelease: (evt, gestureState) => {
-        console.log(`[PanResponder] onPanResponderRelease - dx:${gestureState.dx.toFixed(1)} threshold:${SWIPE_THRESHOLD}`);
+      onPanResponderRelease: (_, gestureState) => {
         if (gestureState.dx > SWIPE_THRESHOLD && currentColumnIndex > 0) {
           // Swipe para direita - coluna anterior
-          console.log('[PanResponder] SWIPE DIREITA - coluna anterior');
           handlePreviousColumn();      //......Ir para anterior
         } else if (gestureState.dx < -SWIPE_THRESHOLD && currentColumnIndex < phaseColumns.length - 1) {
           // Swipe para esquerda - proxima coluna
-          console.log('[PanResponder] SWIPE ESQUERDA - proxima coluna');
           handleNextColumn();          //......Ir para proxima
         } else {
           // Voltar para posicao original
-          console.log('[PanResponder] Voltando posicao original');
           Animated.spring(translateX, {
             toValue: 0,                //......Posicao original
             useNativeDriver: true,     //......Driver nativo
           }).start();
         }
       },
-      onPanResponderTerminate: (evt, gestureState) => {
-        console.log('[PanResponder] onPanResponderTerminate - GESTO TERMINADO/CANCELADO');
-      },
+      onPanResponderTerminate: () => {},
     });
   }, [currentColumnIndex, phaseColumns.length, handlePreviousColumn, handleNextColumn, translateX]);
 
@@ -605,99 +659,74 @@ const KanbanMobileView: React.FC<KanbanMobileViewProps> = ({
         )}
       </View>
 
-      {/* Area de Cards */}
-      {/* DEBUG: Mostra quantidade de cards e altura calculada */}
-      {console.log(`[KanbanMobileView] Renderizando ${filteredCards.length} cards na coluna ${currentColumn?.name || 'N/A'}, cardsAreaHeight: ${cardsAreaHeight}`)}
+      {/* Area de Cards - FlatList Unificado (Mobile e Web) */}
       <View
         style={[
           styles.cardsArea,
           Platform.OS === 'web' && {
             height: cardsAreaHeight,
             maxHeight: cardsAreaHeight,
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            WebkitOverflowScrolling: 'touch',
           } as any,
         ]}
       >
-        {Platform.OS === 'web' ? (
-          // Conteudo direto para web com scroll nativo do container
-          <>
-            {filteredCards.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>
-                  {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum lead nesta coluna'}
-                </Text>
-                <Text style={styles.emptySubtext}>
-                  {searchQuery ? 'Tente buscar por outro termo' : 'Deslize para navegar entre colunas'}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.cardsListContent}>
-                {filteredCards.map((card, index) => {
-                  if (index === 0) {
-                    console.log(`[WebScroll] Primeiro card: ${card.leadName}`);
-                  }
-                  if (index === filteredCards.length - 1) {
-                    console.log(`[WebScroll] Ultimo card: ${card.leadName}`);
-                  }
-                  return (
-                    <KanbanCard
-                      key={card.id}
-                      card={card}
-                      onPress={onCardPress}
-                      onChatPress={onCardChatPress}
-                      onLongPress={onCardLongPress}
-                    />
-                  );
-                })}
-              </View>
-            )}
-          </>
-        ) : (
-          // FlatList para mobile nativo - performance otimizada
-          <FlatList
-            data={filteredCards}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item: card, index }) => {
-              if (index === 0) {
-                console.log(`[FlatList] Primeiro card: ${card.leadName}`);
-              }
-              if (index === filteredCards.length - 1) {
-                console.log(`[FlatList] Ultimo card: ${card.leadName}`);
-              }
-              return (
-                <KanbanCard
-                  key={card.id}
-                  card={card}
-                  onPress={onCardPress}
-                  onChatPress={onCardChatPress}
-                  onLongPress={onCardLongPress}
-                />
-              );
-            }}
-            ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>
-                  {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum lead nesta coluna'}
-                </Text>
-                <Text style={styles.emptySubtext}>
-                  {searchQuery ? 'Tente buscar por outro termo' : 'Deslize para navegar entre colunas'}
-                </Text>
-              </View>
-            }
-            contentContainerStyle={styles.cardsListContent}
-            style={{ flex: 1 }}
-            showsVerticalScrollIndicator={true}
-            scrollEnabled={true}
-            nestedScrollEnabled={true}
-            onScroll={(event) => {
-              const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-              console.log(`[FlatList] onScroll - offsetY:${contentOffset.y.toFixed(1)} contentHeight:${contentSize.height.toFixed(1)} layoutHeight:${layoutMeasurement.height.toFixed(1)}`);
-            }}
-            scrollEventThrottle={16}
-          />
-        )}
+        <FlatList
+          data={visibleCards}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item: card }) => (
+            <KanbanCard
+              card={card}
+              onPress={onCardPress}
+              onChatPress={onCardChatPress}
+              onLongPress={onCardLongPress}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>
+                {debouncedSearch ? 'Nenhum resultado encontrado' : 'Nenhum lead nesta coluna'}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {debouncedSearch ? 'Tente buscar por outro termo' : 'Deslize para navegar entre colunas'}
+              </Text>
+            </View>
+          }
+          ListFooterComponent={hasMoreCards ? (
+            <TouchableOpacity
+              style={{
+                backgroundColor: COLORS.primary,
+                paddingVertical: 12,
+                paddingHorizontal: 24,
+                borderRadius: 8,
+                alignItems: 'center',
+                marginVertical: 16,
+                marginHorizontal: 16,
+              }}
+              onPress={handleLoadMore}
+              activeOpacity={0.7}
+            >
+              <Text style={{
+                color: '#FFFFFF',
+                fontFamily: 'Inter_500Medium',
+                fontSize: 14,
+              }}>
+                Carregar mais ({filteredCards.length - visibleCount} restantes)
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          contentContainerStyle={styles.cardsListContent}
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={true}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
+          getItemLayout={getItemLayout}
+          initialNumToRender={15}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          windowSize={Platform.OS === 'web' ? 10 : 5}
+          removeClippedSubviews={Platform.OS !== 'web'}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+        />
       </View>
 
       {/* Modal de Acoes */}

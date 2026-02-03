@@ -254,7 +254,8 @@ export const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',   //......Fonte regular
     color: COLORS.textPrimary,        //......Cor texto
     paddingVertical: 0,               //......Sem padding vertical
-  },
+    outlineStyle: 'none',             //......Remove borda de foco web
+  } as any,
 
   // Area de cards (container externo)
   cardsArea: {
