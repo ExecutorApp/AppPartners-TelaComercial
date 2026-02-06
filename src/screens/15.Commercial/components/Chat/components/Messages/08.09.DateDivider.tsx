@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
 
   // Badge da data
   dateBadge: {
-    backgroundColor: ChatColors.dateBadge, //....Fundo do badge
+    backgroundColor: '#FFFFFF',           //......Fundo branco
     paddingHorizontal: 12,                //......Espaco horizontal
     paddingVertical: 6,                   //......Espaco vertical
     borderRadius: 8,                      //......Bordas arredondadas
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontFamily: 'Inter_500Medium',        //......Fonte media
     fontSize: 12,                         //......Tamanho fonte
-    color: ChatColors.dateBadgeText,      //......Cor do texto
+    color: '#7D8592',                     //......Cor cinza escuro
     textAlign: 'center',                  //......Alinhamento centro
   },
 });

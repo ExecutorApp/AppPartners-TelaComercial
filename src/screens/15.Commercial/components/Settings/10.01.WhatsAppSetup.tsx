@@ -171,9 +171,9 @@ const WhatsAppSetup: React.FC<WhatsAppSetupProps> = ({
       setIsLoadingChats(true);                     //......Inicia loading
       const instanceName = `partners_${userId}`;
       console.log('[WhatsAppSetup] Buscando chats...');
-      const chatList = await evolutionService.fetchChats(instanceName);
-      console.log('[WhatsAppSetup] Chats encontrados:', chatList?.length || 0);
-      setChats(chatList || []);                    //......Atualiza lista
+      const result = await evolutionService.fetchChats(instanceName);
+      console.log('[WhatsAppSetup] Chats encontrados:', result?.contacts?.length || 0);
+      setChats(result?.contacts || []);            //......Atualiza lista de contacts
     } catch (error) {
       console.error('[WhatsAppSetup] Erro ao buscar chats:', error);
     } finally {
@@ -249,6 +249,13 @@ const WhatsAppSetup: React.FC<WhatsAppSetupProps> = ({
 
       // Aguardar inicializacao
       await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Configurar settings para sincronizar historico completo
+      console.log('[WhatsAppSetup] Configurando syncFullHistory...');
+      await evolutionService.setSettings(instanceName, {
+        syncFullHistory: true,                   //......Sincronizar historico
+        readMessages: true,                      //......Marcar como lido
+      });
 
       // Obter QR Code
       console.log('[WhatsAppSetup] Obtendo QR Code...');

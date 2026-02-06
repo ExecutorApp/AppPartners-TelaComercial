@@ -20,6 +20,11 @@ import {                                  //......Componentes RN
 import { ChatColors } from '../../styles/08.ChatColors';
 
 // ========================================
+// Imports de Componentes
+// ========================================
+import LinkPreviewCard from './08.12.LinkPreviewCard';
+
+// ========================================
 // Imports de Tipos
 // ========================================
 import { TextContent } from '../../types/08.types.whatsapp';
@@ -104,14 +109,31 @@ const TextMessage: React.FC<TextMessageProps> = ({
   };
 
   // ========================================
+  // Texto sem URL quando card esta presente
+  // ========================================
+  const displayText = content.linkPreview
+    ? content.text.replace(/https?:\/\/[^\s]+/g, '').trim() //...Remove URLs do texto
+    : content.text;                                          //...Texto original
+
+  // ========================================
   // Render Principal
   // ========================================
   return (
     <View style={styles.container}>
-      {/* Texto da Mensagem */}
-      <Text style={styles.textWrapper}>
-        {renderTextWithLinks(content.text)}
-      </Text>
+      {/* Card de Preview do Link */}
+      {content.linkPreview && (
+        <LinkPreviewCard
+          linkPreview={content.linkPreview} //......Dados do preview
+          isOutgoing={isOutgoing}           //......Direcao
+        />
+      )}
+
+      {/* Texto da Mensagem (oculta URL quando card presente) */}
+      {displayText.length > 0 && (
+        <Text style={styles.textWrapper}>
+          {renderTextWithLinks(displayText)}
+        </Text>
+      )}
     </View>
   );
 };

@@ -57,6 +57,11 @@ import { MessageStatus as StatusType } from '../../types/08.types.whatsapp';
 import MessageStatus from './08.08.MessageStatus';
 
 // ========================================
+// Imports de Tipo TimestampStyle
+// ========================================
+import { TimestampStyle } from '../../10.00.LeadLolaSwipeContainer';
+
+// ========================================
 // Interface de Props
 // ========================================
 interface AudioMessageProps {
@@ -64,6 +69,7 @@ interface AudioMessageProps {
   isOutgoing: boolean;                    //......Se e enviada
   timestamp?: Date;                       //......Hora de envio
   status?: StatusType;                    //......Status da mensagem
+  timestampStyle?: TimestampStyle;        //......Estilo do timestamp
   onRetry?: () => Promise<boolean>;       //......Callback de retry (retorna true se sucesso)
 }
 
@@ -126,6 +132,7 @@ const AudioMessage: React.FC<AudioMessageProps> = ({
   isOutgoing,                             //......Direcao
   timestamp,                              //......Hora de envio
   status,                                 //......Status da mensagem
+  timestampStyle = 'container',           //......Estilo do timestamp
   onRetry,                                //......Callback de retry
 }) => {
   // ========================================
@@ -550,20 +557,30 @@ const AudioMessage: React.FC<AudioMessageProps> = ({
       {timestamp && (
         <Pressable
           style={[
-            styles.timestampContainer,
-            { borderColor: isOutgoing ? '#1777CF' : '#3A3F51' },
+            timestampStyle === 'container' ? styles.timestampContainer : styles.timestampContainerTransparent,
+            timestampStyle === 'container' && {
+              borderColor: isOutgoing ? '#1777CF' : '#D8D8D8',
+              borderRightWidth: isOutgoing ? 2 : 1,
+              borderBottomWidth: isOutgoing ? 2 : 1,
+            },
           ]}
           onPress={status === 'failed' ? handleRetry : undefined}
           disabled={status !== 'failed' || isRetrying}
         >
-          <Text style={styles.timestampText}>
+          <Text style={
+            timestampStyle === 'container'
+              ? styles.timestampText
+              : (isOutgoing ? styles.timestampTextWhite : styles.timestampTextBlack)
+          }>
             {timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </Text>
+          {/* AJUSTE-CHECK-SIZE: Altere o valor de size para mudar tamanho do check */}
           {isOutgoing && status && (
             <MessageStatus
               status={isRetrying ? 'pending' : status}
               isOutgoing={isOutgoing}
-              size={13}
+              size={11}                   //......AJUSTE: Tamanho do check (padrao: 11)
+              iconColor={timestampStyle === 'transparent' ? '#FFFFFF' : undefined}
             />
           )}
         </Pressable>
@@ -751,38 +768,91 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_300Light',         //......Fonte light
   },
 
-  // Container branco padronizado do timestamp de envio (posicao absoluta)
   // ========================================
-  // AJUSTES MANUAIS DO CONTAINER DE HORARIO:
-  // bottom: Posicao vertical (0 = na borda | negativo = para baixo)
-  // right: Posicao horizontal (0 = na borda | negativo = para direita)
-  // height: Altura do container
-  // paddingTop/paddingBottom: Centraliza conteudo verticalmente
+  // AJUSTE-AUDIO-CONTAINER (Modo Container Branco)
+  // ========================================
+  // Container branco padronizado do timestamp de envio (posicao absoluta)
+  //
+  // AJUSTE-AUDIO-VERTICAL: Altere "bottom" para subir/descer o container
+  //   - Valor mais NEGATIVO = desce o container (ex: -10, -12, -15)
+  //   - Valor menos NEGATIVO = sobe o container (ex: -6, -4, -2)
+  //   - Valor ZERO = container na borda inferior do card
+  //
+  // AJUSTE-AUDIO-HORIZONTAL: Altere "right" para mover esquerda/direita
+  //   - Valor mais NEGATIVO = move para DIREITA (ex: -16, -18, -20)
+  //   - Valor menos NEGATIVO = move para ESQUERDA (ex: -12, -10, -8)
+  //   - Valor ZERO = container na borda direita do card
+  //
+  // AJUSTE-AUDIO-GAP: Altere "gap" para espaco entre hora e check
+  // AJUSTE-AUDIO-MARGEM-CHECK: Altere "paddingRight" para margem do check
   // ========================================
   timestampContainer: {
     position: 'absolute',                 //......Posicao absoluta
-    bottom: -8,                           //......AJUSTE: Posicao vertical (negativo = desce)
-    right: -14,                            //......AJUSTE: Posicao horizontal (negativo = direita)
-    height: 20,                           //......AJUSTE: Altura do container
-    paddingHorizontal: 10,                //......Padding horizontal
-    paddingTop: 2,                        //......AJUSTE: Padding superior
-    paddingBottom: 0,                     //......AJUSTE: Padding inferior
-    backgroundColor: 'rgba(252, 252, 252, 0.5)', //..TESTE: Fundo branco 50%
-    borderTopLeftRadius: 12,              //......AJUSTE: Arredonda canto superior esquerdo
-    borderBottomRightRadius: 6,           //......AJUSTE: Arredonda canto inferior direito
+    bottom: -8,                           //......AJUSTE-AUDIO-VERTICAL: Subir/descer
+    right: -14,                           //......AJUSTE-AUDIO-HORIZONTAL: Esquerda/direita
+    height: 20,                           //......Altura do container
+    paddingLeft: 10,                      //......Padding esquerdo
+    paddingRight: 5,                      //......AJUSTE-AUDIO-MARGEM-CHECK: Margem direita do check
+    paddingTop: 2,                        //......Padding superior
+    paddingBottom: 0,                     //......Padding inferior
+    backgroundColor: 'rgba(252, 252, 252, 0.5)', //..Fundo branco 50%
+    borderTopLeftRadius: 12,              //......Arredonda superior esquerdo
+    borderBottomRightRadius: 6,           //......Arredonda inferior direito
     flexDirection: 'row',                 //......Layout horizontal
     alignItems: 'center',                 //......Centraliza vertical
     justifyContent: 'center',             //......Centraliza horizontal
-    gap: 5,                               //......Espaco entre hora e check
-    borderRightWidth: 2,                  //......Borda direita continua do bubble
-    borderBottomWidth: 2,                 //......Borda inferior continua do bubble
+    gap: 2,                               //......AJUSTE-AUDIO-GAP: Espaco hora/check (padrao: 2)
   },
 
   // Texto do timestamp (preto sobre fundo branco)
   timestampText: {
     color: '#3A3F51',                     //......Cor preta
     fontSize: 12,                         //......Tamanho fonte
-    fontFamily: 'Inter_400Regular',       //......Fonte regular
+    fontFamily: 'Inter_300Light',         //......Fonte light padronizada
+  },
+
+  // Texto do timestamp branco (modo transparente - outgoing)
+  timestampTextWhite: {
+    color: '#FFFFFF',                     //......Cor branca
+    fontSize: 12,                         //......Tamanho fonte
+    fontFamily: 'Inter_300Light',         //......Fonte light padronizada
+  },
+
+  // Texto do timestamp preto (modo transparente - incoming)
+  timestampTextBlack: {
+    color: '#3A3F51',                     //......Cor preta
+    fontSize: 12,                         //......Tamanho fonte
+    fontFamily: 'Inter_300Light',         //......Fonte light padronizada
+  },
+
+  // ========================================
+  // AJUSTE-AUDIO-CONTAINER-TRANSPARENTE (Modo Transparente)
+  // ========================================
+  // Container transparente do timestamp (sem fundo branco)
+  //
+  // AJUSTE-AUDIO-VERTICAL-TRANSP: Altere "bottom" para subir/descer
+  //   - Valor mais NEGATIVO = desce (ex: -10, -12, -15)
+  //   - Valor menos NEGATIVO = sobe (ex: -6, -4, -2)
+  //   - Valor ZERO = na borda inferior do card
+  //
+  // AJUSTE-AUDIO-HORIZONTAL-TRANSP: Altere "right" para esquerda/direita
+  //   - Valor mais NEGATIVO = move para DIREITA (ex: -12, -14, -16)
+  //   - Valor menos NEGATIVO = move para ESQUERDA (ex: -6, -4, -2)
+  //   - Valor ZERO = na borda direita do card
+  //
+  // AJUSTE-AUDIO-GAP-TRANSP: Altere "gap" para espaco entre hora e check
+  // AJUSTE-AUDIO-MARGEM-CHECK-TRANSP: Altere "paddingRight" para margem do check
+  // ========================================
+  timestampContainerTransparent: {
+    position: 'absolute' as const,        //......Posicao absoluta
+    bottom: -0,                           //......AJUSTE-AUDIO-VERTICAL-TRANSP: Subir/descer
+    right: -2,                            //......AJUSTE-AUDIO-HORIZONTAL-TRANSP: Esquerda/direita
+    flexDirection: 'row' as const,        //......Layout horizontal
+    alignItems: 'center' as const,        //......Centraliza vertical
+    justifyContent: 'center' as const,    //......Centraliza horizontal
+    gap: 2,                               //......AJUSTE-AUDIO-GAP-TRANSP: Espaco hora/check
+    paddingLeft: 4,                       //......Padding esquerdo
+    paddingRight: 0,                      //......AJUSTE-AUDIO-MARGEM-CHECK-TRANSP: Margem do check
   },
 
   // Container de Retry (abaixo do card de audio)

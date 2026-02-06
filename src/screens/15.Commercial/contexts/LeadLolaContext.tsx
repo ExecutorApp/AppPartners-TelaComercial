@@ -76,6 +76,9 @@ export const LeadLolaProvider: React.FC<LeadLolaProviderProps> = ({
   // ========================================
   const animateTo = useCallback((screen: ActiveScreen) => {
     const toValue = screen === 'lead' ? 0 : -SCREEN_WIDTH;
+
+    // Atualiza tela IMEDIATAMENTE (antes da animacao)
+    setActiveScreen(screen);              //......Troca header instantanea
     setIsAnimating(true);
 
     Animated.spring(translateX, {
@@ -84,7 +87,6 @@ export const LeadLolaProvider: React.FC<LeadLolaProviderProps> = ({
       friction: 8,                        //......Friccao da mola
       tension: 40,                        //......Tensao da mola
     }).start(() => {
-      setActiveScreen(screen);            //......Atualiza tela ativa
       setIsAnimating(false);              //......Finaliza animacao
     });
   }, [translateX]);

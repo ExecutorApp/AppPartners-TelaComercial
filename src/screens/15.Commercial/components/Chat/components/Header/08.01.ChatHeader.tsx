@@ -38,6 +38,7 @@ import { useLolaAvatar } from '../../../../contexts/LolaAvatarContext';
 // ========================================
 interface ChatHeaderProps {
   chatInfo: ChatInfo;                     //......Info do chat
+  activeScreen?: 'lead' | 'lola';         //......Tela ativa
   onBackPress: () => void;                //......Handler voltar
   onProfilePress?: () => void;            //......Handler perfil
   onMenuPress?: () => void;               //......Handler menu
@@ -193,6 +194,7 @@ const Avatar: React.FC<{
 // ========================================
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatInfo,                               //......Info do chat
+  activeScreen = 'lead',                  //......Tela ativa (padrao: lead)
   onBackPress,                            //......Handler voltar
   onProfilePress,                         //......Handler perfil
   onMenuPress,                            //......Handler menu
@@ -203,14 +205,24 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const { state: lolaState, handleTap: handleLolaExpand } = useLolaAvatar();
 
   // ========================================
-  // Avatar da Lola visivel apenas no estado header
+  // Avatar da Lola visivel apenas no estado header (em ambas as telas)
   // ========================================
   const showLolaInHeader = lolaState === 'header';
+
+  // ========================================
+  // Verificar se esta na tela da Lola
+  // ========================================
+  const isLolaScreen = activeScreen === 'lola';
 
   // ========================================
   // Formatar Status
   // ========================================
   const getStatusText = (): string => {
+    // Se estiver na tela da Lola, mostra status fixo
+    if (isLolaScreen) {
+      return 'Assistente Pessoal';        //......Status Lola
+    }
+
     if (chatInfo.isTyping) {
       return 'digitando...';              //......Digitando
     }
@@ -260,28 +272,37 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         style={styles.profileArea}        //......Estilo area
         onPress={onProfilePress}          //......Handler
       >
-        {/* Avatar */}
-        <Avatar
-          photo={chatInfo.leadPhoto}      //......Foto
-          name={chatInfo.leadName}        //......Nome
-          isOnline={chatInfo.isOnline}    //......Online
-        />
+        {/* Avatar - Lola ou Lead */}
+        {isLolaScreen ? (
+          <View style={styles.lolaAvatarContainer}>
+            <Image
+              source={require('../../../../../../assets/lola-visemes/lola-rest.png')}
+              style={styles.lolaAvatarImage}
+            />
+          </View>
+        ) : (
+          <Avatar
+            photo={chatInfo.leadPhoto}    //......Foto
+            name={chatInfo.leadName}      //......Nome
+            isOnline={chatInfo.isOnline}  //......Online
+          />
+        )}
 
-        {/* Info do Lead */}
+        {/* Info do Lead ou Lola */}
         <View style={styles.infoContainer}>
           {/* Nome */}
           <Text
             style={styles.nameText}       //......Estilo nome
             numberOfLines={1}             //......Uma linha
           >
-            {chatInfo.leadName}
+            {isLolaScreen ? 'Lola' : chatInfo.leadName}
           </Text>
 
           {/* Status */}
           <Text
             style={[
               styles.statusText,          //......Estilo status
-              chatInfo.isTyping && styles.typingText,
+              chatInfo.isTyping && !isLolaScreen && styles.typingText,
             ]}
             numberOfLines={1}             //......Uma linha
           >
@@ -377,6 +398,26 @@ const styles = StyleSheet.create({
     width: 44,                            //......Largura
     height: 44,                           //......Altura
     borderRadius: 8,                      //......Bordas levemente arredondadas
+  },
+
+  // Container do avatar da Lola (mesmo padrao do lead)
+  lolaAvatarContainer: {
+    width: 44,                            //......Largura (igual ao lead)
+    height: 44,                           //......Altura (igual ao lead)
+    borderRadius: 8,                      //......Bordas arredondadas (igual ao lead)
+    borderWidth: 1,                       //......Borda slim
+    borderColor: '#FFFFFF',               //......Borda branca clean
+    backgroundColor: '#FFFFFF',           //......Fundo branco clean
+    overflow: 'hidden',                   //......Esconde overflow
+    position: 'relative',                 //......Posicao relativa
+  },
+
+  // Imagem do avatar da Lola (apenas rosto, ajustado no container)
+  lolaAvatarImage: {
+    width: 55,                            //......Largura reduzida para mostrar cabeca completa
+    height: 75,                           //......Altura reduzida para mostrar cabeca completa
+    marginTop: -5,                        //......Ajuste vertical para centralizar rosto
+    marginLeft: -6,                       //......Ajuste horizontal para centralizar rosto
   },
 
   // Placeholder do avatar (quadrado com bordas arredondadas)

@@ -111,6 +111,7 @@ const FunnelTab: React.FC = () => {
     addColumn,                        //......Adicionar coluna
     addCard,                          //......Adicionar card
     isWhatsAppConnected,              //......Status WhatsApp
+    loadWhatsAppContacts,             //......Carregar contatos
   } = useKanban();
 
   // ========================================
@@ -342,8 +343,12 @@ const FunnelTab: React.FC = () => {
 
   // Handler para mudanca de conexao
   const handleConnectionChange = useCallback((connected: boolean) => {
-    setIsWhatsAppConnected(connected); //....Atualizar estado
-  }, []);
+    // Carregar contatos quando conectar
+    if (connected) {
+      console.log('[FunnelTab] Conexao estabelecida, carregando contatos...');
+      loadWhatsAppContacts();          //....Carregar contatos do WhatsApp
+    }
+  }, [loadWhatsAppContacts]);
 
   // ========================================
   // Render

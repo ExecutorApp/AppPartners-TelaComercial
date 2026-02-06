@@ -11,6 +11,8 @@ import React, {                           //......React core
   useCallback,                            //......Hook de callback
   useRef,                                 //......Hook de ref
   useEffect,                              //......Hook de efeito
+  useImperativeHandle,                    //......Hook de ref imperativa
+  forwardRef,                             //......Forward ref
   memo,                                   //......Memoizacao
 } from 'react';                           //......Biblioteca React
 import {                                  //......Componentes RN
@@ -51,6 +53,11 @@ import { ReplyInfo } from '../../types/08.types.whatsapp';
 
 // Estado possivel do componente de audio
 type AudioState = 'idle' | 'recording' | 'paused' | 'playing';
+
+// Tipo do ref exposto pelo InputBar
+export interface InputBarRef {
+  insertText: (text: string) => void;     //......Insere texto no input
+}
 
 // Interface de Props
 interface InputBarProps {
@@ -94,6 +101,12 @@ const LIVE_BAR_COUNT = 38;
 // Altura minima e maxima das barras de gravacao
 const MIN_BAR_HEIGHT = 3;
 const MAX_BAR_HEIGHT = 18;
+
+// Constantes para altura do input multiline
+const MIN_INPUT_HEIGHT = 40;                //......Altura minima do input
+const LINE_HEIGHT = 20;                     //......Altura de cada linha
+const MAX_LINES = 5;                        //......Maximo de linhas visiveis
+const MAX_INPUT_HEIGHT = MIN_INPUT_HEIGHT + (LINE_HEIGHT * (MAX_LINES - 1));
 
 // ========================================
 // Hook: useWebMicrophoneLevels
@@ -327,12 +340,25 @@ const PlusBtn = memo(() => (
   </Svg>
 ));
 
-// Icone de fechar (X)
+// Icone de fechar (X) pequeno para o circulo
 const CloseIcon = memo(() => (
-  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+  <Svg width={10} height={10} viewBox="0 0 24 24" fill="none">
     <Path
       d="M18 6L6 18M6 6L18 18"
       stroke="#7D8592"
+      strokeWidth={3}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+));
+
+// Icone de limpar texto (X) slim para o input
+const ClearTextIcon = memo(() => (
+  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M18 6L6 18M6 6L18 18"
+      stroke="#91929E"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -377,7 +403,7 @@ const TranscribeIcon = memo(() => (
 // ========================================
 // Componente Principal InputBar
 // ========================================
-const InputBar: React.FC<InputBarProps> = ({
+const InputBar = forwardRef<InputBarRef, InputBarProps>(({
   onSendMessage,                          //......Handler enviar
   onAttachPress,                          //......Handler anexo
   replyingTo,                             //......Reply info
@@ -385,12 +411,20 @@ const InputBar: React.FC<InputBarProps> = ({
   disabled = false,                       //......Padrao habilitado
   placeholder = 'Digite sua mensagem...', //......Placeholder padrao
   onSendAudio,                            //......Handler enviar audio
-}) => {
+}, ref) => {
   // ========================================
   // Estados do Texto
   // ========================================
-  const [text, setText] = useState('');   //......Texto digitado
+  const [text, setText] = useState('');             //......Texto digitado
+  const [inputHeight, setInputHeight] = useState(MIN_INPUT_HEIGHT);
   const inputRef = useRef<TextInput>(null);
+
+  // ========================================
+  // Ref imperativa para insercao de texto externo
+  // ========================================
+  useImperativeHandle(ref, () => ({
+    insertText: (t: string) => setText(prev => prev + t),
+  }));
 
   // ========================================
   // Estados de Gravacao de Audio
@@ -427,6 +461,20 @@ const InputBar: React.FC<InputBarProps> = ({
   // Verificar se tem texto
   // ========================================
   const hasText = text.trim().length > 0;
+
+  // ========================================
+  // Renderiza nome do remetente com ~pushName em preto
+  // ========================================
+  const renderSenderName = (name: string) => {
+    const tildeIdx = name.indexOf(' ~');
+    if (tildeIdx === -1) return name;
+    return (
+      <>
+        {name.substring(0, tildeIdx + 1)}
+        <Text style={styles.replyPushName}>{name.substring(tildeIdx + 1)}</Text>
+      </>
+    );
+  };
 
   // ========================================
   // Efeito de Inicializacao e Limpeza
@@ -489,6 +537,7 @@ const InputBar: React.FC<InputBarProps> = ({
 
     onSendMessage(text.trim());           //......Chama callback
     setText('');                          //......Limpa input
+    setInputHeight(MIN_INPUT_HEIGHT);     //......Reseta altura
     Keyboard.dismiss();                   //......Fecha teclado
   }, [text, hasText, disabled, onSendMessage]);
 
@@ -498,6 +547,25 @@ const InputBar: React.FC<InputBarProps> = ({
   const handleCancelReply = useCallback(() => {
     onCancelReply?.();                    //......Chama callback
   }, [onCancelReply]);
+
+  // ========================================
+  // Handler de Mudanca de Tamanho do Conteudo
+  // So aumenta quando realmente quebra linha
+  // ========================================
+  const handleContentSizeChange = useCallback((event: any) => {
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const PADDING_VERTICAL = 20;                              //......Padding vertical total (10 + 10)
+    const textHeight = contentHeight - PADDING_VERTICAL;      //......Altura real do texto
+    const numLines = Math.max(1, Math.round(textHeight / LINE_HEIGHT));
+
+    if (numLines <= 1) {
+      setInputHeight(MIN_INPUT_HEIGHT);                       //......1 linha = 40px
+    } else {
+      const extraLines = Math.min(numLines - 1, MAX_LINES - 1);
+      const newHeight = MIN_INPUT_HEIGHT + (extraLines * LINE_HEIGHT);
+      setInputHeight(Math.min(newHeight, MAX_INPUT_HEIGHT));  //......Limita altura maxima
+    }
+  }, []);
 
   // ========================================
   // Inicia Gravacao
@@ -881,7 +949,14 @@ const InputBar: React.FC<InputBarProps> = ({
         {replyingTo && (
           <View style={styles.replyContainer}>
             <View style={styles.replyBar} />
-            <View style={styles.replyContent} />
+            <View style={styles.replyContent}>
+              <Text style={styles.replySenderName} numberOfLines={1}>
+                {renderSenderName(replyingTo.senderName)}
+              </Text>
+              <Text style={styles.replyPreviewText} numberOfLines={1}>
+                {replyingTo.content || 'Mensagem'}
+              </Text>
+            </View>
             <TouchableOpacity
               style={styles.replyClose}
               onPress={handleCancelReply}
@@ -941,7 +1016,14 @@ const InputBar: React.FC<InputBarProps> = ({
           {replyingTo && (
             <View style={styles.replyContainer}>
               <View style={styles.replyBar} />
-              <View style={styles.replyContent} />
+              <View style={styles.replyContent}>
+                <Text style={styles.replySenderName} numberOfLines={1}>
+                  {renderSenderName(replyingTo.senderName)}
+                </Text>
+                <Text style={styles.replyPreviewText} numberOfLines={1}>
+                  {replyingTo.content || 'Mensagem'}
+                </Text>
+              </View>
               <TouchableOpacity
                 style={styles.replyClose}
                 onPress={handleCancelReply}
@@ -1001,7 +1083,14 @@ const InputBar: React.FC<InputBarProps> = ({
       {replyingTo && (
         <View style={styles.replyContainer}>
           <View style={styles.replyBar} />
-          <View style={styles.replyContent} />
+          <View style={styles.replyContent}>
+            <Text style={styles.replySenderName} numberOfLines={1}>
+              {renderSenderName(replyingTo.senderName)}
+            </Text>
+            <Text style={styles.replyPreviewText} numberOfLines={1}>
+              {replyingTo.content || 'Mensagem'}
+            </Text>
+          </View>
           <TouchableOpacity
             style={styles.replyClose}
             onPress={handleCancelReply}
@@ -1026,17 +1115,28 @@ const InputBar: React.FC<InputBarProps> = ({
           {/* Campo de Texto */}
           <TextInput
             ref={inputRef}
-            style={styles.textInput}
+            style={[styles.textInput, { height: inputHeight }]}
             placeholder={placeholder}
             placeholderTextColor="#91929E"
             value={text}
             onChangeText={setText}
             maxLength={1000}
-            returnKeyType="send"
-            onSubmitEditing={handleSend}
-            multiline={false}
+            multiline={true}
+            scrollEnabled={inputHeight >= MAX_INPUT_HEIGHT}
+            onContentSizeChange={handleContentSizeChange}
+            textAlignVertical="center"
             editable={!disabled}
           />
+          {/* Botao Limpar Texto */}
+          {hasText && (
+            <TouchableOpacity
+              style={styles.clearTextBtn}
+              onPress={() => { setText(''); setInputHeight(MIN_INPUT_HEIGHT); }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <ClearTextIcon />
+            </TouchableOpacity>
+          )}
         </View>
         {/* Botao Enviar ou Microfone */}
         {hasText ? (
@@ -1059,7 +1159,7 @@ const InputBar: React.FC<InputBarProps> = ({
       </View>
     </View>
   );
-};
+});
 
 // ========================================
 // Export Default
@@ -1078,43 +1178,71 @@ const styles = StyleSheet.create({
     paddingBottom: 8,                     //......Padding inferior
   },
 
-  // Container do reply
+  // Container do reply (sem padding vertical para barra ocupar altura total)
   replyContainer: {
     flexDirection: 'row',                 //......Layout horizontal
     alignItems: 'center',                 //......Centraliza vertical
-    paddingHorizontal: 12,                //......Padding horizontal
-    paddingVertical: 8,                   //......Padding vertical
+    paddingLeft: 0,                       //......Sem margem esquerda
+    paddingRight: 12,                     //......Padding direito
     backgroundColor: '#F4F4F4',           //......Cor de fundo
     borderBottomWidth: 1,                 //......Borda inferior
     borderBottomColor: '#D8E0F0',         //......Cor da borda
   },
 
-  // Barra lateral reply
+  // Barra lateral reply (flush na borda esquerda, altura total)
   replyBar: {
     width: 4,                             //......Largura
-    height: '100%',                       //......Altura total
+    alignSelf: 'stretch',                 //......Estica altura total
     backgroundColor: '#1777CF',           //......Cor azul
-    borderRadius: 2,                      //......Bordas arredondadas
-    marginRight: 8,                       //......Margem direita
+    borderRadius: 0,                      //......Sem arredondamento
+    marginRight: 10,                      //......Margem direita do texto
   },
 
-  // Conteudo do reply
+  // Conteudo do reply (padding vertical aqui, nao no container)
   replyContent: {
     flex: 1,                              //......Ocupa espaco
+    justifyContent: 'center',             //......Centraliza vertical
+    paddingVertical: 8,                   //......Espacamento vertical
   },
 
-  // Botao fechar reply
+  // Nome do remetente no reply
+  replySenderName: {
+    fontFamily: 'Inter_600SemiBold',      //......Fonte bold
+    fontSize: 13,                         //......Tamanho fonte
+    color: '#1777CF',                     //......Cor azul
+    marginBottom: 2,                      //......Espaco inferior
+  },
+
+  // Nome do pushName (~nome) no reply
+  replyPushName: {
+    fontFamily: 'Inter_400Regular',       //......Fonte regular
+    color: '#3A3F51',                     //......Cor preta padrao sistema
+  },
+
+  // Preview do conteudo no reply
+  replyPreviewText: {
+    fontFamily: 'Inter_400Regular',       //......Fonte regular
+    fontSize: 13,                         //......Tamanho fonte
+    color: '#7D8592',                     //......Cor cinza
+  },
+
+  // Botao fechar reply (circulo outline padrao WhatsApp)
   replyClose: {
-    width: 32,                            //......Largura
-    height: 32,                           //......Altura
+    width: 22,                            //......Largura do circulo
+    height: 22,                           //......Altura do circulo
+    borderRadius: 11,                     //......Forma circular
+    borderWidth: 1.5,                     //......Borda outline
+    borderColor: '#7D8592',               //......Cor da borda cinza
+    backgroundColor: 'transparent',       //......Sem fundo
     justifyContent: 'center',             //......Centraliza vertical
     alignItems: 'center',                 //......Centraliza horizontal
+    alignSelf: 'center',                  //......Centraliza no container
   },
 
   // Linha do input
   inputRow: {
     flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
+    alignItems: 'flex-end',               //......Alinha na base
     paddingHorizontal: 8,                 //......Padding horizontal
     paddingVertical: 8,                   //......Padding vertical
     gap: 7,                               //......Espaco entre
@@ -1124,31 +1252,45 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,                              //......Ocupa espaco
     flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
+    alignItems: 'flex-end',               //......Alinha na base
     backgroundColor: '#F4F4F4',           //......Cor de fundo cinza
     borderRadius: 6,                      //......Bordas arredondadas
     paddingHorizontal: 10,                //......Padding horizontal
-    height: 40,                           //......Altura
+    minHeight: 40,                        //......Altura minima
+    paddingVertical: 0,                   //......Sem padding vertical
   },
 
   // Botao de anexar
   attachBtn: {
     width: 30,                            //......Largura
-    height: 40,                           //......Altura
+    height: 40,                           //......Altura minima
     justifyContent: 'center',             //......Centraliza vertical
     alignItems: 'center',                 //......Centraliza horizontal
+    alignSelf: 'flex-end',                //......Alinha na base
   },
 
   // Campo de texto
   textInput: {
     flex: 1,                              //......Ocupa espaco
     fontSize: 14,                         //......Tamanho fonte
+    lineHeight: 20,                       //......Altura da linha
     color: '#3A3F51',                     //......Cor do texto
     paddingHorizontal: 8,                 //......Padding horizontal
-    height: 40,                           //......Altura
+    paddingTop: 10,                       //......Padding superior
+    paddingBottom: 10,                    //......Padding inferior
     outlineStyle: 'none',                 //......Remove outline de foco
     borderWidth: 0,                       //......Remove borda
   } as any,
+
+  // Botao de limpar texto (X)
+  clearTextBtn: {
+    width: 24,                            //......Largura do botao
+    height: 40,                           //......Altura do botao
+    justifyContent: 'center',             //......Centraliza vertical
+    alignItems: 'center',                 //......Centraliza horizontal
+    marginRight: 4,                       //......Margem direita
+    alignSelf: 'flex-end',                //......Alinha na base
+  },
 
   // Botao de acao
   actBtn: {

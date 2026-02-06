@@ -164,9 +164,6 @@ const MessageStatus: React.FC<MessageStatusProps> = ({
     // Se tiver cor customizada, usa ela
     if (iconColor) return iconColor;
 
-    // Se nao for outgoing, nao mostra
-    if (!isOutgoing) return 'transparent';
-
     // Cores por status (Padrao WhatsApp Oficial)
     switch (status) {
       case 'pending':                     //......Pendente (relogio)
@@ -236,7 +233,7 @@ const MessageStatus: React.FC<MessageStatusProps> = ({
   };
 
   // ========================================
-  // Nao mostrar para incoming
+  // Nao mostrar para incoming (padrao WhatsApp)
   // ========================================
   if (!isOutgoing) {
     return null;

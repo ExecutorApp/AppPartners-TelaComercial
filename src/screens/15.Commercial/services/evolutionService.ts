@@ -177,6 +177,13 @@ export const evolutionService = {
       console.log('[EvolutionService] Passo 3: Aguardando inicializacao...');
       await new Promise(resolve => setTimeout(resolve, 2000));
 
+      // Passo 3.5: Configurar settings para sincronizar historico
+      console.log('[EvolutionService] Passo 3.5: Configurando syncFullHistory...');
+      await this.setSettings(instanceName, {
+        syncFullHistory: true,                   //......Sincronizar historico
+        readMessages: true,                      //......Marcar como lido
+      });
+
       // Passo 4: Conectar com numero para obter pairing code
       console.log('[EvolutionService] Passo 4: Solicitando pairing code...');
       const url = `${EVOLUTION_URL}/instance/connect/${instanceName}?number=${formattedNumber}`;
@@ -233,23 +240,67 @@ export const evolutionService = {
     return response.json();                      //......Retorna JSON
   },
 
+  // Configurar settings da instancia
+  async setSettings(
+    instanceName: string,
+    settings: {
+      syncFullHistory?: boolean;                 //......Sincronizar historico
+      readMessages?: boolean;                    //......Marcar como lido
+      rejectCall?: boolean;                      //......Rejeitar chamadas
+      groupsIgnore?: boolean;                    //......Ignorar grupos
+      alwaysOnline?: boolean;                    //......Sempre online
+    }
+  ): Promise<EvolutionResponse> {
+    console.log('[EvolutionService] setSettings:', instanceName, settings);
+    try {
+      const response = await fetch(
+        `${EVOLUTION_URL}/settings/set/${instanceName}`,
+        {
+          method: 'POST',                        //......Metodo POST
+          headers,                               //......Headers padrao
+          body: JSON.stringify({
+            rejectCall: settings.rejectCall ?? false,
+            msgCall: '',                         //......Mensagem chamada
+            groupsIgnore: settings.groupsIgnore ?? false,
+            alwaysOnline: settings.alwaysOnline ?? false,
+            readMessages: settings.readMessages ?? true,
+            readStatus: false,                   //......Status leitura
+            syncFullHistory: settings.syncFullHistory ?? true,
+          }),
+        }
+      );
+      const result = await response.json();      //......Retorna JSON
+      console.log('[EvolutionService] setSettings result:', JSON.stringify(result, null, 2));
+      return result;
+    } catch (error: any) {
+      console.error('[EvolutionService] setSettings error:', error?.message);
+      return { error: error?.message };          //......Retorna erro
+    }
+  },
+
   // ========================================
   // MENSAGENS - ENVIAR
   // ========================================
 
-  // Enviar texto
+  // Enviar texto (com suporte a quoted reply)
   async sendText(
     instanceName: string,
     number: string,
-    text: string
+    text: string,
+    quoted?: { key: { id: string; remoteJid: string; fromMe: boolean }; message?: any }
   ): Promise<EvolutionResponse> {
     const url = `${EVOLUTION_URL}/message/sendText/${instanceName}`;
     // Formato Evolution API v2.x: text no nivel raiz
-    const body = {
+    const body: any = {
       number: number,                            //......Numero destino
       text: text,                                //......Texto da mensagem (nivel raiz v2.x)
       delay: 1000,                               //......Delay em ms
     };
+
+    // Adicionar quoted para reply vinculado
+    if (quoted) {
+      body.quoted = quoted;                      //......Mensagem citada para reply
+    }
 
     console.log('[EvolutionService] ========================================');
     console.log('[EvolutionService] INICIO: sendText');
@@ -275,11 +326,27 @@ export const evolutionService = {
       console.log('[EvolutionService] FIM: sendText');
       console.log('[EvolutionService] ========================================');
 
+      // Verificar se houve erro HTTP
+      if (!response.ok) {
+        console.error('[EvolutionService] ERRO HTTP:', response.status);
+        return {
+          error: data.message || data.error || `Erro HTTP ${response.status}`,
+          status: String(response.status),
+        };
+      }
+
+      // Verificar se a resposta tem key (indicador de sucesso)
+      if (!data.key && !data.messageId) {
+        console.warn('[EvolutionService] Resposta sem key/messageId:', data);
+      }
+
       return data;
     } catch (error) {
       console.error('[EvolutionService] ERRO em sendText:', error);
       console.error('[EvolutionService] Stack:', (error as Error).stack);
-      throw error;
+      return {
+        error: (error as Error).message || 'Erro de rede ao enviar mensagem',
+      };
     }
   },
 
@@ -370,6 +437,108 @@ export const evolutionService = {
     }
   },
 
+  // ========================================
+  // Enviar Video
+  // ========================================
+  async sendVideo(
+    instanceName: string,
+    number: string,
+    videoData: string,
+    mimeType: string = 'video/mp4',
+    caption?: string
+  ): Promise<EvolutionResponse> {
+    const url = `${EVOLUTION_URL}/message/sendMedia/${instanceName}`;
+
+    // Detectar se e base64 ou URL
+    const isBase64 = !videoData.startsWith('http');
+
+    console.log('[EvolutionService] ========================================');
+    console.log('[EvolutionService] INICIO: sendVideo');
+    console.log('[EvolutionService] ========================================');
+    console.log('[EvolutionService] URL:', url);
+    console.log('[EvolutionService] isBase64:', isBase64);
+    console.log('[EvolutionService] mimeType:', mimeType);
+
+    try {
+      let response: Response;
+
+      if (isBase64) {
+        // Converter base64 para Blob e enviar como FormData
+        const byteString = atob(videoData);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([uint8Array], { type: mimeType });
+
+        // Determinar extensao baseada no mimeType
+        const extensionMap: Record<string, string> = {
+          'video/mp4': 'mp4',
+          'video/quicktime': 'mov',
+          'video/x-msvideo': 'avi',
+          'video/webm': 'webm',
+          'video/3gpp': '3gp',
+        };
+        const extension = extensionMap[mimeType] || 'mp4';
+
+        // Criar FormData
+        const formData = new FormData();
+        formData.append('number', number);
+        formData.append('mediatype', 'video');
+        formData.append('caption', caption || '');
+        formData.append('file', blob, `video.${extension}`);
+
+        console.log('[EvolutionService] Enviando video como FormData (file upload)');
+        console.log('[EvolutionService] Blob size:', blob.size);
+        console.log('[EvolutionService] Extension:', extension);
+
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'apikey': EVOLUTION_API_KEY,         //......Apenas apikey, sem Content-Type
+          },
+          body: formData,
+        });
+      } else {
+        // URL: enviar como JSON normal
+        const body = {
+          number: number,
+          mediatype: 'video',
+          media: videoData,
+          caption: caption || '',
+        };
+
+        console.log('[EvolutionService] Enviando video como JSON (URL)');
+
+        response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+        });
+      }
+
+      console.log('[EvolutionService] Response status:', response.status);
+
+      const data = await response.json();
+
+      console.log('[EvolutionService] Response data:', JSON.stringify(data, null, 2));
+      console.log('[EvolutionService] FIM: sendVideo');
+
+      // Retorna erro estruturado se status nao for 2xx
+      if (!response.ok) {
+        return {
+          error: data.error || data.message || 'Erro ao enviar video',
+        };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('[EvolutionService] ERRO em sendVideo:', error);
+      throw error;
+    }
+  },
+
   // Enviar audio (PTT - Push to Talk)
   async sendAudio(
     instanceName: string,
@@ -419,30 +588,6 @@ export const evolutionService = {
     }
   },
 
-  // Enviar video
-  async sendVideo(
-    instanceName: string,
-    number: string,
-    videoUrl: string,
-    caption?: string
-  ): Promise<EvolutionResponse> {
-    const url = `${EVOLUTION_URL}/message/sendMedia/${instanceName}`;
-    const body = {
-      number: number,                            //......Numero destino
-      mediaMessage: {                            //......Objeto mediaMessage (formato Evolution API)
-        mediatype: 'video',                      //......Tipo midia
-        media: videoUrl,                         //......URL ou base64 do video
-        caption: caption || '',                  //......Legenda (vazio se nao tiver)
-      },
-    };
-
-    const response = await fetch(url, {
-      method: 'POST',                            //......Metodo POST
-      headers,                                   //......Headers padrao
-      body: JSON.stringify(body),                //......Corpo da requisicao
-    });
-    return response.json();                      //......Retorna JSON
-  },
 
   // Enviar documento
   async sendDocument(
@@ -530,11 +675,8 @@ export const evolutionService = {
       reaction: emoji,                           //......Emoji da reacao (nivel raiz v2.x)
     };
 
-    console.log('[EvolutionService] ========================================');
-    console.log('[EvolutionService] INICIO: sendReaction');
-    console.log('[EvolutionService] ========================================');
-    console.log('[EvolutionService] URL:', url);
-    console.log('[EvolutionService] Body:', JSON.stringify(body, null, 2));
+    console.log('[🔴 REACTION_DEBUG] 3.1.1 URL completa:', url); //......URL request
+    console.log('[🔴 REACTION_DEBUG] 3.1.2 Body enviado:', JSON.stringify(body, null, 2)); //......Body formatado
 
     try {
       const response = await fetch(url, {
@@ -543,22 +685,27 @@ export const evolutionService = {
         body: JSON.stringify(body),              //......Corpo da requisicao
       });
 
-      console.log('[EvolutionService] Response status:', response.status);
+      console.log('[🔴 REACTION_DEBUG] 3.2.1 Status HTTP:', response.status); //......Status code
+      console.log('[🔴 REACTION_DEBUG] 3.2.2 Status Text:', response.statusText); //......Status texto
 
       const data = await response.json();
 
-      console.log('[EvolutionService] Response data:', JSON.stringify(data, null, 2));
-      console.log('[EvolutionService] FIM: sendReaction');
+      console.log('[🔴 REACTION_DEBUG] 3.2.3 Response body:', JSON.stringify(data, null, 2)); //......Response completo
 
       if (!response.ok) {
+        console.error('[🔴 REACTION_DEBUG] ❌ Response não OK:', { //......Erro response
+          status: response.status, //......Status erro
+          data, //......Dados erro
+        });
         return {
           error: data.error || data.message || 'Erro ao enviar reacao',
         };
       }
 
+      console.log('[🔴 REACTION_DEBUG] ✅ Response OK'); //......Sucesso
       return data;
     } catch (error) {
-      console.error('[EvolutionService] ERRO em sendReaction:', error);
+      console.error('[🔴 REACTION_DEBUG] ❌ EXCEÇÃO no fetch:', error); //......Excecao fetch
       throw error;
     }
   },
@@ -788,23 +935,122 @@ export const evolutionService = {
   // ========================================
 
   // Obter mensagens de um chat
+  // NOTA: Evolution API usa diferentes formatos de JID:
+  // - Mensagens enviadas (fromMe: true): remoteJid = numero@s.whatsapp.net
+  // - Mensagens recebidas (fromMe: false): remoteJid = id@lid, remoteJidAlt = numero@s.whatsapp.net
+  // Por isso, fazemos duas buscas e combinamos os resultados
   async getMessages(
     instanceName: string,
     number: string,
     limit: number = 50
   ): Promise<any[]> {
-    const response = await fetch(
-      `${EVOLUTION_URL}/chat/findMessages/${instanceName}`,
-      {
+    // Formatar numero com sufixo WhatsApp
+    const remoteJid = number.includes('@')
+      ? number
+      : `${number}@s.whatsapp.net`;
+
+    const url = `${EVOLUTION_URL}/chat/findMessages/${instanceName}`;
+
+    console.log('[EvolutionService] ========================================');
+    console.log('[EvolutionService] INICIO: getMessages');
+    console.log('[EvolutionService] URL:', url);
+    console.log('[EvolutionService] remoteJid:', remoteJid);
+
+    try {
+      // Busca 1: Mensagens enviadas (por remoteJid)
+      const bodyOutgoing = {
+        where: {
+          key: {
+            remoteJid: remoteJid,                //......JID enviadas
+          },
+        },
+        limit: limit,                            //......Limite de mensagens
+      };
+
+      console.log('[EvolutionService] Busca 1 (outgoing):', JSON.stringify(bodyOutgoing, null, 2));
+
+      const responseOutgoing = await fetch(url, {
         method: 'POST',                          //......Metodo POST
         headers,                                 //......Headers padrao
-        body: JSON.stringify({                   //......Corpo da requisicao
-          number: number,                        //......Numero do chat
-          limit: limit,                          //......Limite de mensagens
-        }),
-      }
-    );
-    return response.json();                      //......Retorna JSON
+        body: JSON.stringify(bodyOutgoing),      //......Corpo requisicao
+      });
+
+      const dataOutgoing = await responseOutgoing.json();
+
+      // Busca 2: Mensagens recebidas (por remoteJidAlt)
+      const bodyIncoming = {
+        where: {
+          key: {
+            remoteJidAlt: remoteJid,             //......JID recebidas
+          },
+        },
+        limit: limit,                            //......Limite de mensagens
+      };
+
+      console.log('[EvolutionService] Busca 2 (incoming):', JSON.stringify(bodyIncoming, null, 2));
+
+      const responseIncoming = await fetch(url, {
+        method: 'POST',                          //......Metodo POST
+        headers,                                 //......Headers padrao
+        body: JSON.stringify(bodyIncoming),      //......Corpo requisicao
+      });
+
+      const dataIncoming = await responseIncoming.json();
+
+      // Extrair mensagens de ambas respostas
+      const extractMessages = (data: any): any[] => {
+        if (Array.isArray(data)) return data;
+        if (data?.messages?.records && Array.isArray(data.messages.records)) {
+          return data.messages.records;
+        }
+        if (data?.messages && Array.isArray(data.messages)) {
+          return data.messages;
+        }
+        if (data?.data && Array.isArray(data.data)) {
+          return data.data;
+        }
+        return [];
+      };
+
+      const messagesOutgoing = extractMessages(dataOutgoing);
+      const messagesIncoming = extractMessages(dataIncoming);
+
+      console.log('[EvolutionService] Mensagens enviadas:', messagesOutgoing.length);
+      console.log('[EvolutionService] Mensagens recebidas:', messagesIncoming.length);
+
+      // Combinar e deduplicar por ID
+      const messageMap = new Map<string, any>();
+
+      messagesOutgoing.forEach((msg: any) => {
+        const id = msg.id || msg.key?.id;
+        if (id) messageMap.set(id, msg);
+      });
+
+      messagesIncoming.forEach((msg: any) => {
+        const id = msg.id || msg.key?.id;
+        if (id && !messageMap.has(id)) {
+          messageMap.set(id, msg);
+        }
+      });
+
+      const messages = Array.from(messageMap.values());
+
+      // Ordenar por timestamp
+      messages.sort((a, b) => {
+        const timestampA = a.messageTimestamp || 0;
+        const timestampB = b.messageTimestamp || 0;
+        return timestampA - timestampB;
+      });
+
+      console.log('[EvolutionService] Total combinado:', messages.length);
+      console.log('[EvolutionService] FIM: getMessages');
+      console.log('[EvolutionService] ========================================');
+
+      return messages;
+    } catch (error) {
+      console.error('[EvolutionService] ERRO em getMessages:', error);
+      return [];
+    }
   },
 
   // Buscar perfil do contato

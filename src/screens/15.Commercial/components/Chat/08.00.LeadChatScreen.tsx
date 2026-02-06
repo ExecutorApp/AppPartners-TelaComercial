@@ -143,6 +143,7 @@ const LeadChatScreen: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<WhatsAppMessage | null>(null);
   const [viewerImage, setViewerImage] = useState<string>('');
+  const [shareUrl, setShareUrl] = useState<string>('');
 
   // ========================================
   // Info do Chat
@@ -411,9 +412,9 @@ const LeadChatScreen: React.FC = () => {
   // Handler de Encaminhar para Contatos
   // ========================================
   const handleShareForward = useCallback(async (contactIds: string[], message: string) => {
-    console.log('[LeadChatScreen] Encaminhar imagem para contatos:', contactIds);
-    console.log('[LeadChatScreen] Mensagem:', message);
-    console.log('[LeadChatScreen] Imagem:', viewerImage);
+    const isUrlShare = !!shareUrl;        //......Se e compartilhamento de URL
+    console.log('[LeadChatScreen] Encaminhar para contatos:', contactIds);
+    console.log('[LeadChatScreen] Modo:', isUrlShare ? 'URL' : 'Imagem');
     console.log('[LeadChatScreen] Instance:', instanceName);
 
     // Fecha modais primeiro para feedback visual
@@ -424,84 +425,95 @@ const LeadChatScreen: React.FC = () => {
     // Verificacoes
     if (!instanceName) {
       console.error('[LeadChatScreen] Erro: instanceName nao definido');
+      setShareUrl('');                    //......Limpa URL
       return;
     }
 
-    if (!viewerImage) {
-      console.error('[LeadChatScreen] Erro: viewerImage nao definido');
-      return;
-    }
+    // Extrai numero de telefone do contactId
+    const extractPhone = (contactId: string): string => {
+      if (contactId.startsWith('whatsapp_')) {
+        const jidMatch = contactId.match(/whatsapp_(\d+)@/);
+        return jidMatch ? jidMatch[1] : '';
+      } else if (contactId.startsWith('phone_')) {
+        const parts = contactId.split('_');
+        return parts.length >= 2 ? parts[1] : '';
+      }
+      return '';
+    };
 
     try {
-      // Converter blob URL para base64 se necessario
-      let imageData = viewerImage;
-      if (viewerImage.startsWith('blob:')) {
-        console.log('[LeadChatScreen] Convertendo blob URL para base64...');
-        const response = await fetch(viewerImage);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        imageData = await new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-            const base64 = reader.result as string;
-            // Remove o prefixo data:image/...;base64,
-            const pureBase64 = base64.split(',')[1] || base64;
-            resolve(pureBase64);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        console.log('[LeadChatScreen] Base64 gerado, tamanho:', imageData.length);
-      }
+      if (isUrlShare) {
+        // Compartilhar URL como mensagem de texto
+        const textToSend = message ? `${shareUrl}\n\n${message}` : shareUrl;
 
-      // Envia para cada contato selecionado
-      for (const contactId of contactIds) {
-        // Extrai o numero do telefone do contactId
-        // Formato: whatsapp_5517991396062@s.whatsapp.net_694
-        // Ou: phone_xxxx_0
-        let phoneNumber = '';
+        for (const contactId of contactIds) {
+          const phoneNumber = extractPhone(contactId);
+          if (!phoneNumber) continue;     //......Pula sem numero
 
-        if (contactId.startsWith('whatsapp_')) {
-          // Extrai o JID: 5517991396062@s.whatsapp.net
-          const jidMatch = contactId.match(/whatsapp_(\d+)@/);
-          if (jidMatch) {
-            phoneNumber = jidMatch[1];    //......Apenas os numeros
-          }
-        } else if (contactId.startsWith('phone_')) {
-          // Contato da agenda - extrai o numero do meio
-          const parts = contactId.split('_');
-          if (parts.length >= 2) {
-            phoneNumber = parts[1];       //......ID do contato
+          console.log('[LeadChatScreen] Enviando URL para:', phoneNumber);
+          const result = await evolutionService.sendText(
+            instanceName,
+            phoneNumber,
+            textToSend
+          );
+
+          if (result.error) {
+            console.error('[LeadChatScreen] Erro ao enviar para', phoneNumber, ':', result.error);
+          } else {
+            console.log('[LeadChatScreen] URL enviada para:', phoneNumber);
           }
         }
-
-        if (!phoneNumber) {
-          console.warn('[LeadChatScreen] Nao foi possivel extrair numero de:', contactId);
-          continue;
+        setShareUrl('');                  //......Limpa URL apos envio
+      } else {
+        // Compartilhar imagem (fluxo original)
+        if (!viewerImage) {
+          console.error('[LeadChatScreen] Erro: viewerImage nao definido');
+          return;
         }
 
-        console.log('[LeadChatScreen] Enviando para:', phoneNumber);
+        let imageData = viewerImage;
+        if (viewerImage.startsWith('blob:')) {
+          console.log('[LeadChatScreen] Convertendo blob URL para base64...');
+          const response = await fetch(viewerImage);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          imageData = await new Promise((resolve, reject) => {
+            reader.onloadend = () => {
+              const base64 = reader.result as string;
+              const pureBase64 = base64.split(',')[1] || base64;
+              resolve(pureBase64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        }
 
-        // Envia a imagem via Evolution API
-        const result = await evolutionService.sendImage(
-          instanceName,
-          phoneNumber,
-          imageData,
-          message || undefined            //......Caption (mensagem)
-        );
+        for (const contactId of contactIds) {
+          const phoneNumber = extractPhone(contactId);
+          if (!phoneNumber) continue;     //......Pula sem numero
 
-        if (result.error) {
-          console.error('[LeadChatScreen] Erro ao enviar para', phoneNumber, ':', result.error);
-        } else {
-          console.log('[LeadChatScreen] Enviado com sucesso para:', phoneNumber);
+          console.log('[LeadChatScreen] Enviando imagem para:', phoneNumber);
+          const result = await evolutionService.sendImage(
+            instanceName,
+            phoneNumber,
+            imageData,
+            message || undefined          //......Caption
+          );
+
+          if (result.error) {
+            console.error('[LeadChatScreen] Erro ao enviar para', phoneNumber, ':', result.error);
+          } else {
+            console.log('[LeadChatScreen] Imagem enviada para:', phoneNumber);
+          }
         }
       }
 
-      console.log('[LeadChatScreen] Encaminhamento concluido para todos os contatos');
-
+      console.log('[LeadChatScreen] Encaminhamento concluido');
     } catch (error) {
       console.error('[LeadChatScreen] Erro no encaminhamento:', error);
+      setShareUrl('');                    //......Limpa URL em caso de erro
     }
-  }, [viewerImage, instanceName]);
+  }, [viewerImage, shareUrl, instanceName]);
 
   // ========================================
   // Handler de Responder Imagem (comportamento antigo)
@@ -573,45 +585,81 @@ const LeadChatScreen: React.FC = () => {
     reaction: string | null,
     previousEmoji?: string
   ) => {
-    if (!selectedMessage) return;
+    console.group('[🔴 REACTION_DEBUG] 2. Handler de Reação Iniciado'); //......Inicia grupo
 
-    console.log('[LeadChatScreen] Atualizando reacao:', {
-      messageId: selectedMessage.id,
-      messageKey: selectedMessage.messageKey,
-      previousEmoji,
-      newReaction: reaction,
+    console.log('[🔴 REACTION_DEBUG] 2.1 Parâmetros recebidos:'); //......Titulo parametros
+    console.table({ //......Tabela parametros
+      'Nova Reação': reaction || '(remover)', //......Nova reacao
+      'Reação Anterior': previousEmoji || '(nenhuma)', //......Reacao anterior
+      'Modo': reaction ? 'ADICIONAR' : 'REMOVER', //......Modo de operacao
     });
 
-    // Atualiza localmente primeiro (feedback imediato)
-    updateMessageReaction(selectedMessage.id, reaction);
+    if (!selectedMessage) {
+      console.error('[🔴 REACTION_DEBUG] ❌ ERRO: selectedMessage não existe'); //......Erro mensagem
+      console.groupEnd(); //......Fecha grupo
+      return;
+    }
 
-    // Envia reacao para o WhatsApp via Evolution API
-    if (selectedMessage.messageKey && instanceName) {
+    console.log('[🔴 REACTION_DEBUG] 2.2 Mensagem selecionada:', { //......Info mensagem
+      id: selectedMessage.id, //......ID mensagem
+      hasMessageKey: !!selectedMessage.messageKey, //......Tem chave
+      messageKey: selectedMessage.messageKey, //......Chave completa
+    });
+
+    if (!selectedMessage.messageKey) {
+      console.error('[🔴 REACTION_DEBUG] ❌ ERRO CRÍTICO: messageKey não existe na mensagem'); //......Erro critico
+      console.log('[🔴 REACTION_DEBUG] 💡 Esta mensagem não pode receber reações'); //......Dica
+      console.groupEnd(); //......Fecha grupo
+      return;
+    }
+
+    console.log('[🔴 REACTION_DEBUG] 2.3 MessageKey válida encontrada:', selectedMessage.messageKey); //......Chave valida
+
+    // Atualiza localmente primeiro
+    console.log('[🔴 REACTION_DEBUG] 2.4 Atualizando estado local...'); //......Iniciando update
+    updateMessageReaction(selectedMessage.id, reaction);
+    console.log('[🔴 REACTION_DEBUG] ✅ Estado local atualizado'); //......Sucesso update
+
+    // Envia para API
+    if (instanceName) {
       try {
-        // Evolution API v2.x: string vazia "" remove a reacao
         const emojiToSend = reaction ?? '';
 
-        console.log('[LeadChatScreen] Enviando reacao para WhatsApp:', emojiToSend || '(vazio para remover)');
-        console.log('[LeadChatScreen] Modo:', reaction ? 'adicionar' : 'remover');
+        console.group('[🔴 REACTION_DEBUG] 3. Enviando para Evolution API'); //......Grupo API
+        console.log('[🔴 REACTION_DEBUG] 3.1 Request payload:'); //......Titulo payload
+        console.table({ //......Tabela payload
+          'Instance': instanceName, //......Nome instancia
+          'Message ID': selectedMessage.messageKey.id, //......ID mensagem
+          'Remote JID': selectedMessage.messageKey.remoteJid, //......JID destinatario
+          'From Me': selectedMessage.messageKey.fromMe, //......De mim
+          'Emoji': emojiToSend || '(vazio = remover)', //......Emoji enviado
+        });
 
         const result = await evolutionService.sendReaction(
           instanceName,
           selectedMessage.messageKey,
           emojiToSend
         );
-        console.log('[LeadChatScreen] Resultado sendReaction:', result);
+
+        console.log('[🔴 REACTION_DEBUG] 3.2 Resposta da API recebida'); //......Recebeu resposta
+        console.log('[🔴 REACTION_DEBUG] 3.3 Result completo:', result); //......Resultado completo
 
         if (result.error) {
-          console.error('[LeadChatScreen] Erro ao enviar reacao:', result.error);
+          console.error('[🔴 REACTION_DEBUG] ❌ ERRO na resposta da API:', result.error); //......Erro API
         } else {
-          console.log('[LeadChatScreen] Reacao enviada com sucesso!');
+          console.log('[🔴 REACTION_DEBUG] ✅ Reação enviada com sucesso!'); //......Sucesso API
         }
+        console.groupEnd(); //......Fecha grupo API
+
       } catch (error) {
-        console.error('[LeadChatScreen] Excecao ao enviar reacao:', error);
+        console.error('[🔴 REACTION_DEBUG] ❌ EXCEÇÃO ao enviar reação:', error); //......Excecao
+        console.groupEnd(); //......Fecha grupo API
       }
-    } else if (!selectedMessage.messageKey) {
-      console.warn('[LeadChatScreen] messageKey nao disponivel para reacao');
+    } else {
+      console.error('[🔴 REACTION_DEBUG] ❌ ERRO: instanceName não existe'); //......Erro instance
     }
+
+    console.groupEnd(); //......Fecha grupo principal
   }, [selectedMessage, updateMessageReaction, instanceName]);
 
   // ========================================
@@ -646,6 +694,14 @@ const LeadChatScreen: React.FC = () => {
     setShowMessageOptions(false);         //......Fecha opcoes
     setSelectedMessage(null);             //......Limpa selecao
   }, [selectedMessage]);
+
+  // ========================================
+  // Handler de Encaminhar Link (botao forward do Instagram)
+  // ========================================
+  const handleLinkForwardPress = useCallback((url: string) => {
+    setShareUrl(url);                     //......Guarda URL para envio
+    setShowShareModal(true);              //......Abre modal share
+  }, []);
 
   // ========================================
   // Handler de Encaminhar
@@ -762,6 +818,7 @@ const LeadChatScreen: React.FC = () => {
             onMessageLongPress={handleMessageLongPress}
             onImagePress={handleImagePress}
             onAudioRetry={retryAudioMessage}
+            onForwardPress={handleLinkForwardPress}
           />
         </View>
       </View>
@@ -861,7 +918,7 @@ const LeadChatScreen: React.FC = () => {
         visible={showShareModal}          //......Visibilidade
         imageUrl={viewerImage}            //......URL da imagem
         instanceName={instanceName}       //......Nome da instancia
-        onClose={() => setShowShareModal(false)}
+        onClose={() => { setShowShareModal(false); setShareUrl(''); }}
         onForward={handleShareForward}    //......Handler encaminhar
       />
     </View>

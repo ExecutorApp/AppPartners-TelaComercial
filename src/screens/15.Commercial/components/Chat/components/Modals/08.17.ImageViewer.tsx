@@ -12,7 +12,7 @@ import React, {                           //......React core
   useCallback,                            //......Hook de callback
   useEffect,                              //......Hook de efeito
   useRef,                                 //......Hook de referencia
-} from 'react';                           //......Biblioteca React
+} from 'react';                           //......Biblioteca React 
 import {                                  //......Componentes RN
   View,                                   //......Container basico
   Text,                                   //......Texto
@@ -40,6 +40,11 @@ import Svg, {                             //......SVG core
 // Imports de Cores
 // ========================================
 import { ChatColors } from '../../styles/08.ChatColors';
+
+// ========================================
+// Imports de Componentes
+// ========================================
+import EmojiPicker from './08.15.EmojiPicker';
 
 // ========================================
 // Constantes
@@ -390,52 +395,6 @@ const QUICK_EMOJIS = [
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 // ========================================
-// Lista de Emojis Completa para Modal - TODOS os emojis
-// ========================================
-const FULL_REACTION_EMOJIS = [
-  // Carinhas Felizes
-  '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
-  '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩',
-  // Carinhas com Amor
-  '😘', '😗', '☺️', '😚', '😙', '🥲', '😋', '😛',
-  '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔',
-  // Carinhas Neutras
-  '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
-  '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷',
-  // Carinhas Doentes
-  '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴',
-  '😵', '🤯', '🤠', '🥳', '🥸', '😎', '🤓', '🧐',
-  // Carinhas Tristes
-  '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳',
-  '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭',
-  // Carinhas Zangadas
-  '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱',
-  '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️',
-  // Gestos e Maos
-  '👍', '👎', '👌', '🤌', '🤏', '✌️', '🤞', '🤟',
-  '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️',
-  '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '👐',
-  '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾',
-  // Coracoes
-  '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍',
-  '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗',
-  '💖', '💘', '💝', '💟', '♥️', '🫀', '🫶', '💏',
-  // Simbolos e Objetos
-  '🔥', '💯', '✨', '⭐', '🌟', '💫', '🎉', '🎊',
-  '🎁', '🏆', '🥇', '🥈', '🥉', '🏅', '🎯', '🎪',
-  '🎭', '🎨', '🎬', '🎤', '🎧', '🎵', '🎶', '🎹',
-  // Animais
-  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
-  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
-  // Natureza
-  '🌸', '🌺', '🌻', '🌹', '🌷', '🌼', '🌱', '🌿',
-  '☀️', '🌙', '⭐', '🌈', '☁️', '⛈️', '❄️', '🔥',
-  // Comida
-  '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓',
-  '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍕', '🍔',
-];
-
-// ========================================
 // Componente Principal ImageViewer
 // ========================================
 const ImageViewer: React.FC<ImageViewerProps> = ({
@@ -470,8 +429,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
 
   // Estados para Reacoes
   const [showQuickReactions, setShowQuickReactions] = useState(false);
-  const [showFullReactions, setShowFullReactions] = useState(false);
-  const [showReactionInfo, setShowReactionInfo] = useState(false);
+  const [showReactionModal, setShowReactionModal] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
   // ========================================
@@ -502,8 +460,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
       setShowEmojiPicker(false);          //......Fecha emoji picker
       setShowDeleteConfirm(false);        //......Fecha modal de exclusao
       setShowQuickReactions(false);       //......Fecha reacoes rapidas
-      setShowFullReactions(false);        //......Fecha modal completo
-      setShowReactionInfo(false);         //......Fecha info reacao
+      setShowReactionModal(false);        //......Fecha modal de reacoes
       slideAnim.setValue(INPUT_HEIGHT + 50);
       deleteModalAnim.setValue(300);      //......Reset animacao modal
       reactionModalAnim.setValue(300);    //......Reset animacao reacoes
@@ -687,11 +644,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
   }, []);
 
   // ========================================
-  // Handler de Abrir Modal Completo de Reacoes
+  // Handler de Abrir Modal de Reacoes (Unificado)
   // ========================================
-  const handleOpenFullReactions = useCallback(() => {
+  const handleOpenReactionModal = useCallback(() => {
     setShowQuickReactions(false);         //......Fecha rapidas
-    setShowFullReactions(true);           //......Abre completo
+    setShowReactionModal(true);           //......Abre modal unificado
     // Anima entrada do modal
     Animated.spring(reactionModalAnim, {
       toValue: 0,
@@ -702,79 +659,46 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
   }, []);
 
   // ========================================
-  // Handler de Fechar Modal Completo de Reacoes
+  // Handler de Fechar Modal de Reacoes
   // ========================================
-  const handleCloseFullReactions = useCallback(() => {
+  const handleCloseReactionModal = useCallback(() => {
     // Anima saida do modal
     Animated.timing(reactionModalAnim, {
       toValue: 300,
       duration: 200,
       useNativeDriver: true,
     }).start(() => {
-      setShowFullReactions(false);        //......Fecha modal
+      setShowReactionModal(false);        //......Fecha modal
     });
   }, []);
 
   // ========================================
-  // Handler de Selecionar Reacao
+  // Handler de Selecionar Reacao (das rapidas)
   // ========================================
   const handleSelectReaction = useCallback((emoji: string) => {
+    console.group('[🔴 REACTION_DEBUG] 1. Seleção de Reação'); //......Grupo de logs
+    console.log('[🔴 REACTION_DEBUG] 1.1 Emoji selecionado:', emoji); //......Emoji escolhido
+    console.log('[🔴 REACTION_DEBUG] 1.2 Reação atual:', currentReaction); //......Reacao antes
+    console.log('[🔴 REACTION_DEBUG] 1.3 Callback onReaction existe:', !!onReaction); //......Valida callback
+    console.groupEnd(); //......Fecha grupo
     setSelectedReaction(emoji);           //......Define reacao
     setShowQuickReactions(false);         //......Fecha rapidas
-    setShowFullReactions(false);          //......Fecha modal
-    reactionModalAnim.setValue(300);      //......Reset animacao
     if (onReaction) {
       onReaction(emoji);                  //......Callback
     }
-  }, [onReaction]);
+  }, [onReaction, currentReaction]);
 
-  // ========================================
-  // Handler de Abrir Info da Reacao
-  // ========================================
-  const handleOpenReactionInfo = useCallback(() => {
-    if (selectedReaction) {
-      setShowReactionInfo(true);          //......Mostra info
-      // Anima entrada do modal
-      Animated.spring(reactionModalAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 100,
-        friction: 10,
-      }).start();
-    }
-  }, [selectedReaction]);
-
-  // ========================================
-  // Handler de Fechar Info da Reacao
-  // ========================================
-  const handleCloseReactionInfo = useCallback(() => {
-    // Anima saida do modal
-    Animated.timing(reactionModalAnim, {
-      toValue: 300,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      setShowReactionInfo(false);         //......Fecha info
-    });
-  }, []);
-
-  // ========================================
-  // Handler de Remover Reacao (NAO fecha o modal)
-  // ========================================
-  const handleRemoveReaction = useCallback(() => {
-    const previousEmoji = selectedReaction; //......Guarda emoji anterior
-    setSelectedReaction(null);            //......Remove reacao
-    // NAO fecha o modal - usuario pode continuar escolhendo
-    if (onReaction) {
-      onReaction(null, previousEmoji || undefined); //......Callback com emoji anterior
-    }
-  }, [onReaction, selectedReaction]);
 
   // ========================================
   // Handler de Toggle Reacao (do modal info - toggle se mesmo, muda se diferente)
   // NAO fecha o modal - usuario pode continuar escolhendo
   // ========================================
   const handleToggleReaction = useCallback((emoji: string) => {
+    console.group('[🔴 REACTION_DEBUG] 1. Toggle de Reação'); //......Grupo de logs
+    console.log('[🔴 REACTION_DEBUG] 1.1 Emoji clicado:', emoji); //......Emoji escolhido
+    console.log('[🔴 REACTION_DEBUG] 1.2 Reação atual:', selectedReaction); //......Reacao antes
+    console.log('[🔴 REACTION_DEBUG] 1.3 Ação:', emoji === selectedReaction ? 'REMOVER' : 'ADICIONAR'); //......Tipo de acao
+    console.groupEnd(); //......Fecha grupo
     if (emoji === selectedReaction) {
       // Se clicar no mesmo emoji, remove a reacao (mas nao fecha)
       setSelectedReaction(null);          //......Remove reacao
@@ -934,7 +858,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
               {/* Botao Mais (+) */}
               <TouchableOpacity
                 style={styles.quickReactionBtn}
-                onPress={handleOpenFullReactions}
+                onPress={handleOpenReactionModal}
               >
                 <PlusIcon />
               </TouchableOpacity>
@@ -943,10 +867,10 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
         )}
 
         {/* Indicador de Reacao na Imagem - Visivel apenas quando showBars = true */}
-        {showBars && selectedReaction && !showQuickReactions && !showFullReactions && !showReactionInfo && (
+        {showBars && selectedReaction && !showQuickReactions && !showReactionModal && (
           <Pressable
             style={styles.reactionIndicator}
-            onPress={handleOpenReactionInfo}
+            onPress={handleOpenReactionModal}
           >
             <Text style={styles.reactionIndicatorText}>{selectedReaction}</Text>
           </Pressable>
@@ -1080,132 +1004,23 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
           </View>
         )}
 
-        {/* Modal Completo de Reacoes - TODOS os emojis com scroll */}
-        {showFullReactions && (
-          <View style={styles.reactionModalOverlay}>
+        {/* EmojiPicker para Reacoes - Modal Unificado */}
+        {showReactionModal && (
+          <View style={styles.emojiPickerOverlay}>
             {/* Overlay - fecha ao tocar */}
             <Pressable
-              style={styles.reactionModalBackdrop}
-              onPress={handleCloseFullReactions}
+              style={styles.emojiPickerBackdrop}
+              onPress={handleCloseReactionModal}
             />
-
-            {/* Container do Modal */}
-            <Animated.View
-              style={[
-                styles.reactionModalContainer,
-                { transform: [{ translateY: reactionModalAnim }] },
-              ]}
-            >
-              {/* Header com titulo e botao X */}
-              <View style={styles.reactionModalHeader}>
-                <Text style={styles.reactionModalTitle}>Escolher reação</Text>
-                <Pressable
-                  style={styles.reactionModalCloseBtn}
-                  onPress={handleCloseFullReactions}
-                  hitSlop={8}
-                >
-                  <CloseIconSimple />
-                </Pressable>
-              </View>
-
-              {/* Grid de Emojis com scroll */}
-              <ScrollView
-                style={styles.reactionModalScrollView}
-                showsVerticalScrollIndicator={true}
-                contentContainerStyle={styles.reactionModalScrollContent}
-              >
-                <View style={styles.reactionModalGrid}>
-                  {FULL_REACTION_EMOJIS.map((emoji, index) => (
-                    <TouchableOpacity
-                      key={`full-reaction-${index}`}
-                      style={[
-                        styles.reactionModalBtn,
-                        selectedReaction === emoji && styles.reactionModalBtnSelected,
-                      ]}
-                      onPress={() => handleSelectReaction(emoji)}
-                    >
-                      <Text style={styles.reactionModalText}>{emoji}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </Animated.View>
-          </View>
-        )}
-
-        {/* Modal de Alterar/Remover Reacao - Mostra TODOS os emojis */}
-        {showReactionInfo && (
-          <View style={styles.reactionModalOverlay}>
-            {/* Overlay - fecha ao tocar */}
-            <Pressable
-              style={styles.reactionModalBackdrop}
-              onPress={handleCloseReactionInfo}
-            />
-
-            {/* Container do Modal */}
-            <Animated.View
-              style={[
-                styles.reactionChangeContainer,
-                { transform: [{ translateY: reactionModalAnim }] },
-              ]}
-            >
-              {/* Header com titulo e botao X */}
-              <View style={styles.reactionChangeHeader}>
-                <Text style={styles.reactionChangeTitle}>Alterar reação</Text>
-                <Pressable
-                  style={styles.reactionChangeCloseBtn}
-                  onPress={handleCloseReactionInfo}
-                  hitSlop={8}
-                >
-                  <CloseIconSimple />
-                </Pressable>
-              </View>
-
-              {/* Indicador do emoji atual ou placeholder */}
-              <View style={styles.reactionChangeCurrentContainer}>
-                <Text style={styles.reactionChangeCurrentLabel}>Reação atual:</Text>
-                {selectedReaction ? (
-                  <TouchableOpacity
-                    style={styles.reactionChangeCurrentBadge}
-                    onPress={handleRemoveReaction}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.reactionChangeCurrentEmoji}>{selectedReaction}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <View style={styles.reactionChangePlaceholder}>
-                    <Text style={styles.reactionChangePlaceholderText}>?</Text>
-                  </View>
-                )}
-                <Text style={styles.reactionChangeHint}>
-                  {selectedReaction
-                    ? 'Toque no mesmo emoji para remover'
-                    : 'Selecione um emoji abaixo'}
-                </Text>
-              </View>
-
-              {/* Grid de Emojis com scroll */}
-              <ScrollView
-                style={styles.reactionChangeScrollView}
-                showsVerticalScrollIndicator={true}
-                contentContainerStyle={styles.reactionChangeScrollContent}
-              >
-                <View style={styles.reactionChangeGrid}>
-                  {FULL_REACTION_EMOJIS.map((emoji, index) => (
-                    <TouchableOpacity
-                      key={`change-reaction-${index}`}
-                      style={[
-                        styles.reactionChangeBtn,
-                        selectedReaction === emoji && styles.reactionChangeBtnSelected,
-                      ]}
-                      onPress={() => handleToggleReaction(emoji)}
-                    >
-                      <Text style={styles.reactionChangeText}>{emoji}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </Animated.View>
+            {/* EmojiPicker na parte inferior */}
+            <View style={styles.emojiPickerWrapper}>
+              <EmojiPicker
+                visible={showReactionModal}
+                onClose={handleCloseReactionModal}
+                onSelect={handleToggleReaction}
+                selectedEmoji={selectedReaction}
+              />
+            </View>
           </View>
         )}
       </View>
@@ -1594,355 +1409,33 @@ const styles = StyleSheet.create({
     fontSize: 30,                         //......Tamanho emoji maior
   },
 
-  // Overlay do Modal de Reacoes
-  reactionModalOverlay: {
+  // Overlay do EmojiPicker
+  emojiPickerOverlay: {
     position: 'absolute',                 //......Posicao absoluta
     top: 0,                               //......Topo
     left: 0,                              //......Esquerda
     right: 0,                             //......Direita
     bottom: 0,                            //......Fundo
-    zIndex: 400,                          //......Acima de tudo
+    zIndex: 500,                          //......Acima de tudo
     justifyContent: 'flex-end',           //......Alinha no fundo
   },
 
-  // Backdrop do Modal de Reacoes
-  reactionModalBackdrop: {
+  // Backdrop do EmojiPicker
+  emojiPickerBackdrop: {
     position: 'absolute',                 //......Posicao absoluta
     top: 0,                               //......Topo
     left: 0,                              //......Esquerda
     right: 0,                             //......Direita
     bottom: 0,                            //......Fundo
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', //....Fundo escurecido
   },
 
-  // Container do Modal de Reacoes Completo - Fundo branco, 80% altura
-  reactionModalContainer: {
+  // Wrapper do EmojiPicker
+  emojiPickerWrapper: {
+    width: '100%',                        //......Largura total
     backgroundColor: '#FFFFFF',           //......Fundo branco
-    borderTopLeftRadius: 20,              //......Arredondamento TL
-    borderTopRightRadius: 20,             //......Arredondamento TR
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    height: '80%',                        //......Altura 80% da tela
-  },
-
-  // Header do Modal de Reacoes
-  reactionModalHeader: {
-    flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
-    justifyContent: 'center',             //......Centraliza titulo
-    paddingHorizontal: 16,                //......Padding horizontal
-    paddingTop: 16,                       //......Padding superior
-    paddingBottom: 12,                    //......Padding inferior
-    position: 'relative',                 //......Para posicionar o X
-    borderBottomWidth: 1,                 //......Borda inferior
-    borderBottomColor: '#E5E7EB',         //......Cor da borda cinza claro
-  },
-
-  // Titulo do Modal de Reacoes
-  reactionModalTitle: {
-    fontFamily: 'Inter_600SemiBold',      //......Fonte bold
-    fontSize: 18,                         //......Tamanho fonte
-    color: '#1F2937',                     //......Cor escura
-  },
-
-  // Botao Fechar do Modal de Reacoes
-  reactionModalCloseBtn: {
-    position: 'absolute',                 //......Posicao absoluta
-    right: 16,                            //......Alinha direita
-    top: 16,                              //......Alinha topo
-    padding: 4,                           //......Padding
-  },
-
-  // Handle de arrasto do Modal
-  reactionModalHandle: {
-    width: 40,                            //......Largura
-    height: 4,                            //......Altura
-    backgroundColor: '#D1D5DB',           //......Cor cinza claro
-    borderRadius: 2,                      //......Bordas
-    alignSelf: 'center',                  //......Centraliza
-    marginTop: 12,                        //......Margem superior
-    marginBottom: 16,                     //......Margem inferior
-  },
-
-  // ScrollView do Modal de Reacoes - Flex para ocupar espaco
-  reactionModalScrollView: {
-    flex: 1,                              //......Ocupa espaco disponivel
-  },
-
-  // Conteudo do ScrollView de Reacoes
-  reactionModalScrollContent: {
-    paddingHorizontal: 8,                 //......Padding horizontal
-    paddingVertical: 12,                  //......Padding vertical
-  },
-
-  // Grid de Emojis do Modal Completo
-  reactionModalGrid: {
-    flexDirection: 'row',                 //......Layout horizontal
-    flexWrap: 'wrap',                     //......Quebra linha
-    justifyContent: 'flex-start',         //......Alinha esquerda
-  },
-
-  // Botao de Emoji no Modal Completo
-  reactionModalBtn: {
-    width: '12.5%',                       //......1/8 da largura (8 colunas)
-    aspectRatio: 1,                       //......Quadrado
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-    borderRadius: 8,                      //......Bordas
-  },
-
-  // Botao de Emoji Selecionado
-  reactionModalBtnSelected: {
-    backgroundColor: 'rgba(23, 119, 207, 0.15)',
-    borderWidth: 1,                       //......Borda fina
-    borderColor: '#1777CF',               //......Cor azul
-  },
-
-  // Texto do Emoji no Modal
-  reactionModalText: {
-    fontSize: 28,                         //......Tamanho emoji
-  },
-
-  // Container do Modal de Info da Reacao
-  reactionInfoContainer: {
-    backgroundColor: '#1F1F1F',           //......Fundo escuro
-    borderTopLeftRadius: 20,              //......Arredondamento TL
-    borderTopRightRadius: 20,             //......Arredondamento TR
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    paddingHorizontal: 16,                //......Padding horizontal
-  },
-
-  // Titulo do Modal de Info
-  reactionInfoTitle: {
-    fontFamily: 'Inter_600SemiBold',      //......Fonte bold
-    fontSize: 18,                         //......Tamanho fonte
-    color: '#FFFFFF',                     //......Cor branca
-    textAlign: 'center',                  //......Centraliza
-    marginBottom: 16,                     //......Margem inferior
-  },
-
-  // Tabs de Emojis
-  reactionInfoTabs: {
-    flexDirection: 'row',                 //......Layout horizontal
-    gap: 8,                               //......Espaco entre
-    marginBottom: 16,                     //......Margem inferior
-  },
-
-  // Tab individual
-  reactionInfoTab: {
-    width: 44,                            //......Largura
-    height: 44,                           //......Altura
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-    borderRadius: 22,                     //......Circular
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-
-  // Tab selecionada
-  reactionInfoTabSelected: {
-    flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
-    paddingHorizontal: 12,                //......Padding horizontal
-    height: 44,                           //......Altura
-    borderRadius: 22,                     //......Bordas
-    backgroundColor: '#1D4F45',           //......Fundo verde escuro
-    gap: 4,                               //......Espaco entre
-  },
-
-  // Emoji na Tab selecionada
-  reactionInfoTabEmoji: {
-    fontSize: 20,                         //......Tamanho emoji
-  },
-
-  // Contagem na Tab selecionada
-  reactionInfoTabCount: {
-    fontFamily: 'Inter_500Medium',        //......Fonte media
-    fontSize: 14,                         //......Tamanho fonte
-    color: '#FFFFFF',                     //......Cor branca
-  },
-
-  // Container do Usuario
-  reactionInfoUser: {
-    flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
-    paddingVertical: 12,                  //......Padding vertical
-    gap: 12,                              //......Espaco entre
-  },
-
-  // Avatar do Usuario
-  reactionInfoAvatar: {
-    width: 44,                            //......Largura
-    height: 44,                           //......Altura
-    borderRadius: 22,                     //......Circular
-    backgroundColor: '#1777CF',           //......Fundo azul
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-  },
-
-  // Texto do Avatar
-  reactionInfoAvatarText: {
-    fontFamily: 'Inter_600SemiBold',      //......Fonte bold
-    fontSize: 18,                         //......Tamanho fonte
-    color: '#FFFFFF',                     //......Cor branca
-  },
-
-  // Info do Usuario
-  reactionInfoUserInfo: {
-    flex: 1,                              //......Ocupa espaco
-  },
-
-  // Nome do Usuario
-  reactionInfoUserName: {
-    fontFamily: 'Inter_500Medium',        //......Fonte media
-    fontSize: 16,                         //......Tamanho fonte
-    color: '#FFFFFF',                     //......Cor branca
-  },
-
-  // Dica de remover
-  reactionInfoUserHint: {
-    fontFamily: 'Inter_400Regular',       //......Fonte regular
-    fontSize: 13,                         //......Tamanho fonte
-    color: '#9CA3AF',                     //......Cor cinza
-    marginTop: 2,                         //......Margem superior
-  },
-
-  // Emoji do Usuario
-  reactionInfoUserEmoji: {
-    fontSize: 28,                         //......Tamanho emoji
-  },
-
-  // Container do Modal de Alterar Reacao - Fundo branco, 80% altura
-  reactionChangeContainer: {
-    backgroundColor: '#FFFFFF',           //......Fundo branco
-    borderTopLeftRadius: 20,              //......Arredondamento TL
-    borderTopRightRadius: 20,             //......Arredondamento TR
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    height: '80%',                        //......Altura 80% da tela
-  },
-
-  // Header do Modal de Alterar Reacao
-  reactionChangeHeader: {
-    flexDirection: 'row',                 //......Layout horizontal
-    alignItems: 'center',                 //......Centraliza vertical
-    justifyContent: 'center',             //......Centraliza titulo
-    paddingHorizontal: 16,                //......Padding horizontal
-    paddingTop: 16,                       //......Padding superior
-    paddingBottom: 12,                    //......Padding inferior
-    position: 'relative',                 //......Para posicionar o X
-    borderBottomWidth: 1,                 //......Borda inferior
-    borderBottomColor: '#E5E7EB',         //......Cor da borda cinza claro
-  },
-
-  // Titulo do Modal de Alterar Reacao
-  reactionChangeTitle: {
-    fontFamily: 'Inter_600SemiBold',      //......Fonte bold
-    fontSize: 18,                         //......Tamanho fonte
-    color: '#1F2937',                     //......Cor escura
-  },
-
-  // Botao Fechar do Modal de Alterar
-  reactionChangeCloseBtn: {
-    position: 'absolute',                 //......Posicao absoluta
-    right: 16,                            //......Alinha direita
-    top: 16,                              //......Alinha topo
-    padding: 4,                           //......Padding
-  },
-
-  // Container do Emoji Atual
-  reactionChangeCurrentContainer: {
-    alignItems: 'center',                 //......Centraliza horizontal
-    paddingVertical: 16,                  //......Padding vertical
-    borderBottomWidth: 1,                 //......Borda inferior
-    borderBottomColor: '#E5E7EB',         //......Cor da borda cinza claro
-  },
-
-  // Label do Emoji Atual
-  reactionChangeCurrentLabel: {
-    fontFamily: 'Inter_400Regular',       //......Fonte regular
-    fontSize: 12,                         //......Tamanho fonte
-    color: '#6B7280',                     //......Cor cinza
-    marginBottom: 12,                     //......Margem inferior
-  },
-
-  // Badge do Emoji Atual - Tamanho fixo
-  reactionChangeCurrentBadge: {
-    width: 88,                            //......Largura fixa
-    height: 72,                           //......Altura fixa
-    backgroundColor: 'rgba(23, 119, 207, 0.15)',
-    borderRadius: 12,                     //......Bordas arredondadas
-    borderWidth: 1,                       //......Borda fina
-    borderColor: '#1777CF',               //......Cor azul
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-  },
-
-  // Emoji Atual Grande
-  reactionChangeCurrentEmoji: {
-    fontSize: 48,                         //......Tamanho grande
-  },
-
-  // Placeholder quando nao tem reacao - Mesmo tamanho do badge
-  reactionChangePlaceholder: {
-    width: 88,                            //......Largura fixa igual ao badge
-    height: 72,                           //......Altura fixa igual ao badge
-    borderRadius: 12,                     //......Bordas arredondadas
-    borderWidth: 1,                       //......Borda fina
-    borderColor: '#D1D5DB',               //......Cor cinza
-    borderStyle: 'dashed',                //......Borda tracejada
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-    backgroundColor: '#F9FAFB',           //......Fundo cinza claro
-  },
-
-  // Texto do Placeholder - Mesmo tamanho do emoji
-  reactionChangePlaceholderText: {
-    fontSize: 48,                         //......Tamanho igual ao emoji
-    color: '#D1D5DB',                     //......Cor cinza
-  },
-
-  // Dica de remover
-  reactionChangeHint: {
-    fontFamily: 'Inter_400Regular',       //......Fonte regular
-    fontSize: 12,                         //......Tamanho fonte
-    color: '#6B7280',                     //......Cor cinza
-    marginTop: 12,                        //......Margem superior
-  },
-
-  // ScrollView do Modal de Alterar - Flex para ocupar espaco
-  reactionChangeScrollView: {
-    flex: 1,                              //......Ocupa espaco disponivel
-  },
-
-  // Conteudo do ScrollView
-  reactionChangeScrollContent: {
-    paddingHorizontal: 8,                 //......Padding horizontal
-    paddingVertical: 12,                  //......Padding vertical
-  },
-
-  // Grid de Emojis do Modal de Alterar
-  reactionChangeGrid: {
-    flexDirection: 'row',                 //......Layout horizontal
-    flexWrap: 'wrap',                     //......Quebra linha
-    justifyContent: 'flex-start',         //......Alinha esquerda
-  },
-
-  // Botao de Emoji no Modal de Alterar
-  reactionChangeBtn: {
-    width: '12.5%',                       //......1/8 da largura (8 colunas)
-    aspectRatio: 1,                       //......Quadrado
-    justifyContent: 'center',             //......Centraliza vertical
-    alignItems: 'center',                 //......Centraliza horizontal
-    borderRadius: 8,                      //......Bordas arredondadas
-  },
-
-  // Botao de Emoji Selecionado no Modal de Alterar
-  reactionChangeBtnSelected: {
-    backgroundColor: 'rgba(23, 119, 207, 0.15)',
-    borderWidth: 1,                       //......Borda fina
-    borderColor: '#1777CF',               //......Cor azul
-  },
-
-  // Texto do Emoji no Modal de Alterar
-  reactionChangeText: {
-    fontSize: 28,                         //......Tamanho emoji
+    borderTopLeftRadius: 16,              //......Borda superior esquerda
+    borderTopRightRadius: 16,             //......Borda superior direita
+    overflow: 'hidden',                   //......Esconde overflow
   },
 });

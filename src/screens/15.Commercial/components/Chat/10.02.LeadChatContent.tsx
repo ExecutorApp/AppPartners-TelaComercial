@@ -10,6 +10,7 @@ import React, {
   useState,                               //......Hook de estado
   useCallback,                            //......Hook de callback
   useEffect,                              //......Hook de efeito
+  useRef,                                 //......Hook de ref
 } from 'react';
 import {
   View,                                   //......Container basico
@@ -36,6 +37,7 @@ import {
   ChatInfo,                               //......Info do chat
   WhatsAppMessage,                        //......Interface mensagem
   TextContent,                            //......Conteudo texto
+  DocumentContent,                        //......Conteudo documento
   ReplyInfo,                              //......Info reply
 } from './types/08.types.whatsapp';
 
@@ -51,13 +53,14 @@ import * as Sharing from 'expo-sharing';
 // ========================================
 import ChatHeader from './components/Header/08.01.ChatHeader';
 import MessageList from './components/Messages/08.02.MessageList';
-import InputBar from './components/Input/08.10.InputBar';
+import InputBar, { InputBarRef } from './components/Input/08.10.InputBar';
 import RecordingBar from './components/Input/08.14.RecordingBar';
 import EmojiPicker from './components/Modals/08.15.EmojiPicker';
 import AttachmentMenu from './components/Modals/08.16.AttachmentMenu';
 import ImageViewer from './components/Modals/08.17.ImageViewer';
 import MessageOptions from './components/Modals/08.18.MessageOptions';
 import ShareModal from './components/Modals/08.19.ShareModal';
+import VideoViewer from './components/Modals/08.18.VideoViewer';
 
 // ========================================
 // Imports de Hooks
@@ -120,6 +123,8 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
     deleteMessage,
     updateMessageReaction,
     retryAudioMessage,
+    pausePolling,
+    resumePolling,
   } = useMessages({ leadId, leadPhone, leadName });
 
   // ========================================
@@ -135,15 +140,23 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
   } = useVoiceRecorder();
 
   // ========================================
+  // Ref do InputBar
+  // ========================================
+  const inputBarRef = useRef<InputBarRef>(null);
+
+  // ========================================
   // Estados dos Modais
   // ========================================
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showImageViewer, setShowImageViewer] = useState(false);
+  const [showVideoViewer, setShowVideoViewer] = useState(false);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<WhatsAppMessage | null>(null);
   const [viewerImage, setViewerImage] = useState<string>('');
+  const [viewerVideo, setViewerVideo] = useState<string>('');
+  const [shareUrl, setShareUrl] = useState<string>(''); //......URL para compartilhar
 
   // ========================================
   // Info do Chat
@@ -166,6 +179,18 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
       sendAudioMessage(recordingUri, recordingDuration);
     }
   }, [recordingUri, recordingDuration, sendAudioMessage]);
+
+  // ========================================
+  // Pausar polling quando emoji picker abrir
+  // Evita processamento pesado durante scroll
+  // ========================================
+  useEffect(() => {
+    if (showEmojiPicker) {
+      pausePolling();  //......Pausa polling
+    } else {
+      resumePolling(); //......Retoma polling
+    }
+  }, [showEmojiPicker, pausePolling, resumePolling]);
 
   // ========================================
   // Handler de Voltar
@@ -230,7 +255,7 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
   }, []);
 
   const handleEmojiSelect = useCallback((emoji: string) => {
-    console.log('Emoji selecionado:', emoji);
+    inputBarRef.current?.insertText(emoji);
   }, []);
 
   // ========================================
@@ -295,6 +320,18 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
   }, []);
 
   // ========================================
+  // Handler de Abrir Video no Viewer
+  // ========================================
+  const handleVideoPress = useCallback((videoUrl: string, message?: WhatsAppMessage) => {
+    console.log('[LeadChatContent] handleVideoPress chamado, videoUrl:', videoUrl);
+    console.log('[LeadChatContent] message:', message?.id);
+    setViewerVideo(videoUrl);
+    setSelectedMessage(message || null);
+    setShowVideoViewer(true);
+    console.log('[LeadChatContent] showVideoViewer setado para true');
+  }, []);
+
+  // ========================================
   // Handler de Download Imagem
   // ========================================
   const handleImageDownload = useCallback(async () => {
@@ -348,15 +385,42 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
 
   // ========================================
   // Handler de Encaminhar para Contatos
+  // Suporta URL (texto) e imagem
   // ========================================
   const handleShareForward = useCallback(async (contactIds: string[], message: string) => {
-    setShowShareModal(false);
-    setShowImageViewer(false);
-    setSelectedMessage(null);
+    setShowShareModal(false);  //......Fecha modal
+    setShowImageViewer(false); //......Fecha viewer
+    setSelectedMessage(null);  //......Limpa mensagem selecionada
 
-    if (!instanceName || !viewerImage) return;
+    if (!instanceName) return; //......Precisa da instancia
+
+    // Funcao auxiliar para extrair telefone do contactId
+    const extractPhone = (contactId: string): string => {
+      if (contactId.startsWith('whatsapp_')) {
+        const jidMatch = contactId.match(/whatsapp_(\d+)@/);
+        if (jidMatch) return jidMatch[1];
+      } else if (contactId.startsWith('phone_')) {
+        const parts = contactId.split('_');
+        if (parts.length >= 2) return parts[1];
+      }
+      return '';
+    };
 
     try {
+      // Modo URL: envia texto com o link
+      if (shareUrl) {
+        const textToSend = message ? `${shareUrl}\n${message}` : shareUrl;
+        for (const contactId of contactIds) {
+          const phoneNumber = extractPhone(contactId);
+          if (!phoneNumber) continue;
+          await evolutionService.sendText(instanceName, phoneNumber, textToSend);
+        }
+        setShareUrl(''); //......Limpa URL apos envio
+        return;
+      }
+
+      // Modo imagem: envia imagem com legenda
+      if (!viewerImage) return;
       let imageData = viewerImage;
       if (viewerImage.startsWith('blob:')) {
         const response = await fetch(viewerImage);
@@ -374,22 +438,14 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
       }
 
       for (const contactId of contactIds) {
-        let phoneNumber = '';
-        if (contactId.startsWith('whatsapp_')) {
-          const jidMatch = contactId.match(/whatsapp_(\d+)@/);
-          if (jidMatch) phoneNumber = jidMatch[1];
-        } else if (contactId.startsWith('phone_')) {
-          const parts = contactId.split('_');
-          if (parts.length >= 2) phoneNumber = parts[1];
-        }
+        const phoneNumber = extractPhone(contactId);
         if (!phoneNumber) continue;
-
         await evolutionService.sendImage(instanceName, phoneNumber, imageData, message || undefined);
       }
     } catch (error) {
       console.error('Erro no encaminhamento:', error);
     }
-  }, [viewerImage, instanceName]);
+  }, [viewerImage, shareUrl, instanceName]);
 
   // ========================================
   // Handler de Responder Imagem
@@ -456,6 +512,145 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
   }, [selectedMessage, updateMessageReaction, instanceName]);
 
   // ========================================
+  // Handler de Download Video
+  // ========================================
+  const handleVideoDownload = useCallback(async () => {
+    if (!viewerVideo) return;
+
+    try {
+      if (Platform.OS === 'web') {
+        const timestamp = Date.now();
+        const fileName = `video_${timestamp}.mp4`;
+
+        if (viewerVideo.startsWith('blob:') || viewerVideo.startsWith('data:')) {
+          const link = document.createElement('a');
+          link.href = viewerVideo;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          const response = await fetch(viewerVideo);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+        }
+      } else {
+        const timestamp = Date.now();
+        const fileName = `video_${timestamp}.mp4`;
+        const fileUri = FileSystem.documentDirectory + fileName;
+        const downloadResult = await FileSystem.downloadAsync(viewerVideo, fileUri);
+        const isSharingAvailable = await Sharing.isAvailableAsync();
+        if (isSharingAvailable) {
+          await Sharing.shareAsync(downloadResult.uri);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao baixar video:', error);
+    }
+  }, [viewerVideo]);
+
+  // ========================================
+  // Handler de Compartilhar Video
+  // ========================================
+  const handleVideoShare = useCallback(() => {
+    console.log('Compartilhar video');
+  }, []);
+
+  // ========================================
+  // Handler de Excluir Video
+  // ========================================
+  const handleVideoDelete = useCallback(() => {
+    if (!selectedMessage) return;
+    deleteMessage(selectedMessage.id);
+    setShowVideoViewer(false);
+    setSelectedMessage(null);
+  }, [selectedMessage, deleteMessage]);
+
+  // ========================================
+  // Handler de Reacao no Video
+  // ========================================
+  const handleVideoReaction = useCallback(async (reaction: string | null) => {
+    if (!selectedMessage) return;
+    updateMessageReaction(selectedMessage.id, reaction);
+
+    if (selectedMessage.messageKey && instanceName) {
+      try {
+        const emojiToSend = reaction ?? '';
+        await evolutionService.sendReaction(instanceName, selectedMessage.messageKey, emojiToSend);
+      } catch (error) {
+        console.error('Erro ao enviar reacao:', error);
+      }
+    }
+  }, [selectedMessage, updateMessageReaction, instanceName]);
+
+  // ========================================
+  // Handler de Encaminhar Link via ShareModal
+  // ========================================
+  const handleLinkForwardPress = useCallback((url: string) => {
+    setShareUrl(url);           //......Guarda URL para envio
+    setShowShareModal(true);    //......Abre modal de compartilhamento
+  }, []);
+
+  // ========================================
+  // Handler de Swipe Reply
+  // Cria ReplyInfo a partir da mensagem e ativa reply
+  // ========================================
+  const handleSwipeReply = useCallback((message: WhatsAppMessage) => {
+    let previewText = '';                 //......Preview do conteudo
+    switch (message.type) {
+      case 'text':                        //......Texto
+        previewText = (message.content as TextContent).text;
+        break;
+      case 'audio':                       //......Audio
+        previewText = 'Mensagem de áudio';
+        break;
+      case 'image':                       //......Imagem
+        previewText = 'Foto';
+        break;
+      case 'video':                       //......Video
+        previewText = 'Vídeo';
+        break;
+      case 'document':                    //......Documento
+        previewText = (message.content as DocumentContent).fileName || 'Documento';
+        break;
+      default:                            //......Padrao
+        previewText = 'Mensagem';
+    }
+    // Nome no formato WhatsApp: nome salvo ou +telefone ~pushName
+    let senderName = 'Você';             //......Padrao outgoing
+    if (message.direction !== 'outgoing') {
+      const isNameSaved = leadName && !/^[\d\s\+\-\(\)]+$/.test(leadName.trim());
+      if (isNameSaved) {
+        senderName = leadName;            //......Nome salvo na agenda
+      } else {
+        const clean = leadPhone.replace(/\D/g, '');
+        const phone = clean.length === 13 && clean.startsWith('55')
+          ? `+${clean.slice(0,2)} ${clean.slice(2,4)} ${clean.slice(4,9)}-${clean.slice(9)}`
+          : clean.length === 12 && clean.startsWith('55')
+            ? `+${clean.slice(0,2)} ${clean.slice(2,4)} ${clean.slice(4,8)}-${clean.slice(8)}`
+            : leadPhone.startsWith('+') ? leadPhone : `+${leadPhone}`;
+        const pushName = message.senderName && message.senderName !== 'Contato' ? message.senderName : undefined;
+        senderName = pushName ? `${phone} ~${pushName}` : phone;
+      }
+    }
+    const replyInfo: ReplyInfo = {
+      messageId: message.id,              //......ID da mensagem
+      senderName,                         //......Nome formatado
+      content: previewText.substring(0, 100),
+      type: message.type,                 //......Tipo da mensagem
+      messageKey: message.messageKey,     //......Chave para quoted reply na API
+    };
+    setReplyTo(replyInfo);                //......Ativa reply no input
+  }, [setReplyTo, leadName, leadPhone]);
+
+  // ========================================
   // Handler de Reply
   // ========================================
   const handleReply = useCallback(() => {
@@ -465,6 +660,7 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
       senderName: selectedMessage.senderName || 'Voce',
       content: selectedMessage.type === 'text' ? (selectedMessage.content as TextContent).text : '',
       type: selectedMessage.type,
+      messageKey: selectedMessage.messageKey,
     };
     setReplyTo(replyInfo);
     setShowMessageOptions(false);
@@ -537,6 +733,33 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
         />
       )}
 
+      {/* ========================================
+          Camada de Opacidade Branca
+          ========================================
+          AJUSTE MANUAL: Altere o valor de opacity para clarear/escurecer o fundo
+          - opacity: 0.1 = 10% branco (quase transparente)
+          - opacity: 0.3 = 30% branco (recomendado)
+          - opacity: 0.5 = 50% branco (mais claro)
+          - opacity: 0.7 = 70% branco (bem claro)
+          ======================================== */}
+      {Platform.OS === 'web' ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#FFFFFF',
+            opacity: 0.3,                         // AJUSTE: 30% de opacidade
+            zIndex: 1,
+            pointerEvents: 'none',
+          }}
+        />
+      ) : (
+        <View style={styles.whiteOverlay} />
+      )}
+
       {/* Header */}
       <View style={styles.headerWrapper}>
         <ChatHeader
@@ -554,7 +777,10 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
             messages={messages}
             onMessageLongPress={handleMessageLongPress}
             onImagePress={handleImagePress}
+            onVideoPress={handleVideoPress}
             onAudioRetry={retryAudioMessage}
+            onForwardPress={handleLinkForwardPress}
+            onSwipeReply={handleSwipeReply}
           />
         </View>
       </View>
@@ -574,6 +800,7 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
             />
           ) : (
             <InputBar
+              ref={inputBarRef}
               onSendMessage={handleSendMessage}
               onVoiceStart={handleVoiceStart}
               onVoiceEnd={handleVoiceEnd}
@@ -596,6 +823,13 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
             onSelectEmoji={handleEmojiPress}
           />
         </KeyboardAvoidingView>
+
+        {/* Emoji Picker como painel abaixo do input */}
+        <EmojiPicker
+          visible={showEmojiPicker}
+          onClose={() => setShowEmojiPicker(false)}
+          onSelect={handleEmojiSelect}
+        />
       </View>
 
       {/* Overlay para fechar AttachmentMenu */}
@@ -607,12 +841,6 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
       )}
 
       {/* Modais */}
-      <EmojiPicker
-        visible={showEmojiPicker}
-        onClose={() => setShowEmojiPicker(false)}
-        onSelect={handleEmojiSelect}
-      />
-
       <ImageViewer
         visible={showImageViewer}
         imageUrl={viewerImage}
@@ -629,6 +857,22 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
         onDelete={handleImageDelete}
         onReaction={handleImageReaction}
         onSendReply={handleImageViewerSendReply}
+      />
+
+      <VideoViewer
+        visible={showVideoViewer}
+        videoUrl={viewerVideo}
+        senderName={selectedMessage?.senderName}
+        timestamp={selectedMessage?.timestamp}
+        currentReaction={selectedMessage?.reaction}
+        onClose={() => {
+          setShowVideoViewer(false);
+          setSelectedMessage(null);
+        }}
+        onDownload={handleVideoDownload}
+        onShare={handleVideoShare}
+        onDelete={handleVideoDelete}
+        onReaction={handleVideoReaction}
       />
 
       <MessageOptions
@@ -648,7 +892,7 @@ const LeadChatContent: React.FC<LeadChatContentProps> = ({
         visible={showShareModal}
         imageUrl={viewerImage}
         instanceName={instanceName}
-        onClose={() => setShowShareModal(false)}
+        onClose={() => { setShowShareModal(false); setShareUrl(''); }}
         onForward={handleShareForward}
       />
     </View>
@@ -695,6 +939,26 @@ const styles = StyleSheet.create({
     width: '100%',                        //......Largura total
     height: '100%',                       //......Altura total
     zIndex: 0,                            //......Atras de tudo
+  },
+
+  // Camada de opacidade branca sobre o fundo
+  // ========================================
+  // AJUSTE MANUAL: Altere 'opacity' para clarear/escurecer
+  // opacity: 0.1 = Quase transparente
+  // opacity: 0.3 = Recomendado (30% branco)
+  // opacity: 0.5 = Mais claro
+  // opacity: 0.7 = Bem claro
+  // ========================================
+  whiteOverlay: {
+    position: 'absolute',                 //......Posicao absoluta
+    top: 0,                               //......Topo
+    left: 0,                              //......Esquerda
+    right: 0,                             //......Direita
+    bottom: 0,                            //......Fundo
+    backgroundColor: '#FFFFFF',           //......Cor branca
+    opacity: 0.3,                         //......AJUSTE: 30% de opacidade
+    zIndex: 1,                            //......Acima do background
+    pointerEvents: 'none',                //......Nao captura toques
   },
 
   // Conteudo das mensagens

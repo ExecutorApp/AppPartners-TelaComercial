@@ -12,6 +12,7 @@ export type MessageType =
   | 'text'                            //......Mensagem de texto
   | 'audio'                           //......Mensagem de audio
   | 'image'                           //......Mensagem de imagem
+  | 'video'                           //......Mensagem de video
   | 'document'                        //......Mensagem de documento
   | 'deleted';                        //......Mensagem deletada
 
@@ -32,9 +33,20 @@ export type MessageDirection =
 // Interfaces de Conteudo
 // ========================================
 
+// Dados de preview de link (OG metadata do WhatsApp)
+export interface LinkPreview {
+  url: string;                        //......URL do link
+  title?: string;                     //......Titulo OG da pagina
+  description?: string;               //......Descricao OG da pagina
+  thumbnail?: string;                 //......Thumbnail base64 ou URL
+  siteName?: string;                  //......Nome do site
+  previewType?: number;               //......Tipo: 0 = padrao, 1 = video
+}
+
 // Conteudo de texto
 export interface TextContent {
   text: string;                       //......Texto da mensagem
+  linkPreview?: LinkPreview;          //......Preview de link opcional
 }
 
 // Conteudo de audio
@@ -54,6 +66,17 @@ export interface ImageContent {
   caption?: string;                   //......Legenda opcional
 }
 
+// Conteudo de video
+export interface VideoContent {
+  url: string;                        //......URL do video
+  thumbnail?: string;                 //......URL da miniatura
+  width: number;                      //......Largura em pixels
+  height: number;                     //......Altura em pixels
+  duration?: number;                  //......Duracao em segundos
+  mimeType?: string;                  //......Tipo MIME do video
+  caption?: string;                   //......Legenda opcional
+}
+
 // Conteudo de documento
 export interface DocumentContent {
   url: string;                        //......URL do documento
@@ -68,6 +91,7 @@ export type MessageContent =
   | TextContent                       //......Conteudo texto
   | AudioContent                      //......Conteudo audio
   | ImageContent                      //......Conteudo imagem
+  | VideoContent                      //......Conteudo video
   | DocumentContent;                  //......Conteudo documento
 
 // ========================================
@@ -78,6 +102,9 @@ export interface ReplyInfo {
   senderName: string;                 //......Nome do remetente
   content: string;                    //......Preview do conteudo
   type: MessageType;                  //......Tipo da mensagem
+  thumbnail?: string;                 //......Thumbnail base64 do link preview
+  linkUrl?: string;                   //......URL do link na mensagem citada
+  messageKey?: MessageKey;            //......Chave da mensagem para quoted reply
 }
 
 // ========================================
@@ -151,10 +178,29 @@ export const isAudioContent = (
 };
 
 // Verifica se e conteudo de imagem
+// Imagem nao tem mimeType nem duration do video
 export const isImageContent = (
   content: MessageContent
 ): content is ImageContent => {
-  return 'width' in content && 'height' in content;
+  return (
+    'width' in content &&
+    'height' in content &&
+    !('mimeType' in content) &&           //......Nao tem mimeType (diferencia de video)
+    !('fileName' in content)              //......Nao e documento
+  );
+};
+
+// Verifica se e conteudo de video
+// Video sempre tem mimeType quando enviado
+export const isVideoContent = (
+  content: MessageContent
+): content is VideoContent => {
+  return (
+    'width' in content &&
+    'height' in content &&
+    'mimeType' in content &&              //......Tem mimeType (video)
+    !('fileName' in content)              //......Nao e documento
+  );
 };
 
 // Verifica se e conteudo de documento
